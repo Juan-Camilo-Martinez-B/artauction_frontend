@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Fraunces, Source_Sans_3 } from 'next/font/google';
+import { SiteFooter } from '@/components/site-footer';
+import { SiteHeader } from '@/components/site-header';
 import './globals.css';
 
 const serif = Fraunces({ subsets: ['latin'], variable: '--font-serif' });
@@ -17,9 +19,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#contenido" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:bg-white focus:px-3 focus:py-2">
           Saltar al contenido
         </a>
+        <SiteHeader />
         <main id="contenido" className="mx-auto max-w-6xl px-4 py-10">
           {children}
         </main>
+        <SiteFooter />
       </body>
     </html>
   );
