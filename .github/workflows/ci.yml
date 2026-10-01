@@ -13,4 +13,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # TODO(fase-3): npm ci, eslint, tsc --noEmit, vitest y smoke de Playwright.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Smoke
+        run: npm run test:e2e
+        env:
+          CI: true
