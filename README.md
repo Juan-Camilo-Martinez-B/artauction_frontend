@@ -4,7 +4,7 @@ Cliente web de **ArtAuction AI**: subastas de arte y antigüedades en tiempo rea
 
 Este directorio es un repositorio Git independiente. No importa código de `artauction-backend` ni de `artauction-database` por ruta relativa. La integración es solo por contratos versionados:
 
-- HTTP: cliente TypeScript generado desde el OpenAPI que publica el backend.
+- HTTP: cliente TypeScript alineado con el OpenAPI v1 que publica el backend.
 - Tiempo real: catálogo de eventos WebSocket versionado (Socket.IO).
 
 ## Responsabilidad
@@ -35,17 +35,17 @@ Nada que tarde más de unos 50 ms corre en el hilo principal. Los mensajes de lo
 ## Estructura
 
 ```
-src/app/(public)     páginas estáticas y catálogo público
+src/app/(public)     landing, catálogo, obra, sala y galería pública
 src/app/(auth)       registro e inicio de sesión
-src/app/(private)    perfil, galería privada y sala autenticada
+src/app/(private)    perfil, publicar, galería, feed y avisos
 src/app/admin        panel de revisión manual
+src/app/api          cookie de refresh y revalidateTag
 src/components       piezas de interfaz compartidas
-src/features         auctions, catalog, gallery, auth
-src/workers          image-worker, auction-socket-worker, catalog-worker
-src/lib/api          cliente generado desde OpenAPI
+src/workers          imagen, subasta y catálogo
+src/lib/api          cliente HTTP de la API v1
 src/lib/ws           tipos del catálogo de eventos
-src/hooks            estado de UI y suscripción al worker de subasta
-tests                pruebas de componentes, workers y e2e
+src/hooks            filtro, imagen y canal de subasta
+tests                pruebas de unidad y smoke e2e
 ```
 
 ## Convenciones
@@ -65,6 +65,20 @@ Copia `.env.example` a `.env.local`. `NEXT_PUBLIC_*` llega al navegador; el rest
 
 El `Dockerfile` es multi-stage y publica el output `standalone` en el puerto `8080` (Cloud Run). La imagen se puede construir cuando existan `package.json` y el build de Next.js.
 
+## Rutas
+
+| Ruta | Render |
+|---|---|
+| `/` y `/como-funciona` | SSG |
+| `/catalogo` | ISR 60 s, tag `catalog` |
+| `/galerias/[ownerId]` | ISR 60 s, tags `gallery` y `gallery:{ownerId}` |
+| `/obras/[id]` | SSR con `Suspense` (ficha y puntaje por separado) |
+| `/subasta/[id]` | Esqueleto SSR y sala en cliente |
+| `/entrar` y `/registro` | Cliente. El access token queda en `sessionStorage`; el refresh, en cookie `httpOnly` |
+| `/perfil`, `/galeria`, `/publicar`, `/feed`, `/notificaciones` | Cliente, `Cache-Control: private, no-store` |
+| `/admin` | Cliente, sin caché compartida |
+| `POST /api/revalidate` | Invalida tags con el header `x-revalidate-secret` |
+
 ## Estado
 
-Fase 0: andamiaje del repositorio. La aplicación, los workers y las pruebas llegan en la fase de frontend.
+Fase 3: aplicación Next.js con workers, sala en vivo, catálogo ISR y smoke de puja. El despliegue a Cloud Run queda para la fase de infraestructura.
