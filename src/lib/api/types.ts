@@ -2,6 +2,8 @@ export interface AuthUser {
   userId: string;
   email: string;
   role: string;
+  displayName?: string;
+  avatarUrl?: string | null;
 }
 
 export interface TokenPair {
@@ -15,6 +17,7 @@ export interface LotImage {
   objectKey: string;
   position: number;
   perceptualHash: string | null;
+  url?: string | null;
 }
 
 export interface AuditSummary {

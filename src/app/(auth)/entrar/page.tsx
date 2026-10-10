@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, type SubmitEvent } from 'react';
+import { useEffect, useState, type SubmitEvent } from 'react';
 import { Field, FormError } from '@/components/field';
 import { ApiError, artApi } from '@/lib/api/client';
-import { writeAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,18 +13,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    void browserSession.restore().then(() => {
+      if (browserSession.current().status === 'authenticated') {
+        router.replace('/catalogo');
+      }
+    });
+  }, [router]);
+
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     try {
       const tokens = await artApi.login(email, password);
-      writeAccessToken(tokens.accessToken);
-      await fetch('/api/session', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ refreshToken: tokens.refreshToken }),
-      });
-      router.push('/perfil');
+      await browserSession.establish(tokens);
+      router.push('/catalogo');
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'No se pudo entrar.');
     }

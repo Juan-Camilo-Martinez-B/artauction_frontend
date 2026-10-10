@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, type SubmitEvent } from 'react';
 import { Field, FormError } from '@/components/field';
 import { ApiError, artApi } from '@/lib/api/client';
-import { writeAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function RegisterPage() {
         role: seller ? 'SELLER' : 'USER',
       });
       const tokens = await artApi.login(email, password);
-      writeAccessToken(tokens.accessToken);
+      await browserSession.establish(tokens);
       router.push(seller ? '/publicar' : '/catalogo');
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'No se pudo crear la cuenta.');

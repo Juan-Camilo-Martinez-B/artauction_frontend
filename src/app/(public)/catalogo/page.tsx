@@ -14,6 +14,8 @@ export default async function CatalogPage({
   const query = first(params['q']);
   const category = first(params['category']);
   const representation = first(params['representation']);
+  const page = Math.max(1, Number(first(params['page'])) || 1);
+  const pageSize = 60;
   const search = new URLSearchParams();
   if (query) {
     search.set('q', query);
@@ -24,6 +26,8 @@ export default async function CatalogPage({
   if (representation) {
     search.set('representation', representation);
   }
+  search.set('page', String(page));
+  search.set('pageSize', String(pageSize));
   const suffix = search.size > 0 ? `?${search.toString()}` : '';
   const [{ catalog, error }, categories] = await Promise.all([getPublicLots(suffix), getCategories()]);
 
@@ -44,6 +48,8 @@ export default async function CatalogPage({
         query={query}
         representation={representation}
         total={catalog.total}
+        page={catalog.page}
+        pageSize={catalog.pageSize}
       />
     </section>
   );

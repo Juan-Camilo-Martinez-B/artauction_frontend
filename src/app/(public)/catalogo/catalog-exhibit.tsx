@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ArtworkImage } from '@/components/artwork-image';
 import type { Category, Lot } from '@/lib/api/types';
 
 export function CatalogExhibit({
@@ -8,6 +9,8 @@ export function CatalogExhibit({
   query,
   representation,
   total,
+  page,
+  pageSize,
 }: {
   lots: Lot[];
   categories: Category[];
@@ -15,6 +18,8 @@ export function CatalogExhibit({
   query: string;
   representation: string;
   total: number;
+  page: number;
+  pageSize: number;
 }) {
   const featured = [...lots].sort((left, right) => (right.authenticityScore ?? 0) - (left.authenticityScore ?? 0))[0];
   const rest = lots.filter((lot) => lot.id !== featured?.id);
@@ -84,6 +89,7 @@ export function CatalogExhibit({
         ))}
       </div>
       <p className="mt-8 text-sm text-muted">{total} obras en esta selección.</p>
+      <CatalogPager page={page} pageSize={pageSize} total={total} query={query} category={activeCategory} representation={representation} />
     </div>
   );
 }
@@ -106,14 +112,11 @@ function WorkSurface({ lot, featured = false }: { lot: Lot; featured?: boolean }
   return (
     <Link
       href={`/obras/${lot.id}`}
-      className={`relative block overflow-hidden bg-white ${featured ? 'min-h-72' : threeD ? 'aspect-square' : 'aspect-[3/4]'}`}
+      className="relative block w-full overflow-hidden border border-line bg-paper"
       aria-label={lot.title}
     >
-      <span
-        className="absolute inset-6 border border-line"
-        style={{ background: threeD ? 'radial-gradient(circle at 50% 70%, #efe6d6, #d8d0c2 70%)' : 'linear-gradient(160deg, #f7f1e6, #e4d5c3)' }}
-      />
-      {threeD ? <span className="absolute bottom-8 left-1/2 h-16 w-10 -translate-x-1/2 bg-ink/80" aria-hidden="true" /> : null}
+      <ArtworkImage src={lot.images?.[0]?.url ?? null} alt="" featured={featured} />
+      {threeD && !lot.images?.[0]?.url ? <span className="absolute bottom-8 left-1/2 h-16 w-10 -translate-x-1/2 bg-ink/80" aria-hidden="true" /> : null}
       <span className="absolute left-3 top-3 bg-paper/90 px-2 py-1 text-[10px] uppercase tracking-wider">
         {threeD ? 'Objeto' : 'Obra mural'}
         {primary ? ` · ${primary}` : ''}
@@ -124,6 +127,42 @@ function WorkSurface({ lot, featured = false }: { lot: Lot; featured?: boolean }
 
 function featuredLabel(lot: Lot): string {
   return lot.categories?.find((link) => link.isPrimary)?.category.name ?? 'Sin categoría';
+}
+
+function CatalogPager({
+  page,
+  pageSize,
+  total,
+  query,
+  category,
+  representation,
+}: {
+  page: number;
+  pageSize: number;
+  total: number;
+  query: string;
+  category: string;
+  representation: string;
+}) {
+  const pages = Math.max(1, Math.ceil(total / Math.max(pageSize, 1)));
+  if (pages <= 1) {
+    return null;
+  }
+  return (
+    <nav aria-label="Páginas del catálogo" className="mt-4 flex items-center gap-3 text-sm">
+      {page > 1 ? <Link href={pageHref(page - 1, category, query, representation)}>Anterior</Link> : null}
+      <span>
+        Página {page} de {pages}
+      </span>
+      {page < pages ? <Link href={pageHref(page + 1, category, query, representation)}>Siguiente</Link> : null}
+    </nav>
+  );
+}
+
+function pageHref(page: number, category: string, query: string, representation: string): string {
+  const href = hrefFor(category, query, representation);
+  const joiner = href.includes('?') ? '&' : '?';
+  return `${href}${joiner}page=${String(page)}`;
 }
 
 function hrefFor(category: string, query: string, representation: string): string {

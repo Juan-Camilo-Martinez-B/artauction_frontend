@@ -29,7 +29,7 @@ export function AddToGalleryButton({ lotId }: { lotId: string }) {
   }
 
   return (
-    <div className="mt-6">
+    <div>
       <button
         type="button"
         onClick={() => void add()}

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SessionNav } from './session-nav';
+import { AccountMenu } from './account/account-menu';
 
 const links = [
   { href: '/catalogo', label: 'Catálogo' },
@@ -20,7 +20,7 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
-          <SessionNav />
+          <AccountMenu />
         </nav>
       </div>
     </header>

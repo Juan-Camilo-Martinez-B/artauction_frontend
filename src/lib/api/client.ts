@@ -84,6 +84,9 @@ export const artApi = {
   me(token: string) {
     return api<AuthUser>('/auth/me', { token });
   },
+  updateMe(token: string, input: { displayName: string; avatarUrl?: string }) {
+    return api<AuthUser>('/auth/me', { method: 'PATCH', token, body: JSON.stringify(input) });
+  },
   lots(query = '') {
     return api<CatalogPage>(`/lots${query}`);
   },
