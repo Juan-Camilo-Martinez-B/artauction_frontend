@@ -28,6 +28,26 @@ export interface AuditSummary {
   promptVersion: string;
 }
 
+export interface LotCategoryLink {
+  isPrimary: boolean;
+  category: { id: string; name: string; slug: string };
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  active: boolean;
+}
+
+export interface CatalogPage {
+  items: Lot[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 export interface Lot {
   id: string;
   sellerId: string;
@@ -36,6 +56,10 @@ export interface Lot {
   artistName: string | null;
   creationYear: number | null;
   materials: string;
+  widthCm?: string | null;
+  heightCm?: string | null;
+  depthCm?: string | null;
+  representationKind?: 'TWO_D' | 'THREE_D' | 'OTHER' | null;
   status: string;
   visibility: string;
   authenticityScore: number | null;
@@ -44,6 +68,7 @@ export interface Lot {
   currency: string;
   images?: LotImage[];
   auditSummaries?: AuditSummary[];
+  categories?: LotCategoryLink[];
   auction?: { id: string; status: string; currentPrice: string; endsAt: string } | null;
 }
 
@@ -114,4 +139,41 @@ export interface SignedUpload {
   uploadUrl: string;
   objectKey: string;
   expiresAt: string;
+}
+
+export interface GalleryConfig {
+  schemaVersion: 1;
+  source: 'ai-local' | 'gemini' | 'manual' | 'random';
+  identity: { styleName: string; summary: string; artStyles: string[] };
+  architecture: {
+    spaceType: string;
+    roomWidth: number;
+    roomDepth: number;
+    roomHeight: number;
+    zones: number;
+  };
+  palette: { wall: string; floor: string; ceiling: string; accent: string; pedestal: string };
+  materials: { wall: string; floor: string; sculptureSupport: string };
+  lighting: { ambientIntensity: number; colorTemperature: number; spotIntensity: number; mood: string };
+  navigation: { tour: string; approach: string; motion: string };
+}
+
+export interface PersonalGallery {
+  id: string;
+  name: string;
+  customizationStatus: 'SIN_PERSONALIZAR' | 'PERSONALIZADA' | 'EDITADA';
+  preferences: Record<string, unknown>;
+  suggestedConfig: GalleryConfig | null;
+  appliedConfig: GalleryConfig | null;
+  artworks: Array<{
+    id: string;
+    lotId: string;
+    posX: number;
+    posY: number;
+    posZ: number;
+    rotY: number;
+    scale: number;
+    support: string;
+    lot: Lot;
+  }>;
 }

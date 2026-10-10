@@ -76,6 +76,8 @@ El `Dockerfile` es multi-stage y publica el output `standalone` en el puerto `80
 | `/subasta/[id]` | Esqueleto SSR y sala en cliente |
 | `/entrar` y `/registro` | Cliente. El access token queda en `sessionStorage`; el refresh, en cookie `httpOnly` |
 | `/perfil`, `/galeria`, `/publicar`, `/feed`, `/notificaciones` | Cliente, `Cache-Control: private, no-store` |
+| `/mi-galeria` | Sala 3D personal. Three.js aplica colores, luz y obras guardadas |
+| `/mi-galeria/personalizar` | Asistente «Personaliza tu galería» |
 | `/admin` | Cliente, sin caché compartida |
 | `POST /api/revalidate` | Invalida tags con el header `x-revalidate-secret` |
 

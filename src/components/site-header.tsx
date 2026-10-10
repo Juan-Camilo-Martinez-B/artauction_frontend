@@ -3,6 +3,7 @@ import { SessionNav } from './session-nav';
 
 const links = [
   { href: '/catalogo', label: 'Catálogo' },
+  { href: '/mi-galeria', label: 'Mi galería' },
   { href: '/como-funciona', label: 'Cómo funciona' },
 ];
 

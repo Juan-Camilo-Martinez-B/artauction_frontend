@@ -3,6 +3,7 @@ import { StatusPill } from '@/components/status-pill';
 import { ScoreRing } from '@/components/score-ring';
 import { formatMoney } from '@/lib/money';
 import type { Lot } from '@/lib/api/types';
+import { AddToGalleryButton } from './add-to-gallery';
 
 export async function LotBody({ promise }: { promise: Promise<Lot | null> }) {
   const lot = await promise;
@@ -27,6 +28,11 @@ export async function LotBody({ promise }: { promise: Promise<Lot | null> }) {
           </dd>
         </div>
       </dl>
+      <p className="mt-4 text-sm text-muted">
+        {lot.categories?.find((link) => link.isPrimary)?.category.name ?? 'Sin categoría'} ·{' '}
+        {lot.representationKind === 'THREE_D' ? 'Objeto tridimensional' : lot.representationKind === 'TWO_D' ? 'Obra bidimensional' : 'Formato sin clasificar'}
+      </p>
+      <AddToGalleryButton lotId={lot.id} />
       {lot.auction && lot.status === 'EN_SUBASTA' ? (
         <Link href={`/subasta/${lot.auction.id}`} className="mt-8 inline-block rounded-full bg-ink px-5 py-2 text-paper">
           Entrar a la sala

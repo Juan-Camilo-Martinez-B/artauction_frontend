@@ -1,17 +1,31 @@
 import { artApi, publicApiUrl } from './client';
-import type { GalleryItem, Lot } from './types';
+import type { CatalogPage, Category, GalleryItem, Lot } from './types';
 
-export async function getPublicLots(): Promise<{ lots: Lot[]; error: string | null }> {
+export async function getPublicLots(query = ''): Promise<{ catalog: CatalogPage; error: string | null }> {
   try {
-    const response = await fetch(`${serverApiUrl()}/lots`, {
+    const response = await fetch(`${serverApiUrl()}/lots${query}`, {
       next: { revalidate: 60, tags: ['catalog'] },
     });
     if (!response.ok) {
-      return { lots: [], error: 'El catálogo no está disponible.' };
+      return { catalog: { items: [], total: 0, page: 1, pageSize: 12 }, error: 'El catálogo no está disponible.' };
     }
-    return { lots: (await response.json()) as Lot[], error: null };
+    return { catalog: (await response.json()) as CatalogPage, error: null };
   } catch {
-    return { lots: [], error: 'No hay conexión con la sala.' };
+    return { catalog: { items: [], total: 0, page: 1, pageSize: 12 }, error: 'No hay conexión con la sala.' };
+  }
+}
+
+export async function getCategories(): Promise<Category[]> {
+  try {
+    const response = await fetch(`${serverApiUrl()}/lots/categories`, {
+      next: { revalidate: 60, tags: ['catalog'] },
+    });
+    if (!response.ok) {
+      return [];
+    }
+    return (await response.json()) as Category[];
+  } catch {
+    return [];
   }
 }
 

@@ -2,9 +2,12 @@ import type {
   ActivityItem,
   AuctionView,
   AuthUser,
+  CatalogPage,
+  Category,
   GalleryItem,
   Lot,
   NotificationItem,
+  PersonalGallery,
   PlacedBid,
   SignedUpload,
   TokenPair,
@@ -81,8 +84,14 @@ export const artApi = {
   me(token: string) {
     return api<AuthUser>('/auth/me', { token });
   },
-  lots() {
-    return api<Lot[]>('/lots');
+  lots(query = '') {
+    return api<CatalogPage>(`/lots${query}`);
+  },
+  categories() {
+    return api<Category[]>('/lots/categories');
+  },
+  relatedLots(id: string) {
+    return api<Lot[]>(`/lots/${id}/related`);
   },
   lot(id: string, token?: string | null) {
     return api<Lot>(`/lots/${id}`, { token });
@@ -136,5 +145,27 @@ export const artApi = {
   },
   resolveLot(token: string, lotId: string, verdict: 'APROBADO' | 'BORRADOR') {
     return api<Lot>(`/admin/lots/${lotId}/resolve`, { method: 'POST', token, body: JSON.stringify({ verdict }) });
+  },
+  myGallery(token: string) {
+    return api<PersonalGallery>('/me/gallery', { token });
+  },
+  generateGallery(token: string, preferences: unknown, random = false, replaceApplied = false) {
+    return api<PersonalGallery>('/me/gallery/generate', {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ preferences, random, replaceApplied }),
+    });
+  },
+  saveGalleryConfig(token: string, config: unknown) {
+    return api<PersonalGallery>('/me/gallery/config', { method: 'PATCH', token, body: JSON.stringify(config) });
+  },
+  restoreGallery(token: string) {
+    return api<PersonalGallery>('/me/gallery/restore', { method: 'POST', token });
+  },
+  addToGallery(token: string, lotId: string) {
+    return api<PersonalGallery>('/me/gallery/artworks', { method: 'POST', token, body: JSON.stringify({ lotId }) });
+  },
+  removeFromGallery(token: string, lotId: string) {
+    return api<PersonalGallery>(`/me/gallery/artworks/${lotId}`, { method: 'DELETE', token });
   },
 };
