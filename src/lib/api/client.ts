@@ -148,6 +148,12 @@ export const artApi = {
       body: JSON.stringify({ amount, idempotencyKey }),
     });
   },
+  withdrawBid(token: string, auctionId: string) {
+    return api<{ auctionId: string; released: number; currentPrice: string }>(`/auctions/${auctionId}/withdraw`, {
+      method: 'POST',
+      token,
+    });
+  },
   gallery(ownerId: string, token?: string | null) {
     return api<GalleryItem[]>(`/galleries/${ownerId}`, { token });
   },

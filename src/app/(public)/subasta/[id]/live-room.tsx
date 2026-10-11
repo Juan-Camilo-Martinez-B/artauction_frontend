@@ -6,10 +6,10 @@ import { FormError } from '@/components/field';
 import { StatusPill } from '@/components/status-pill';
 import { useAuctionChannel } from '@/hooks/use-auction-channel';
 import { ApiError, artApi, publicWsUrl } from '@/lib/api/client';
+import type { Auction, WalletSnapshot } from '@/lib/api/types';
+import { canWithdraw, formatArtacoins } from '@/lib/auction/policy';
 import { clockOffset } from '@/lib/clock';
-import { formatMoney } from '@/lib/money';
 import { browserSession } from '@/lib/session/browser-session';
-import type { Auction } from '@/lib/api/types';
 import type { AuctionInbound } from '@/lib/ws/events';
 
 export function LiveRoom({ auctionId }: { auctionId: string }) {
@@ -19,6 +19,7 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
   const [amount, setAmount] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [wallet, setWallet] = useState<WalletSnapshot | null>(null);
   const { send } = useAuctionChannel((message) => {
     applyEvent(message);
   });
@@ -50,7 +51,7 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
       .auction(auctionId)
       .then((view) => {
         setAuction(view.auction);
-        setAmount(view.auction.currentPrice);
+        setAmount(String(Math.round(Number(view.auction.currentPrice))));
         setOffsetMs(clockOffset(view.serverTime));
         setSynced(true);
       })
@@ -64,6 +65,7 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
       if (!token) {
         return;
       }
+      void artApi.wallet(token).then(setWallet).catch(() => undefined);
       send({ version: 1, type: 'join', auctionId, token, wsUrl: publicWsUrl() });
     });
   }, [auctionId, send]);
@@ -83,9 +85,27 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
       setAuction((current) =>
         current ? { ...current, currentPrice: placed.currentPrice, endsAt: placed.endsAt } : current,
       );
-      setNotice(placed.extended ? 'Puja aceptada. El cierre se alargó 30 segundos.' : 'Puja aceptada.');
+      setNotice(placed.extended ? 'Oferta aceptada. El cierre se alargó 30 segundos.' : 'Oferta aceptada.');
+      setWallet(await artApi.wallet(token));
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'La puja no entró.');
+    }
+  }
+
+  async function onWithdraw() {
+    setError(null);
+    const token = await browserSession.accessToken();
+    if (!token) {
+      setError('Entra para retirarte.');
+      return;
+    }
+    try {
+      const result = await artApi.withdrawBid(token, auctionId);
+      setAuction((current) => (current ? { ...current, currentPrice: result.currentPrice } : current));
+      setNotice(`Te retiraste. Volvieron ${result.released} artacoins al bolsillo.`);
+      setWallet(await artApi.wallet(token));
+    } catch (caught) {
+      setError(caught instanceof ApiError ? caught.message : 'No fue posible retirarse.');
     }
   }
 
@@ -97,24 +117,38 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
     <div>
       <StatusPill status={auction.status} />
       <p className="mt-4 text-sm text-muted">Precio actual</p>
-      <p className="font-serif text-4xl">{formatMoney(auction.currentPrice)}</p>
+      <p className="font-serif text-4xl">{formatArtacoins(auction.currentPrice)}</p>
+      {wallet ? <p className="mt-2 text-sm text-muted">Disponible {formatArtacoins(wallet.balance)}</p> : null}
       {synced ? <Countdown endsAt={auction.endsAt} offsetMs={offsetMs} /> : <p>Sincronizando el reloj del servidor…</p>}
       <form onSubmit={(event) => void onBid(event)} className="mt-8 flex max-w-md flex-col gap-3">
         <label className="text-sm" htmlFor="bid-amount">
-          Tu puja
+          Tu oferta en artacoins
           <input
             id="bid-amount"
             value={amount}
             onChange={(event) => {
               setAmount(event.target.value);
             }}
-            inputMode="decimal"
+            inputMode="numeric"
             className="mt-1 w-full rounded-md border border-line bg-white px-3 py-2"
           />
         </label>
         <button type="submit" className="rounded-full bg-oxide px-5 py-2 text-white">
-          Pujar
+          Ofertar
         </button>
+        {auction.status === 'ACTIVA' ? (
+          <button
+            type="button"
+            className="rounded-full border border-line px-5 py-2"
+            onClick={() => void onWithdraw()}
+            disabled={!canWithdraw(new Date(Date.now() + offsetMs), new Date(auction.endsAt))}
+          >
+            Retirarme
+          </button>
+        ) : null}
+        <p className="text-sm text-muted">
+          Cada oferta nueva retiene solo el aumento. Retirarse exige al menos 4 minutos antes del cierre.
+        </p>
         {notice ? <p role="status">{notice}</p> : null}
         {error ? <FormError>{error}</FormError> : null}
       </form>
