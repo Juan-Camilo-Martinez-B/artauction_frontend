@@ -81,6 +81,9 @@ export function AccountMenu() {
             <span className="block font-medium">{profile.displayName}</span>
             <span className="block truncate text-muted">{profile.email}</span>
           </p>
+          <MenuLink href="/bolsillo" onNavigate={() => setOpen(false)}>
+            Bolsillo
+          </MenuLink>
           <MenuLink href="/ajustes" onNavigate={() => setOpen(false)}>
             Ajustes
           </MenuLink>

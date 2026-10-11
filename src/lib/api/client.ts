@@ -11,6 +11,8 @@ import type {
   PlacedBid,
   SignedUpload,
   TokenPair,
+  TopUpResult,
+  WalletSnapshot,
 } from './types';
 
 export class ApiError extends Error {
@@ -182,5 +184,14 @@ export const artApi = {
   },
   removeFromGallery(token: string, lotId: string) {
     return api<PersonalGallery>(`/me/gallery/artworks/${lotId}`, { method: 'DELETE', token });
+  },
+  wallet(token: string) {
+    return api<WalletSnapshot>('/wallet', { token });
+  },
+  topUp(
+    token: string,
+    input: { coins: number; cardNumber: string; cardName: string; expMonth: number; expYear: number; cvv: string },
+  ) {
+    return api<TopUpResult>('/wallet/top-ups', { method: 'POST', token, body: JSON.stringify(input) });
   },
 };

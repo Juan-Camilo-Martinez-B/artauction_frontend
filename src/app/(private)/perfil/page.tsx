@@ -39,6 +39,7 @@ export default function ProfilePage() {
           <p>{user.email}</p>
           <p className="text-sm text-muted">Rol {user.role}</p>
           <div className="flex flex-wrap gap-3 text-sm">
+            <Link href="/bolsillo">Bolsillo</Link>
             <Link href="/ajustes">Ajustes</Link>
             <Link href="/mi-galeria">Mi galería</Link>
             <Link href="/galeria">Galería social</Link>

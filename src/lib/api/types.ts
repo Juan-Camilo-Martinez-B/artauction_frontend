@@ -162,6 +162,26 @@ export interface GalleryConfig {
   navigation: { tour: string; approach: string; motion: string };
 }
 
+export interface WalletEntry {
+  id: string;
+  kind: 'RECARGA' | 'RETENCION' | 'LIBERACION' | 'CANJE';
+  coins: number;
+  createdAt: string;
+}
+
+export interface WalletSnapshot {
+  balance: number;
+  held: number;
+  entries: WalletEntry[];
+}
+
+export interface TopUpResult {
+  balance: number;
+  credited: number;
+  last4: string;
+  orderId: string;
+}
+
 export interface PersonalGallery {
   id: string;
   name: string;
