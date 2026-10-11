@@ -73,7 +73,15 @@ export interface Lot {
   images?: LotImage[];
   auditSummaries?: AuditSummary[];
   categories?: LotCategoryLink[];
-  auction?: { id: string; status: string; currentPrice: string; endsAt: string } | null;
+  auction?: {
+    id: string;
+    status: string;
+    currentPrice: string;
+    startsAt?: string;
+    endsAt: string;
+    saleDescription?: string | null;
+    currency?: string;
+  } | null;
 }
 
 export interface Bid {

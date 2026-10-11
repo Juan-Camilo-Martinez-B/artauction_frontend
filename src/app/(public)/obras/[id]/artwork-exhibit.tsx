@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ScoreRing } from '@/components/score-ring';
 import { StatusPill } from '@/components/status-pill';
 import { ImageFormat, type ImageOrientation } from '@/lib/artwork/image-format';
+import { formatArtacoins } from '@/lib/auction/policy';
 import { formatMoney } from '@/lib/money';
 import type { Lot } from '@/lib/api/types';
 import { AddToGalleryButton } from './add-to-gallery';
@@ -53,14 +54,23 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
               value={`${formatMoney(lot.suggestedPriceMin)} – ${formatMoney(lot.suggestedPriceMax)}`}
             />
           </dl>
+          {lot.auction?.saleDescription ? (
+            <p className="mt-6 max-w-prose leading-relaxed">{lot.auction.saleDescription}</p>
+          ) : null}
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <AddToGalleryButton lotId={lot.id} />
-            {lot.auction && lot.status === 'EN_SUBASTA' ? (
+            {lot.auction && (lot.status === 'EN_SUBASTA' || lot.status === 'PUBLICADA') ? (
               <Link href={`/subasta/${lot.auction.id}`} className="rounded-full bg-ink px-5 py-2 text-sm text-paper">
-                Entrar a la sala
+                {lot.status === 'EN_SUBASTA' ? 'Entrar a la sala' : 'Ver la subasta'}
               </Link>
             ) : null}
           </div>
+          {lot.auction ? (
+            <p className="mt-4 text-sm text-muted">
+              {formatArtacoins(lot.auction.currentPrice)}
+              {lot.auction.startsAt ? ` · abre ${new Date(lot.auction.startsAt).toLocaleString('es-CO')}` : ''}
+            </p>
+          ) : null}
         </section>
         <ScoreRing score={lot.authenticityScore} verdict={summary?.verdict ?? null} />
         <p className={`px-1 text-sm leading-relaxed text-muted ${orientation === 'landscape' ? 'md:col-span-2' : ''}`}>
