@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ApiError, artApi } from '@/lib/api/client';
 import type { GalleryConfig, PersonalGallery } from '@/lib/api/types';
-import { readAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 import { GalleryRoom } from './gallery-room';
 
 export function GalleryStudio() {
@@ -14,23 +14,24 @@ export function GalleryStudio() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = readAccessToken();
-    if (!token) {
-      setMessage('Entra para ver tu galería personal.');
-      return;
-    }
-    void artApi
-      .myGallery(token)
-      .then((next) => {
-        setGallery(next);
-        setDraft(next.appliedConfig);
-        setMessage('');
-      })
-      .catch(() => setMessage('No se pudo abrir la galería.'));
+    void browserSession.accessToken().then((token) => {
+      if (!token) {
+        setMessage('Entra para ver tu galería personal.');
+        return;
+      }
+      void artApi
+        .myGallery(token)
+        .then((next) => {
+          setGallery(next);
+          setDraft(next.appliedConfig);
+          setMessage('');
+        })
+        .catch(() => setMessage('No se pudo abrir la galería.'));
+    });
   }, []);
 
   async function save() {
-    const token = readAccessToken();
+    const token = await browserSession.accessToken();
     if (!token || !draft) {
       return;
     }
@@ -46,7 +47,7 @@ export function GalleryStudio() {
   }
 
   async function restore() {
-    const token = readAccessToken();
+    const token = await browserSession.accessToken();
     if (!token) {
       return;
     }
@@ -57,7 +58,7 @@ export function GalleryStudio() {
   }
 
   async function remove(lotId: string) {
-    const token = readAccessToken();
+    const token = await browserSession.accessToken();
     if (!token) {
       return;
     }

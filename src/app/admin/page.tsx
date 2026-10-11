@@ -3,7 +3,7 @@
 import { useState, type SubmitEvent } from 'react';
 import { Field, FormError } from '@/components/field';
 import { ApiError, artApi } from '@/lib/api/client';
-import { readAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 
 export default function AdminPage() {
   const [lotId, setLotId] = useState('');
@@ -14,7 +14,7 @@ export default function AdminPage() {
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    const token = readAccessToken();
+    const token = await browserSession.accessToken();
     if (!token) {
       setError('Hace falta una sesión de administración.');
       return;

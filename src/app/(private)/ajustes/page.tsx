@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Field, FormError } from '@/components/field';
 import { ProfileMark } from '@/components/account/profile-mark';
 import { ApiError, artApi } from '@/lib/api/client';
-import { readAccessToken } from '@/lib/session';
 import { browserSession } from '@/lib/session/browser-session';
 
 export default function SettingsPage() {
@@ -29,7 +28,7 @@ export default function SettingsPage() {
 
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    const token = readAccessToken();
+    const token = await browserSession.accessToken();
     if (!token) {
       router.replace('/entrar');
       return;

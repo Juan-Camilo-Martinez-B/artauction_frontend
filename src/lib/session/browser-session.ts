@@ -34,6 +34,11 @@ class BrowserSession {
     };
   }
 
+  async accessToken(): Promise<string | null> {
+    await this.restore();
+    return readAccessToken();
+  }
+
   restore(): Promise<void> {
     if (this.snapshot.status === 'authenticated' && readAccessToken()) {
       return Promise.resolve();

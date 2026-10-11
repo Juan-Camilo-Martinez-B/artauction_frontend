@@ -87,6 +87,11 @@ export function AccountMenu() {
           <MenuLink href="/perfil" onNavigate={() => setOpen(false)}>
             Cuenta
           </MenuLink>
+          {profile.role === 'SELLER' || profile.role === 'ADMIN' ? (
+            <MenuLink href="/publicar" onNavigate={() => setOpen(false)}>
+              Publicar
+            </MenuLink>
+          ) : null}
           {profile.role === 'ADMIN' ? (
             <MenuLink href="/admin" onNavigate={() => setOpen(false)}>
               Revisión

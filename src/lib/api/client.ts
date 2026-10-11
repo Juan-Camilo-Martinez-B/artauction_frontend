@@ -101,7 +101,19 @@ export const artApi = {
   },
   createLot(
     token: string,
-    input: { title: string; description: string; materials: string; artistName?: string; creationYear?: number },
+    input: {
+      title: string;
+      description: string;
+      materials: string;
+      artistName?: string;
+      creationYear?: number;
+      categorySlug: string;
+      representationKind: 'TWO_D' | 'THREE_D';
+      widthCm: number;
+      heightCm: number;
+      depthCm?: number;
+      provenance?: string;
+    },
   ) {
     return api<Lot>('/lots', { method: 'POST', token, body: JSON.stringify(input) });
   },

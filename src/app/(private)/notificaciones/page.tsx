@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { artApi } from '@/lib/api/client';
-import { readAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 import type { NotificationItem } from '@/lib/api/types';
 
 export default function NotificationsPage() {
@@ -10,20 +10,21 @@ export default function NotificationsPage() {
   const [message, setMessage] = useState('Cargando avisos…');
 
   useEffect(() => {
-    const token = readAccessToken();
-    if (!token) {
-      setMessage('Entra para ver tus avisos.');
-      return;
-    }
-    void artApi
-      .notifications(token)
-      .then((rows) => {
-        setItems(rows);
-        setMessage(rows.length === 0 ? 'No tienes avisos.' : '');
-      })
-      .catch(() => {
-        setMessage('No se pudieron cargar los avisos.');
-      });
+    void browserSession.accessToken().then((token) => {
+      if (!token) {
+        setMessage('Entra para ver tus avisos.');
+        return;
+      }
+      void artApi
+        .notifications(token)
+        .then((rows) => {
+          setItems(rows);
+          setMessage(rows.length === 0 ? 'No tienes avisos.' : '');
+        })
+        .catch(() => {
+          setMessage('No se pudieron cargar los avisos.');
+        });
+    });
   }, []);
 
   return (

@@ -47,6 +47,7 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
             <Fact label="Materiales" value={lot.materials} />
             <Fact label="Presentación" value={representation} />
             <Fact label="Medidas" value={measures(lot)} />
+            <Fact label="Procedencia" value={lot.provenance?.trim() || 'Sin procedencia en la ficha'} />
             <Fact
               label="Banda sugerida"
               value={`${formatMoney(lot.suggestedPriceMin)} – ${formatMoney(lot.suggestedPriceMax)}`}

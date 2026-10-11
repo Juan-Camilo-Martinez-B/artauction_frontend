@@ -62,6 +62,7 @@ export interface Lot {
   widthCm?: string | null;
   heightCm?: string | null;
   depthCm?: string | null;
+  provenance?: string | null;
   representationKind?: 'TWO_D' | 'THREE_D' | 'OTHER' | null;
   status: string;
   visibility: string;

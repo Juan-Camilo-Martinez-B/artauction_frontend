@@ -8,7 +8,7 @@ import { useAuctionChannel } from '@/hooks/use-auction-channel';
 import { ApiError, artApi, publicWsUrl } from '@/lib/api/client';
 import { clockOffset } from '@/lib/clock';
 import { formatMoney } from '@/lib/money';
-import { readAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 import type { Auction } from '@/lib/api/types';
 import type { AuctionInbound } from '@/lib/ws/events';
 
@@ -60,17 +60,18 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
   }, [auctionId]);
 
   useEffect(() => {
-    const token = readAccessToken();
-    if (!token) {
-      return;
-    }
-    send({ version: 1, type: 'join', auctionId, token, wsUrl: publicWsUrl() });
+    void browserSession.accessToken().then((token) => {
+      if (!token) {
+        return;
+      }
+      send({ version: 1, type: 'join', auctionId, token, wsUrl: publicWsUrl() });
+    });
   }, [auctionId, send]);
 
   async function onBid(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    const token = readAccessToken();
+    const token = await browserSession.accessToken();
     if (!token) {
       setError('Entra para pujar.');
       return;

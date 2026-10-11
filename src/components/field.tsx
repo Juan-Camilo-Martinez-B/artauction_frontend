@@ -37,11 +37,15 @@ export function TextArea({
   id,
   value,
   onChange,
+  required = false,
+  minLength,
 }: {
   label: string;
   id: string;
   value: string;
   onChange: (value: string) => void;
+  required?: boolean;
+  minLength?: number;
 }) {
   return (
     <label className="block text-sm" htmlFor={id}>
@@ -49,6 +53,8 @@ export function TextArea({
       <textarea
         id={id}
         value={value}
+        required={required}
+        minLength={minLength}
         onChange={(event) => {
           onChange(event.target.value);
         }}

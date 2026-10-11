@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import { ApiError, artApi } from '@/lib/api/client';
-import { readAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 
 export function FollowButton({ ownerId }: { ownerId: string }) {
   const [message, setMessage] = useState<string | null>(null);
 
   async function follow() {
-    const token = readAccessToken();
+    const token = await browserSession.accessToken();
     if (!token) {
       setMessage('Entra para seguir a esta persona.');
       return;

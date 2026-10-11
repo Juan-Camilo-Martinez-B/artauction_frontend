@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { artApi } from '@/lib/api/client';
-import { readAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 import { canShowGalleryItem } from '@/lib/visibility';
 import type { GalleryItem } from '@/lib/api/types';
 
@@ -11,21 +11,22 @@ export default function PrivateGalleryPage() {
   const [message, setMessage] = useState('Cargando tu galería…');
 
   useEffect(() => {
-    const token = readAccessToken();
-    if (!token) {
-      setMessage('Entra para ver tu galería.');
-      return;
-    }
-    void artApi
-      .me(token)
-      .then((user) => artApi.gallery(user.userId, token).then((rows) => ({ user, rows })))
-      .then(({ user, rows }) => {
-        setItems(rows.filter((item) => canShowGalleryItem(item, user.userId)));
-        setMessage('');
-      })
-      .catch(() => {
-        setMessage('No se pudo abrir la galería.');
-      });
+    void browserSession.accessToken().then((token) => {
+      if (!token) {
+        setMessage('Entra para ver tu galería.');
+        return;
+      }
+      void artApi
+        .me(token)
+        .then((user) => artApi.gallery(user.userId, token).then((rows) => ({ user, rows })))
+        .then(({ user, rows }) => {
+          setItems(rows.filter((item) => canShowGalleryItem(item, user.userId)));
+          setMessage('');
+        })
+        .catch(() => {
+          setMessage('No se pudo abrir la galería.');
+        });
+    });
   }, []);
 
   return (

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ApiError, artApi } from '@/lib/api/client';
-import { readAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 
 export function AddToGalleryButton({ lotId }: { lotId: string }) {
   const router = useRouter();
@@ -11,7 +11,7 @@ export function AddToGalleryButton({ lotId }: { lotId: string }) {
   const [pending, setPending] = useState(false);
 
   async function add() {
-    const token = readAccessToken();
+    const token = await browserSession.accessToken();
     if (!token) {
       router.push('/entrar');
       return;

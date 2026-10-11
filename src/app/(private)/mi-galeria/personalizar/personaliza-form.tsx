@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ApiError, artApi } from '@/lib/api/client';
 import { STEPS, emptyAnswers, stepComplete, toPreferences, type AnswerMap } from '@/lib/gallery/steps';
-import { readAccessToken } from '@/lib/session';
+import { browserSession } from '@/lib/session/browser-session';
 
 export function PersonalizaForm() {
   const router = useRouter();
@@ -33,7 +33,7 @@ export function PersonalizaForm() {
   }
 
   async function generate(random: boolean) {
-    const token = readAccessToken();
+    const token = await browserSession.accessToken();
     if (!token) {
       router.push('/entrar');
       return;
