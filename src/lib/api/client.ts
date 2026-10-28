@@ -194,10 +194,20 @@ export const artApi = {
   wallet(token: string) {
     return api<WalletSnapshot>('/wallet', { token });
   },
+  /**
+   * La clave de idempotencia identifica un intento de pago: repetirla con los
+   * mismos datos devuelve la misma orden sin volver a cobrar.
+   */
   topUp(
     token: string,
+    idempotencyKey: string,
     input: { coins: number; cardNumber: string; cardName: string; expMonth: number; expYear: number; cvv: string },
   ) {
-    return api<TopUpResult>('/wallet/top-ups', { method: 'POST', token, body: JSON.stringify(input) });
+    return api<TopUpResult>('/wallet/top-ups', {
+      method: 'POST',
+      token,
+      headers: { 'idempotency-key': idempotencyKey },
+      body: JSON.stringify(input),
+    });
   },
 };

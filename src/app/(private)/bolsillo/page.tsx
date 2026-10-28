@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type SubmitEvent } from 'react';
+import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { Field, FormError } from '@/components/field';
 import { ApiError, artApi } from '@/lib/api/client';
 import type { WalletSnapshot } from '@/lib/api/types';
@@ -14,6 +14,7 @@ const entryLabel: Record<string, string> = {
   RETENCION: 'Retención',
   LIBERACION: 'Devolución',
   CANJE: 'Canje por obra',
+  VENTA: 'Venta de obra',
 };
 
 export default function WalletPage() {
@@ -27,6 +28,13 @@ export default function WalletPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  // Clave del intento de pago en curso: se reutiliza al reintentar con los mismos
+  // datos (no hay doble cobro) y se descarta si cambia algun dato o el cobro sale bien.
+  const attemptKey = useRef<string | null>(null);
+
+  useEffect(() => {
+    attemptKey.current = null;
+  }, [coins, cardNumber, cardName, expMonth, expYear, cvv]);
 
   useEffect(() => {
     void browserSession.accessToken().then(async (token) => {
@@ -52,8 +60,9 @@ export default function WalletPage() {
       return;
     }
     setPending(true);
+    attemptKey.current ??= crypto.randomUUID();
     try {
-      const result = await artApi.topUp(token, {
+      const result = await artApi.topUp(token, attemptKey.current, {
         coins,
         cardNumber,
         cardName,
@@ -61,6 +70,7 @@ export default function WalletPage() {
         expYear: Number(expYear),
         cvv,
       });
+      attemptKey.current = null;
       setCvv('');
       setCardNumber('');
       setNotice(`La pasarela aprobó el cobro. Entraron ${result.credited} artacoins. Terminación ${result.last4}.`);

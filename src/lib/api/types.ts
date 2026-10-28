@@ -172,7 +172,7 @@ export interface GalleryConfig {
 
 export interface WalletEntry {
   id: string;
-  kind: 'RECARGA' | 'RETENCION' | 'LIBERACION' | 'CANJE';
+  kind: 'RECARGA' | 'RETENCION' | 'LIBERACION' | 'CANJE' | 'VENTA';
   coins: number;
   createdAt: string;
 }
