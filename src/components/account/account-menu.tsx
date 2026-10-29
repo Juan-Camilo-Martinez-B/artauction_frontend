@@ -71,7 +71,7 @@ export function AccountMenu() {
         aria-expanded={open}
         aria-controls={menuId}
         aria-label={`Cuenta de ${profile.displayName}`}
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => { setOpen((current) => !current); }}
       >
         <ProfileMark name={profile.displayName} avatarUrl={profile.avatarUrl} />
       </button>
@@ -81,22 +81,22 @@ export function AccountMenu() {
             <span className="block font-medium">{profile.displayName}</span>
             <span className="block truncate text-muted">{profile.email}</span>
           </p>
-          <MenuLink href="/bolsillo" onNavigate={() => setOpen(false)}>
+          <MenuLink href="/bolsillo" onNavigate={() => { setOpen(false); }}>
             Bolsillo
           </MenuLink>
-          <MenuLink href="/ajustes" onNavigate={() => setOpen(false)}>
+          <MenuLink href="/ajustes" onNavigate={() => { setOpen(false); }}>
             Ajustes
           </MenuLink>
-          <MenuLink href="/perfil" onNavigate={() => setOpen(false)}>
+          <MenuLink href="/perfil" onNavigate={() => { setOpen(false); }}>
             Cuenta
           </MenuLink>
           {profile.role === 'SELLER' || profile.role === 'ADMIN' ? (
-            <MenuLink href="/publicar" onNavigate={() => setOpen(false)}>
+            <MenuLink href="/publicar" onNavigate={() => { setOpen(false); }}>
               Publicar
             </MenuLink>
           ) : null}
           {profile.role === 'ADMIN' ? (
-            <MenuLink href="/admin" onNavigate={() => setOpen(false)}>
+            <MenuLink href="/admin" onNavigate={() => { setOpen(false); }}>
               Revisión
             </MenuLink>
           ) : null}

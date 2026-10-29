@@ -43,3 +43,14 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
+
+  # Imagen que levanta el docker compose del backend.
+  image:
+    name: image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build the production image
+        run: docker build -t artauction-frontend .

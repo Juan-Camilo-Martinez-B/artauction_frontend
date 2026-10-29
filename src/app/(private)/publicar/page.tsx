@@ -113,18 +113,18 @@ export default function PublishPage() {
         Estos datos son los de la ficha: título, materiales, categoría, formato, medidas y procedencia. La imagen se redimensiona en el navegador antes de enviarse.
       </p>
       <form onSubmit={(event) => void onSubmit(event)} className="mt-6 space-y-4">
-        <Field id="title" label="Título" required minLength={3} value={title} onChange={(event) => setTitle(event.target.value)} />
+        <Field id="title" label="Título" required minLength={3} value={title} onChange={(event) => { setTitle(event.target.value); }} />
         <TextArea id="description" label="Descripción" required minLength={10} value={description} onChange={setDescription} />
-        <Field id="materials" label="Materiales" required minLength={2} value={materials} onChange={(event) => setMaterials(event.target.value)} />
-        <Field id="artist" label="Artista" value={artistName} onChange={(event) => setArtistName(event.target.value)} />
-        <Field id="year" label="Año" type="number" min={1} max={2100} value={year} onChange={(event) => setYear(event.target.value)} />
+        <Field id="materials" label="Materiales" required minLength={2} value={materials} onChange={(event) => { setMaterials(event.target.value); }} />
+        <Field id="artist" label="Artista" value={artistName} onChange={(event) => { setArtistName(event.target.value); }} />
+        <Field id="year" label="Año" type="number" min={1} max={2100} value={year} onChange={(event) => { setYear(event.target.value); }} />
         <label className="block text-sm" htmlFor="category">
           <span className="mb-1 block font-medium">Categoría</span>
           <select
             id="category"
             required
             value={categorySlug}
-            onChange={(event) => setCategorySlug(event.target.value)}
+            onChange={(event) => { setCategorySlug(event.target.value); }}
             className="w-full rounded-md border border-line bg-white px-3 py-2"
           >
             {categories.map((category) => (
@@ -139,7 +139,7 @@ export default function PublishPage() {
           <select
             id="representation"
             value={representation}
-            onChange={(event) => setRepresentation(event.target.value === 'THREE_D' ? 'THREE_D' : 'TWO_D')}
+            onChange={(event) => { setRepresentation(event.target.value === 'THREE_D' ? 'THREE_D' : 'TWO_D'); }}
             className="w-full rounded-md border border-line bg-white px-3 py-2"
           >
             <option value="TWO_D">Obra bidimensional</option>
@@ -147,13 +147,13 @@ export default function PublishPage() {
           </select>
         </label>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Field id="width" label="Ancho (cm)" type="number" required min={0.1} max={2000} step="0.1" value={widthCm} onChange={(event) => setWidthCm(event.target.value)} />
-          <Field id="height" label="Alto (cm)" type="number" required min={0.1} max={2000} step="0.1" value={heightCm} onChange={(event) => setHeightCm(event.target.value)} />
+          <Field id="width" label="Ancho (cm)" type="number" required min={0.1} max={2000} step="0.1" value={widthCm} onChange={(event) => { setWidthCm(event.target.value); }} />
+          <Field id="height" label="Alto (cm)" type="number" required min={0.1} max={2000} step="0.1" value={heightCm} onChange={(event) => { setHeightCm(event.target.value); }} />
           {representation === 'THREE_D' ? (
-            <Field id="depth" label="Profundidad (cm)" type="number" required min={0.1} max={2000} step="0.1" value={depthCm} onChange={(event) => setDepthCm(event.target.value)} />
+            <Field id="depth" label="Profundidad (cm)" type="number" required min={0.1} max={2000} step="0.1" value={depthCm} onChange={(event) => { setDepthCm(event.target.value); }} />
           ) : null}
         </div>
-        <Field id="provenance" label="Procedencia" minLength={3} value={provenance} onChange={(event) => setProvenance(event.target.value)} />
+        <Field id="provenance" label="Procedencia" minLength={3} value={provenance} onChange={(event) => { setProvenance(event.target.value); }} />
         <label className="block text-sm">
           <span className="mb-1 block font-medium">Imagen</span>
           <input

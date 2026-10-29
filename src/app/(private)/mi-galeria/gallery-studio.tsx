@@ -26,7 +26,7 @@ export function GalleryStudio() {
           setDraft(next.appliedConfig);
           setMessage('');
         })
-        .catch(() => setMessage('No se pudo abrir la galería.'));
+        .catch(() => { setMessage('No se pudo abrir la galería.'); });
     });
   }, []);
 
@@ -92,8 +92,8 @@ export function GalleryStudio() {
       {gallery.artworks.length === 0 ? <p className="mt-4 text-sm text-muted">Tu galería no tiene obras. Añádelas desde el catálogo.</p> : null}
       {config ? (
         <fieldset className="mt-6 grid gap-3 sm:grid-cols-3">
-          <ColorField label="Pared" value={config.palette.wall} onChange={(wall) => setDraft({ ...config, source: 'manual', palette: { ...config.palette, wall } })} />
-          <ColorField label="Suelo" value={config.palette.floor} onChange={(floor) => setDraft({ ...config, source: 'manual', palette: { ...config.palette, floor } })} />
+          <ColorField label="Pared" value={config.palette.wall} onChange={(wall) => { setDraft({ ...config, source: 'manual', palette: { ...config.palette, wall } }); }} />
+          <ColorField label="Suelo" value={config.palette.floor} onChange={(floor) => { setDraft({ ...config, source: 'manual', palette: { ...config.palette, floor } }); }} />
           <label className="text-sm">
             Intensidad
             <input
@@ -102,12 +102,11 @@ export function GalleryStudio() {
               max={1.2}
               step={0.05}
               value={config.lighting.ambientIntensity}
-              onChange={(event) =>
-                setDraft({
+              onChange={(event) => { setDraft({
                   ...config,
                   source: 'manual',
                   lighting: { ...config.lighting, ambientIntensity: Number(event.target.value) },
-                })
+                }); }
               }
             />
           </label>
@@ -144,7 +143,7 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
   return (
     <label className="text-sm">
       {label}
-      <input type="color" value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 block h-10 w-full" />
+      <input type="color" value={value} onChange={(event) => { onChange(event.target.value); }} className="mt-1 block h-10 w-full" />
     </label>
   );
 }

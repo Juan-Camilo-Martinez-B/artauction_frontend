@@ -58,14 +58,14 @@ export default function SettingsPage() {
         <ProfileMark name={displayName || 'Cuenta'} avatarUrl={avatarUrl.trim() || null} />
       </div>
       <form onSubmit={(event) => void onSubmit(event)} className="mt-6 space-y-4">
-        <Field id="display-name" label="Nombre" required minLength={2} maxLength={80} value={displayName} onChange={(event) => setDisplayName(event.target.value)} />
+        <Field id="display-name" label="Nombre" required minLength={2} maxLength={80} value={displayName} onChange={(event) => { setDisplayName(event.target.value); }} />
         <Field
           id="avatar-url"
           label="Imagen de perfil"
           type="url"
           hint="Una dirección https. Si la dejas vacía, la cabecera usa tus iniciales."
           value={avatarUrl}
-          onChange={(event) => setAvatarUrl(event.target.value)}
+          onChange={(event) => { setAvatarUrl(event.target.value); }}
         />
         {error ? <FormError>{error}</FormError> : null}
         {message ? <p className="text-sm">{message}</p> : null}

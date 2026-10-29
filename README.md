@@ -38,7 +38,7 @@ Nada que tarde más de unos 50 ms corre en el hilo principal. Los mensajes de lo
 src/app/(public)     landing, catálogo, obra, sala y galería pública
 src/app/(auth)       registro e inicio de sesión
 src/app/(private)    perfil, publicar, galería, feed y avisos
-src/app/admin        panel de revisión manual
+src/app/admin        cola de revisión manual: tarjetas con los hallazgos de la auditoría y sus evidencias
 src/app/api          cookie de refresh y revalidateTag
 src/components       piezas de interfaz compartidas
 src/workers          imagen, subasta y catálogo
