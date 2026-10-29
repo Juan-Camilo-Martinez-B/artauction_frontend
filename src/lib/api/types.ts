@@ -147,6 +147,30 @@ export interface NotificationItem {
   readAt: string | null;
 }
 
+export interface ReviewEvidence {
+  code: string;
+  value: string;
+}
+
+export interface ReviewFinding {
+  code: string;
+  severity: 'INFO' | 'WARNING' | 'CRITICAL';
+  message: string;
+  evidence: ReviewEvidence[];
+}
+
+export interface ReviewItem {
+  lot: Lot;
+  audit: {
+    summaryId: string;
+    score: number;
+    decidedBy: 'RULES' | 'AI' | 'FALLBACK' | null;
+    modelName: string;
+    createdAt: string | null;
+    findings: ReviewFinding[];
+  } | null;
+}
+
 export interface SignedUpload {
   uploadUrl: string;
   objectKey: string;

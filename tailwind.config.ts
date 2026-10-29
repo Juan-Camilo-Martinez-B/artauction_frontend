@@ -11,6 +11,7 @@ const config: Config = {
         line: '#d8d0c2',
         oxide: '#7a2e24',
         moss: '#1e5c40',
+        ochre: '#8a5a12',
       },
       fontFamily: {
         serif: ['var(--font-serif)', 'Georgia', 'serif'],

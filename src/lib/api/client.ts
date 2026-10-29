@@ -9,6 +9,7 @@ import type {
   NotificationItem,
   PersonalGallery,
   PlacedBid,
+  ReviewItem,
   SignedUpload,
   TokenPair,
   TopUpResult,
@@ -165,6 +166,9 @@ export const artApi = {
   },
   notifications(token: string) {
     return api<NotificationItem[]>('/notifications', { token });
+  },
+  reviewQueue(token: string) {
+    return api<ReviewItem[]>('/admin/reviews', { token });
   },
   resolveLot(token: string, lotId: string, verdict: 'APROBADO' | 'BORRADOR') {
     return api<Lot>(`/admin/lots/${lotId}/resolve`, { method: 'POST', token, body: JSON.stringify({ verdict }) });
