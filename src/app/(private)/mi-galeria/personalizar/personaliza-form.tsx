@@ -69,7 +69,7 @@ export function PersonalizaForm() {
         ))}
       </ol>
       {reviewing ? (
-        <Review answers={answers} pending={pending} error={error} onBack={() => setStep(STEPS.length - 1)} onGenerate={(random) => void generate(random)} />
+        <Review answers={answers} pending={pending} error={error} onBack={() => { setStep(STEPS.length - 1); }} onGenerate={(random) => void generate(random)} />
       ) : current ? (
         <div className="mt-8">
           <h2 className="font-serif text-3xl">{current.title}</h2>
@@ -88,7 +88,7 @@ export function PersonalizaForm() {
                       key={value}
                       type="button"
                       aria-pressed={selected}
-                      onClick={() => toggle(question.key, value, question.multiple)}
+                      onClick={() => { toggle(question.key, value, question.multiple); }}
                       className={`rounded-xl border px-4 py-3 text-left ${selected ? 'border-ink bg-white' : 'border-line bg-paper'}`}
                     >
                       <span className="block font-serif text-lg">{label}</span>
@@ -104,7 +104,7 @@ export function PersonalizaForm() {
                       key={style}
                       type="button"
                       className="text-sm underline"
-                      onClick={() => setAnswers((previous) => ({ ...previous, favoriteStyle: style }))}
+                      onClick={() => { setAnswers((previous) => ({ ...previous, favoriteStyle: style })); }}
                     >
                       Marcar {style} como preferido
                     </button>
@@ -118,20 +118,20 @@ export function PersonalizaForm() {
               <input
                 type="checkbox"
                 checked={answers['contrastWithArt'] === true}
-                onChange={(event) => setAnswers((previous) => ({ ...previous, contrastWithArt: event.target.checked }))}
+                onChange={(event) => { setAnswers((previous) => ({ ...previous, contrastWithArt: event.target.checked })); }}
               />
               Quiero que los colores del espacio contrasten con las obras
             </label>
           ) : null}
           <div className="mt-8 flex justify-between">
-            <button type="button" className="text-sm" disabled={step === 0} onClick={() => setStep((value) => value - 1)}>
+            <button type="button" className="text-sm" disabled={step === 0} onClick={() => { setStep((value) => value - 1); }}>
               Anterior
             </button>
             <button
               type="button"
               className="rounded-full bg-ink px-5 py-2 text-paper disabled:opacity-40"
               disabled={!stepComplete(step, answers)}
-              onClick={() => setStep((value) => value + 1)}
+              onClick={() => { setStep((value) => value + 1); }}
             >
               Siguiente
             </button>
@@ -180,10 +180,10 @@ function Review({
       {pending ? <p className="mt-4">Diseñando el espacio según tus preferencias…</p> : null}
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={onBack}>Volver a editar</button>
-        <button type="button" className="rounded-full bg-ink px-5 py-2 text-paper" disabled={pending} onClick={() => onGenerate(false)}>
+        <button type="button" className="rounded-full bg-ink px-5 py-2 text-paper" disabled={pending} onClick={() => { onGenerate(false); }}>
           Generar mi galería
         </button>
-        <button type="button" className="rounded-full border border-ink px-5 py-2" disabled={pending} onClick={() => onGenerate(true)}>
+        <button type="button" className="rounded-full border border-ink px-5 py-2" disabled={pending} onClick={() => { onGenerate(true); }}>
           Usar una configuración aleatoria
         </button>
       </div>

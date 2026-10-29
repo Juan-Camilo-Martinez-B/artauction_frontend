@@ -12,5 +12,5 @@ export function ArtworkImage({ src, alt, featured = false }: { src: string | nul
       />
     );
   }
-  return <img src={src} alt={alt} className="block h-auto w-full" onError={() => setFailed(true)} />;
+  return <img src={src} alt={alt} className="block h-auto w-full" onError={() => { setFailed(true); }} />;
 }

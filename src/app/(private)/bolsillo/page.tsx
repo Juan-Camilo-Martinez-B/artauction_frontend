@@ -73,7 +73,7 @@ export default function WalletPage() {
       attemptKey.current = null;
       setCvv('');
       setCardNumber('');
-      setNotice(`La pasarela aprobó el cobro. Entraron ${result.credited} artacoins. Terminación ${result.last4}.`);
+      setNotice(`La pasarela aprobó el cobro. Entraron ${String(result.credited)} artacoins. Terminación ${result.last4}.`);
       setWallet(await artApi.wallet(token));
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'La pasarela no completó el cobro.');
@@ -109,19 +109,19 @@ export default function WalletPage() {
                 key={pack}
                 type="button"
                 className={`rounded-full border px-4 py-2 text-sm ${coins === pack ? 'border-ink bg-ink text-paper' : 'border-line'}`}
-                onClick={() => setCoins(pack)}
+                onClick={() => { setCoins(pack); }}
               >
                 {pack}
               </button>
             ))}
           </div>
         </fieldset>
-        <Field id="card-name" label="Nombre en la tarjeta" value={cardName} autoComplete="cc-name" onChange={(event) => setCardName(event.target.value)} required minLength={3} />
-        <Field id="card-number" label="Número" value={cardNumber} inputMode="numeric" autoComplete="cc-number" onChange={(event) => setCardNumber(event.target.value)} required minLength={12} />
+        <Field id="card-name" label="Nombre en la tarjeta" value={cardName} autoComplete="cc-name" onChange={(event) => { setCardName(event.target.value); }} required minLength={3} />
+        <Field id="card-number" label="Número" value={cardNumber} inputMode="numeric" autoComplete="cc-number" onChange={(event) => { setCardNumber(event.target.value); }} required minLength={12} />
         <div className="grid grid-cols-3 gap-3">
-          <Field id="card-month" label="Mes" value={expMonth} inputMode="numeric" autoComplete="cc-exp-month" onChange={(event) => setExpMonth(event.target.value)} required />
-          <Field id="card-year" label="Año" value={expYear} inputMode="numeric" autoComplete="cc-exp-year" onChange={(event) => setExpYear(event.target.value)} required />
-          <Field id="card-cvv" label="Código" value={cvv} inputMode="numeric" autoComplete="cc-csc" onChange={(event) => setCvv(event.target.value)} required minLength={3} maxLength={4} />
+          <Field id="card-month" label="Mes" value={expMonth} inputMode="numeric" autoComplete="cc-exp-month" onChange={(event) => { setExpMonth(event.target.value); }} required />
+          <Field id="card-year" label="Año" value={expYear} inputMode="numeric" autoComplete="cc-exp-year" onChange={(event) => { setExpYear(event.target.value); }} required />
+          <Field id="card-cvv" label="Código" value={cvv} inputMode="numeric" autoComplete="cc-csc" onChange={(event) => { setCvv(event.target.value); }} required minLength={3} maxLength={4} />
         </div>
         <p className="text-sm text-muted">Cobro simulado: {coins}.00 USD por {coins} artacoins. No se guarda el número ni el código.</p>
         <button type="submit" disabled={pending} className="rounded-full bg-oxide px-5 py-2 text-white disabled:opacity-60">

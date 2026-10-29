@@ -102,7 +102,7 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
     try {
       const result = await artApi.withdrawBid(token, auctionId);
       setAuction((current) => (current ? { ...current, currentPrice: result.currentPrice } : current));
-      setNotice(`Te retiraste. Volvieron ${result.released} artacoins al bolsillo.`);
+      setNotice(`Te retiraste. Volvieron ${String(result.released)} artacoins al bolsillo.`);
       setWallet(await artApi.wallet(token));
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'No fue posible retirarse.');

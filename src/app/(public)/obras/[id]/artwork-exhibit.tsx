@@ -30,7 +30,7 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
         alt={lot.title}
         orientation={orientation}
         caption={format?.label() ?? 'Obra'}
-        onMeasure={(width, height) => setFormat(new ImageFormat(width, height))}
+        onMeasure={(width, height) => { setFormat(new ImageFormat(width, height)); }}
       />
       <div className={dossierClass(orientation)}>
         <section className="rounded-[1.75rem] border border-line bg-white p-6 shadow-[0_18px_40px_-32px_rgba(27,24,20,0.45)] sm:p-8">
@@ -103,7 +103,7 @@ function ArtworkFrame({
           <img
             src={src}
             alt={alt}
-            onLoad={(event) => onMeasure(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight)}
+            onLoad={(event) => { onMeasure(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight); }}
             className={imageClass(orientation)}
           />
         ) : (
