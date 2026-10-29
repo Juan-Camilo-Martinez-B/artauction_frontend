@@ -2,10 +2,18 @@ import { expect, test } from '@playwright/test';
 
 const auctionId = '11111111-1111-4111-8111-111111111111';
 
-test('envía una puja y muestra que fue aceptada', async ({ page }) => {
+test('envía una oferta y muestra que fue aceptada', async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem('aa_access', 'token-de-prueba-para-la-sala');
   });
+  // La sesion valida el token con /auth/me; sin respuesta lo descarta y la sala
+  // trata al visitante como anonimo.
+  await page.route('**/auth/me', (route) =>
+    route.fulfill({
+      json: { userId: '44444444-4444-4444-8444-444444444444', email: 'postor@artauction.test', role: 'USER', displayName: 'Postor', avatarUrl: null },
+    }),
+  );
+  await page.route('**/wallet', (route) => route.fulfill({ json: { balance: 500, held: 0, entries: [] } }));
   await page.route('**/auctions/**', async (route) => {
     const url = route.request().url();
     if (route.request().method() === 'GET') {
@@ -48,8 +56,9 @@ test('envía una puja y muestra que fue aceptada', async ({ page }) => {
 
   await page.goto(`/subasta/${auctionId}`);
   await expect(page.getByRole('heading', { name: 'La puja' })).toBeVisible();
-  await page.getByLabel('Tu puja').fill('120.00');
-  await page.getByRole('button', { name: 'Pujar' }).click();
-  await expect(page.getByRole('status')).toContainText('Puja aceptada');
+  // Las ofertas son en artacoins enteras.
+  await page.getByLabel('Tu oferta en artacoins').fill('120');
+  await page.getByRole('button', { name: 'Ofertar' }).click();
+  await expect(page.getByRole('status')).toContainText('Oferta aceptada');
   await expect(page.getByText(/120/)).toBeVisible();
 });
