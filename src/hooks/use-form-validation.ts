@@ -24,5 +24,11 @@ export function useFormValidation<Field extends string>(errors: FieldErrors<Fiel
     return !hasErrors(errors);
   };
 
-  return { touch, visibleError, attemptSubmit };
+  /** Olvida lo tocado tras un envio exitoso, para no marcar en rojo los campos que se vaciaron. */
+  const reset = useCallback(() => {
+    setTouched({});
+    setSubmitted(false);
+  }, []);
+
+  return { touch, visibleError, attemptSubmit, reset };
 }

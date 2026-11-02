@@ -12,7 +12,9 @@ Este directorio es un repositorio Git independiente. No importa código de `arta
 | Tema | Decisión |
 |---|---|
 | Framework | Next.js 15, App Router, TypeScript estricto |
-| Estilos | Tailwind CSS |
+| Estilos | Tailwind CSS con tokens propios (papel, tinta y óxido) y un sistema de componentes en `src/components/ui`; iconos de `lucide-react` |
+| Formularios | Ningún texto empieza por espacio, y correo, contraseña y URL no admiten espacios. Los errores aparecen al salir del campo o al enviar |
+| Pagos | Cobro simulado. La tarjeta se formatea según su marca (Visa, Mastercard, American Express, Diners) y solo se rechaza si está vencida |
 | Pruebas | Vitest + Testing Library, smoke con Playwright |
 | Imágenes | `image-worker` (Dedicated Worker + OffscreenCanvas): redimensiona, comprime y calcula el hash perceptual antes de subir |
 | Subasta en vivo | `auction-socket-worker` (SharedWorker, respaldo Dedicated): una conexión WebSocket compartida entre pestañas y el desfase de reloj con el servidor |
@@ -40,11 +42,14 @@ src/app/(auth)       registro e inicio de sesión
 src/app/(private)    perfil, publicar, galería, feed y avisos
 src/app/admin        cola de revisión manual: tarjetas con los hallazgos de la auditoría y sus evidencias
 src/app/api          cookie de refresh y revalidateTag
+src/components/ui    sistema de diseño: botones, campos, avisos, diálogos, toasts y encabezados
 src/components       piezas de interfaz compartidas
 src/workers          imagen, subasta y catálogo
 src/lib/api          cliente HTTP de la API v1
+src/lib/forms        saneamiento de campos y validadores de cuenta
+src/lib/payments     marcas de tarjeta, máscaras y vencimiento
 src/lib/ws           tipos del catálogo de eventos
-src/hooks            filtro, imagen y canal de subasta
+src/hooks            filtro, imagen, canal de subasta y validación de formularios
 tests                pruebas de unidad y smoke e2e
 ```
 
