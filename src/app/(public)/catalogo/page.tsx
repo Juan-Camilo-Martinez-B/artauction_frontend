@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { LiveAuctions } from '@/components/auctions/live-auctions';
 import { getCategories, getPublicLots } from '@/lib/api/server';
 import { CatalogExhibit } from './catalog-exhibit';
 
@@ -40,6 +41,7 @@ export default async function CatalogPage({
           Una sala editorial de pinturas y objetos. El filtro vive en el servidor; la página se regenera cada minuto.
         </p>
       </header>
+      <LiveAuctions />
       {error ? <p role="alert">{error}</p> : null}
       <CatalogExhibit
         lots={catalog.items}

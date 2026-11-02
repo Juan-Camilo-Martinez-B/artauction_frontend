@@ -43,6 +43,7 @@ src/app/(private)    perfil, publicar, galería, feed y avisos
 src/app/admin        cola de revisión manual: tarjetas con los hallazgos de la auditoría y sus evidencias
 src/app/api          cookie de refresh y revalidateTag
 src/components/ui    sistema de diseño: botones, campos, avisos, diálogos, toasts y encabezados
+src/components/auctions  cartelera de salas en vivo y próximas (subastas rotativas)
 src/components       piezas de interfaz compartidas
 src/workers          imagen, subasta y catálogo
 src/lib/api          cliente HTTP de la API v1

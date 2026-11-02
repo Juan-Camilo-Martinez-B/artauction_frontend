@@ -103,6 +103,12 @@ export interface Auction {
   bids?: Bid[];
 }
 
+/** Cartelera de salas activas y proximas, con la hora del servidor. */
+export interface LiveAuctions {
+  items: Lot[];
+  serverTime: string;
+}
+
 export interface AuctionView {
   auction: Auction;
   serverTime: string;

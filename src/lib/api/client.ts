@@ -5,6 +5,7 @@ import type {
   CatalogPage,
   Category,
   GalleryItem,
+  LiveAuctions,
   Lot,
   NotificationItem,
   PersonalGallery,
@@ -135,6 +136,9 @@ export const artApi = {
   },
   auction(id: string) {
     return api<AuctionView>(`/auctions/${id}`);
+  },
+  liveAuctions(limit = 8) {
+    return api<LiveAuctions>(`/auctions/live?limit=${String(limit)}`);
   },
   openAuction(
     token: string,
