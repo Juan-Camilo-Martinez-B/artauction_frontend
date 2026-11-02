@@ -196,6 +196,13 @@ export const artApi = {
   addToGallery(token: string, lotId: string) {
     return api<PersonalGallery>('/me/gallery/artworks', { method: 'POST', token, body: JSON.stringify({ lotId }) });
   },
+  placeArtwork(
+    token: string,
+    lotId: string,
+    placement: { posX: number; posY: number; posZ: number; rotY: number; scale: number; support: string },
+  ) {
+    return api<PersonalGallery>(`/me/gallery/artworks/${lotId}`, { method: 'PATCH', token, body: JSON.stringify(placement) });
+  },
   removeFromGallery(token: string, lotId: string) {
     return api<PersonalGallery>(`/me/gallery/artworks/${lotId}`, { method: 'DELETE', token });
   },

@@ -54,6 +54,25 @@ src/hooks            filtro, imagen, canal de subasta y validación de formulari
 tests                pruebas de unidad y smoke e2e
 ```
 
+## Galería 3D
+
+La sala personal (`/mi-galeria`) simula una galería real con React Three Fiber.
+
+- **Sala.** Paredes, suelo, techo y pedestales usan texturas PBR CC0 de Poly Haven (`public/textures`, con créditos en su README), repetidas a su tamaño real. El yeso y el concreto toman de la textura solo el relieve y la rugosidad, y el color de la paleta. Luz ambiental, un entorno de paneles de luz para los reflejos y un foco por obra (hasta 8 murales y 4 objetos).
+- **Obras murales.** La imagen real de la obra con su tamaño en centímetros, y un marco según el soporte:
+  - moldura dorada para un óleo;
+  - marco negro con paspartú y vidrio para obras sobre papel o fotografías;
+  - marco flotante para arte digital;
+  - nogal para el resto.
+  Las piezas diminutas reciben un paspartú ancho. Cada obra lleva su cartela.
+- **Objetos 3D.** Un worker (`silhouette.worker.ts`) recorta el fondo de la foto y mide la simetría de la silueta.
+  - Si es simétrica (jarrones, copas), se tornea un sólido de revolución con la foto proyectada.
+  - Si no, la pieza recortada se expone en una vitrina sobre pedestal.
+  - `ObjectModelProvider` permite conectar después una IA de imagen a 3D sin tocar la escena.
+- **Imágenes.** WebGL exige CORS. Las imágenes de Garage se piden con `?texture=1` para no reutilizar la copia sin CORS que dejó el catálogo. Las del Met pasan por `/api/artwork-image`, un proxy con lista de hosts permitidos, sin redirecciones y con límite de tamaño.
+- **Recorrido.** Se arrastra para mirar. WASD o flechas para caminar (Shift corre), Q/E para girar, o los botones en pantalla. Hay colisión con paredes y pedestales. Un clic en una obra lleva hasta ella y abre su ficha. Con `prefers-reduced-motion`, el salto es instantáneo.
+- **Montaje.** En **Editar montaje** se elige una obra para cambiarla de pared, moverla, subirla o escalarla. **Organizar automáticamente** reparte todo según las medidas reales. Ambiente y montaje son un borrador: **Guardar cambios** solo aparece si hay cambios, y avisa antes de cerrar la pestaña.
+
 ## Convenciones
 
 - Commits en [Conventional Commits](https://www.conventionalcommits.org/): `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`, `build`.
@@ -82,7 +101,7 @@ El `Dockerfile` es multi-stage y publica el output `standalone` en el puerto `80
 | `/subasta/[id]` | Esqueleto SSR y sala en cliente |
 | `/entrar` y `/registro` | Cliente. El access token queda en `sessionStorage`; el refresh, en cookie `httpOnly` |
 | `/perfil`, `/galeria`, `/publicar`, `/feed`, `/notificaciones` | Cliente, `Cache-Control: private, no-store` |
-| `/mi-galeria` | Sala 3D personal. Three.js aplica colores, luz y obras guardadas |
+| `/mi-galeria` | Sala 3D personal: recorrido en primera persona y modo de edición del montaje (ver «Galería 3D») |
 | `/mi-galeria/personalizar` | Asistente «Personaliza tu galería» |
 | `/admin` | Cliente, sin caché compartida |
 | `POST /api/revalidate` | Invalida tags con el header `x-revalidate-secret` |
