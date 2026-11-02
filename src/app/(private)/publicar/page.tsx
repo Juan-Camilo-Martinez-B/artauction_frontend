@@ -2,7 +2,8 @@
 
 import { useEffect, useState, type SubmitEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Field, FormError, TextArea } from '@/components/field';
+import { Notice } from '@/components/ui/notice';
+import { TextAreaField, TextField } from '@/components/ui/text-field';
 import { useImageProcessor } from '@/hooks/use-image-processor';
 import { ApiError, artApi } from '@/lib/api/client';
 import type { Category } from '@/lib/api/types';
@@ -113,11 +114,11 @@ export default function PublishPage() {
         Estos datos son los de la ficha: título, materiales, categoría, formato, medidas y procedencia. La imagen se redimensiona en el navegador antes de enviarse.
       </p>
       <form onSubmit={(event) => void onSubmit(event)} className="mt-6 space-y-4">
-        <Field id="title" label="Título" required minLength={3} value={title} onChange={(event) => { setTitle(event.target.value); }} />
-        <TextArea id="description" label="Descripción" required minLength={10} value={description} onChange={setDescription} />
-        <Field id="materials" label="Materiales" required minLength={2} value={materials} onChange={(event) => { setMaterials(event.target.value); }} />
-        <Field id="artist" label="Artista" value={artistName} onChange={(event) => { setArtistName(event.target.value); }} />
-        <Field id="year" label="Año" type="number" min={1} max={2100} value={year} onChange={(event) => { setYear(event.target.value); }} />
+        <TextField id="title" label="Título" required minLength={3} value={title} onValueChange={setTitle} />
+        <TextAreaField id="description" label="Descripción" required minLength={10} value={description} onValueChange={setDescription} />
+        <TextField id="materials" label="Materiales" required minLength={2} value={materials} onValueChange={setMaterials} />
+        <TextField id="artist" label="Artista" value={artistName} onValueChange={setArtistName} />
+        <TextField id="year" label="Año" type="number" min={1} max={2100} value={year} onValueChange={setYear} />
         <label className="block text-sm" htmlFor="category">
           <span className="mb-1 block font-medium">Categoría</span>
           <select
@@ -147,13 +148,13 @@ export default function PublishPage() {
           </select>
         </label>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Field id="width" label="Ancho (cm)" type="number" required min={0.1} max={2000} step="0.1" value={widthCm} onChange={(event) => { setWidthCm(event.target.value); }} />
-          <Field id="height" label="Alto (cm)" type="number" required min={0.1} max={2000} step="0.1" value={heightCm} onChange={(event) => { setHeightCm(event.target.value); }} />
+          <TextField id="width" label="Ancho (cm)" type="number" required min={0.1} max={2000} step="0.1" value={widthCm} onValueChange={setWidthCm} />
+          <TextField id="height" label="Alto (cm)" type="number" required min={0.1} max={2000} step="0.1" value={heightCm} onValueChange={setHeightCm} />
           {representation === 'THREE_D' ? (
-            <Field id="depth" label="Profundidad (cm)" type="number" required min={0.1} max={2000} step="0.1" value={depthCm} onChange={(event) => { setDepthCm(event.target.value); }} />
+            <TextField id="depth" label="Profundidad (cm)" type="number" required min={0.1} max={2000} step="0.1" value={depthCm} onValueChange={setDepthCm} />
           ) : null}
         </div>
-        <Field id="provenance" label="Procedencia" minLength={3} value={provenance} onChange={(event) => { setProvenance(event.target.value); }} />
+        <TextField id="provenance" label="Procedencia" minLength={3} value={provenance} onValueChange={setProvenance} />
         <label className="block text-sm">
           <span className="mb-1 block font-medium">Imagen</span>
           <input
@@ -169,7 +170,7 @@ export default function PublishPage() {
           />
         </label>
         {preview ? <img src={preview} alt="Vista previa de la obra preparada" className="max-h-64 rounded-lg border border-line" /> : null}
-        {error ? <FormError>{error}</FormError> : null}
+        {error ? <Notice tone="error">{error}</Notice> : null}
         <button type="submit" disabled={pending} className="rounded-full bg-oxide px-5 py-2 text-white disabled:opacity-60">
           {pending ? 'Enviando…' : 'Enviar a auditoría'}
         </button>

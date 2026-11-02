@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ArtworkImage } from '@/components/artwork-image';
-import { FormError } from '@/components/field';
+import { Notice } from '@/components/ui/notice';
 import { ApiError, artApi } from '@/lib/api/client';
 import type { ReviewFinding, ReviewItem } from '@/lib/api/types';
 import { browserSession } from '@/lib/session/browser-session';
@@ -169,7 +169,7 @@ export default function AdminPage() {
         Obras que la auditoría no pudo aprobar sola, con los hallazgos y las evidencias que usó. Solo una cuenta administradora puede resolverlas.
       </p>
       <div className="mt-4 space-y-2" aria-live="polite">
-        {error ? <FormError>{error}</FormError> : null}
+        {error ? <Notice tone="error">{error}</Notice> : null}
         {message ? <p role="status">{message}</p> : null}
       </div>
       {items === null ? (

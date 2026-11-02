@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, type SubmitEvent } from 'react';
-import { Field, FormError } from '@/components/field';
+import { Notice } from '@/components/ui/notice';
+import { TextField } from '@/components/ui/text-field';
 import { ApiError, artApi } from '@/lib/api/client';
 import { browserSession } from '@/lib/session/browser-session';
 
@@ -36,15 +37,9 @@ export default function RegisterPage() {
     <section className="mx-auto max-w-md">
       <h1 className="font-serif text-4xl">Crear cuenta</h1>
       <form onSubmit={(event) => void onSubmit(event)} className="mt-6 space-y-4">
-        <Field id="name" label="Nombre" required minLength={2} value={displayName} onChange={(event) => {
-          setDisplayName(event.target.value);
-        }} />
-        <Field id="email" label="Correo" type="email" required value={email} onChange={(event) => {
-          setEmail(event.target.value);
-        }} />
-        <Field id="password" label="Contraseña" type="password" required minLength={10} hint="Mínimo 10 caracteres." value={password} onChange={(event) => {
-          setPassword(event.target.value);
-        }} />
+        <TextField id="name" label="Nombre" required minLength={2} value={displayName} onValueChange={setDisplayName} />
+        <TextField id="email" label="Correo" type="email" required value={email} onValueChange={setEmail} />
+        <TextField id="password" label="Contraseña" type="password" required minLength={10} hint="Mínimo 10 caracteres." value={password} onValueChange={setPassword} />
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -55,7 +50,7 @@ export default function RegisterPage() {
           />
           Quiero publicar obras
         </label>
-        {error ? <FormError>{error}</FormError> : null}
+        {error ? <Notice tone="error">{error}</Notice> : null}
         <button type="submit" className="rounded-full bg-oxide px-5 py-2 text-white">
           Registrarme
         </button>

@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
-import { Field, FormError } from '@/components/field';
+import { Notice } from '@/components/ui/notice';
+import { TextField } from '@/components/ui/text-field';
 import { ApiError, artApi } from '@/lib/api/client';
 import type { WalletSnapshot } from '@/lib/api/types';
 import { formatArtacoins } from '@/lib/auction/policy';
@@ -116,19 +117,19 @@ export default function WalletPage() {
             ))}
           </div>
         </fieldset>
-        <Field id="card-name" label="Nombre en la tarjeta" value={cardName} autoComplete="cc-name" onChange={(event) => { setCardName(event.target.value); }} required minLength={3} />
-        <Field id="card-number" label="Número" value={cardNumber} inputMode="numeric" autoComplete="cc-number" onChange={(event) => { setCardNumber(event.target.value); }} required minLength={12} />
+        <TextField id="card-name" label="Nombre en la tarjeta" value={cardName} autoComplete="cc-name" onValueChange={setCardName} required minLength={3} />
+        <TextField id="card-number" label="Número" value={cardNumber} inputMode="numeric" autoComplete="cc-number" onValueChange={setCardNumber} required minLength={12} />
         <div className="grid grid-cols-3 gap-3">
-          <Field id="card-month" label="Mes" value={expMonth} inputMode="numeric" autoComplete="cc-exp-month" onChange={(event) => { setExpMonth(event.target.value); }} required />
-          <Field id="card-year" label="Año" value={expYear} inputMode="numeric" autoComplete="cc-exp-year" onChange={(event) => { setExpYear(event.target.value); }} required />
-          <Field id="card-cvv" label="Código" value={cvv} inputMode="numeric" autoComplete="cc-csc" onChange={(event) => { setCvv(event.target.value); }} required minLength={3} maxLength={4} />
+          <TextField id="card-month" label="Mes" value={expMonth} inputMode="numeric" autoComplete="cc-exp-month" onValueChange={setExpMonth} required />
+          <TextField id="card-year" label="Año" value={expYear} inputMode="numeric" autoComplete="cc-exp-year" onValueChange={setExpYear} required />
+          <TextField id="card-cvv" label="Código" value={cvv} inputMode="numeric" autoComplete="cc-csc" onValueChange={setCvv} required minLength={3} maxLength={4} />
         </div>
         <p className="text-sm text-muted">Cobro simulado: {coins}.00 USD por {coins} artacoins. No se guarda el número ni el código.</p>
         <button type="submit" disabled={pending} className="rounded-full bg-oxide px-5 py-2 text-white disabled:opacity-60">
           {pending ? 'Cobrando…' : 'Cargar artacoins'}
         </button>
         {notice ? <p role="status">{notice}</p> : null}
-        {error ? <FormError>{error}</FormError> : null}
+        {error ? <Notice tone="error">{error}</Notice> : null}
       </form>
       {wallet && wallet.entries.length > 0 ? (
         <ul className="mt-10 divide-y divide-line">

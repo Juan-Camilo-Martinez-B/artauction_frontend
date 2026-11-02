@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type SubmitEvent } from 'react';
 import { Countdown } from '@/components/countdown';
-import { FormError } from '@/components/field';
+import { Notice } from '@/components/ui/notice';
 import { StatusPill } from '@/components/status-pill';
 import { useAuctionChannel } from '@/hooks/use-auction-channel';
 import { ApiError, artApi, publicWsUrl } from '@/lib/api/client';
@@ -150,7 +150,7 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
           Cada oferta nueva retiene solo el aumento. Retirarse exige al menos 4 minutos antes del cierre.
         </p>
         {notice ? <p role="status">{notice}</p> : null}
-        {error ? <FormError>{error}</FormError> : null}
+        {error ? <Notice tone="error">{error}</Notice> : null}
       </form>
     </div>
   );

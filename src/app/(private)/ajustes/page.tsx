@@ -2,7 +2,8 @@
 
 import { useEffect, useState, type SubmitEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Field, FormError } from '@/components/field';
+import { Notice } from '@/components/ui/notice';
+import { TextField } from '@/components/ui/text-field';
 import { ProfileMark } from '@/components/account/profile-mark';
 import { ApiError, artApi } from '@/lib/api/client';
 import { browserSession } from '@/lib/session/browser-session';
@@ -58,16 +59,16 @@ export default function SettingsPage() {
         <ProfileMark name={displayName || 'Cuenta'} avatarUrl={avatarUrl.trim() || null} />
       </div>
       <form onSubmit={(event) => void onSubmit(event)} className="mt-6 space-y-4">
-        <Field id="display-name" label="Nombre" required minLength={2} maxLength={80} value={displayName} onChange={(event) => { setDisplayName(event.target.value); }} />
-        <Field
+        <TextField id="display-name" label="Nombre" required minLength={2} maxLength={80} value={displayName} onValueChange={setDisplayName} />
+        <TextField
           id="avatar-url"
           label="Imagen de perfil"
           type="url"
           hint="Una dirección https. Si la dejas vacía, la cabecera usa tus iniciales."
           value={avatarUrl}
-          onChange={(event) => { setAvatarUrl(event.target.value); }}
+          onValueChange={setAvatarUrl}
         />
-        {error ? <FormError>{error}</FormError> : null}
+        {error ? <Notice tone="error">{error}</Notice> : null}
         {message ? <p className="text-sm">{message}</p> : null}
         <button type="submit" className="rounded-full bg-ink px-5 py-2 text-paper">
           Guardar
