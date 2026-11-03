@@ -1,8 +1,8 @@
 'use client';
 
-import { Gavel, Undo2, Wifi, WifiOff } from 'lucide-react';
+import { Gavel, ShoppingBag, Undo2, Wifi, WifiOff } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState, type SubmitEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { ArtworkImage } from '@/components/artwork-image';
 import { StatusPill } from '@/components/status-pill';
 import { Button, ButtonLink } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { useAuctionChannel } from '@/hooks/use-auction-channel';
 import { useRemaining } from '@/hooks/use-remaining';
 import { ApiError, artApi, publicWsUrl } from '@/lib/api/client';
 import type { Auction, Lot, WalletSnapshot } from '@/lib/api/types';
+import { buyNowOpen, buyNowThreshold } from '@/lib/auction/buy-now';
 import { canWithdraw, formatArtacoins } from '@/lib/auction/policy';
 import { bidderLabels, mergeBid, nextMinimumBid, quickBids, roomPhase, type RoomPhase } from '@/lib/auction/room';
 import { clockOffset } from '@/lib/clock';
@@ -39,6 +40,11 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [confirmWithdraw, setConfirmWithdraw] = useState(false);
+  const [confirmBuyNow, setConfirmBuyNow] = useState(false);
+  const [buying, setBuying] = useState(false);
+  // Una clave por intento de compra: si la respuesta se pierde y se reintenta,
+  // el servidor reconoce la misma compra y no cobra dos veces.
+  const buyKey = useRef<string | null>(null);
   const [wallet, setWallet] = useState<WalletSnapshot | null>(null);
   const [session, setSession] = useState<SessionSnapshot>(browserSession.current());
 
@@ -76,7 +82,10 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
         }
       }
       if (message.type === 'auction-closed') {
-        setAuction((current) => (current ? { ...current, status: 'CERRADA', currentPrice: message.event.amount, winnerId: message.event.winnerId } : current));
+        const event = message.event;
+        setAuction((current) =>
+          current ? { ...current, status: 'CERRADA', currentPrice: event.amount, winnerId: event.winnerId, closedBy: event.closedBy ?? 'TIME', buyNowAvailable: false } : current,
+        );
       }
     },
     [notify],
@@ -118,6 +127,14 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
   }, [auctionId, send, session.status]);
 
   const phase: RoomPhase | null = auction ? roomPhase(auction, Date.now() + offsetMs) : null;
+
+  // Al cerrar se trae la sala completa: el historial incluye la compra inmediata, si la hubo.
+  const status = auction?.status;
+  useEffect(() => {
+    if (status === 'CERRADA') {
+      void load();
+    }
+  }, [status, load]);
 
   // La apertura y el cierre los hace el programador del servidor: se consulta hasta verlos.
   useEffect(() => {
@@ -189,6 +206,37 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
     }
   }
 
+  function openBuyNow() {
+    setError(null);
+    buyKey.current ??= crypto.randomUUID();
+    setConfirmBuyNow(true);
+  }
+
+  async function onBuyNow() {
+    const key = buyKey.current;
+    const token = await browserSession.accessToken();
+    if (!token || !key) {
+      return;
+    }
+    setBuying(true);
+    try {
+      const bought = await artApi.buyNow(token, auctionId, key);
+      buyKey.current = null;
+      setConfirmBuyNow(false);
+      setAuction((current) =>
+        current ? { ...current, status: 'CERRADA', currentPrice: bought.amount, winnerId: session.profile?.userId ?? null, closedBy: 'BUY_NOW', buyNowAvailable: false } : current,
+      );
+      notify(`¡La compraste por ${formatArtacoins(bought.amount)}! Ya está en tu galería.`, 'success');
+      await refreshWallet(token);
+    } catch (caught) {
+      setConfirmBuyNow(false);
+      setError(caught instanceof ApiError ? caught.message : 'La compra no se completó. Intenta de nuevo.');
+      await load();
+    } finally {
+      setBuying(false);
+    }
+  }
+
   if (loadError) {
     return <EmptyState icon={<Gavel aria-hidden="true" className="h-6 w-6" />} title="Sala no disponible" description={loadError} action={<ButtonLink href="/catalogo">Ver salas en vivo</ButtonLink>} />;
   }
@@ -203,6 +251,11 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
   const isSeller = viewerId !== null && viewerId === auction.sellerId;
   const myActiveBid = history.some((bid) => bid.active !== false && bid.bidderId === viewerId);
   const withdrawAllowed = phase === 'live' && myActiveBid && canWithdraw(new Date(Date.now() + offsetMs), new Date(auction.endsAt));
+  const canBuyNow = phase === 'live' && buyNowOpen(auction, Date.now() + offsetMs);
+  const balance = wallet?.balance ?? null;
+  // Lo que ya tienes retenido en esta sala cuenta para la compra.
+  const myHold = Math.max(0, ...history.filter((bid) => bid.active !== false && bid.bidderId === viewerId).map((bid) => Number(bid.amount)));
+  const buyNowShort = balance !== null && auction.buyNowPrice !== undefined && Number(auction.buyNowPrice) - myHold > balance;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)] lg:items-start">
@@ -261,6 +314,14 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
             wallet={wallet}
             onSubmit={(event) => void onBid(event)}
           />
+          <BuyNowArea
+            auction={auction}
+            phase={phase}
+            authenticated={session.status === 'authenticated'}
+            isSeller={isSeller}
+            available={canBuyNow}
+            onOpen={openBuyNow}
+          />
           {error ? <Notice tone="error" className="mt-4">{error}</Notice> : null}
           {withdrawAllowed ? (
             <Button variant="ghost" className="mt-3" icon={<Undo2 aria-hidden="true" className="h-4 w-4" />} onClick={() => { setConfirmWithdraw(true); }}>
@@ -277,7 +338,10 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
             <ol className="mt-3 divide-y divide-line text-sm">
               {history.slice(0, 12).map((bid) => (
                 <li key={bid.id} className={`flex items-baseline justify-between gap-3 py-2 ${bid.active === false ? 'text-muted line-through' : ''}`}>
-                  <span className={labels.get(bid.bidderId) === 'Tú' ? 'font-medium' : ''}>{labels.get(bid.bidderId)}</span>
+                  <span className={labels.get(bid.bidderId) === 'Tú' ? 'font-medium' : ''}>
+                    {labels.get(bid.bidderId)}
+                    {bid.buyNow ? <span className="ml-2 text-xs uppercase tracking-wide text-oxide">Compra inmediata</span> : null}
+                  </span>
                   <span className="tabular-nums">{formatArtacoins(bid.amount)}</span>
                   <time dateTime={bid.createdAt} className="w-24 text-right text-xs text-muted">
                     {formatRelative(bid.createdAt, new Date(Date.now() + offsetMs))}
@@ -299,6 +363,32 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
       >
         Las artacoins retenidas vuelven a tu bolsillo y dejas de competir por esta obra. Solo se puede hasta 4 minutos antes del cierre.
       </ConfirmDialog>
+
+      <ConfirmDialog
+        open={confirmBuyNow}
+        title="¿Comprar ahora?"
+        confirmLabel={`Comprar por ${formatArtacoins(auction.buyNowPrice ?? 0)}`}
+        tone="accent"
+        confirmDisabled={buyNowShort}
+        confirmLoading={buying}
+        onCancel={() => { setConfirmBuyNow(false); }}
+        onConfirm={() => void onBuyNow()}
+      >
+        <p>
+          Pagas <strong className="text-ink">{formatArtacoins(auction.buyNowPrice ?? 0)}</strong>, te llevas la obra y la subasta termina para todos. Quienes pujaron recuperan lo retenido.
+        </p>
+        {balance !== null ? (
+          <p className={`mt-2 ${buyNowShort ? 'text-oxide' : ''}`}>
+            Disponible: {formatArtacoins(balance)}
+            {myHold > 0 ? ` más ${formatArtacoins(myHold)} ya retenidas en esta sala` : ''}.{' '}
+            {buyNowShort ? (
+              <Link href="/bolsillo" className="font-medium underline underline-offset-4">
+                Recargar
+              </Link>
+            ) : null}
+          </p>
+        ) : null}
+      </ConfirmDialog>
     </div>
   );
 }
@@ -308,7 +398,18 @@ function PhaseClock({ auction, phase, offsetMs, viewerId }: { auction: Auction; 
   const target = phase === 'upcoming' ? (auction.startsAt ?? auction.endsAt) : auction.endsAt;
   const { label } = useRemaining(target, offsetMs);
   if (phase === 'closed') {
-    const text = auction.winnerId === null ? 'Cerró sin ventas: se programará otra fecha.' : auction.winnerId === viewerId ? '¡Ganaste esta obra! Ya está en tu galería.' : 'Cerró con un ganador.';
+    const mine = auction.winnerId !== null && auction.winnerId === viewerId;
+    const buyNow = auction.closedBy === 'BUY_NOW';
+    const text =
+      auction.winnerId === null
+        ? 'Cerró sin ventas: se programará otra fecha.'
+        : buyNow
+          ? mine
+            ? '¡La compraste! Ya está en tu galería.'
+            : 'Se vendió por compra inmediata.'
+          : mine
+            ? '¡Ganaste esta obra! Ya está en tu galería.'
+            : 'Cerró con un ganador.';
     return <Notice tone={auction.winnerId === viewerId ? 'success' : 'info'} className="mt-4">{text}</Notice>;
   }
   if (phase === 'opening' || phase === 'closing') {
@@ -416,5 +517,51 @@ function BidArea({
         Ofertar {amount ? formatArtacoins(Number(amount)) : ''}
       </Button>
     </form>
+  );
+}
+
+/**
+ * Compra inmediata: un boton aparte del formulario de puja. Mientras la sala no
+ * abre se anuncia el precio; cuando una puja llega al 80 % deja de ofrecerse.
+ */
+function BuyNowArea({
+  auction,
+  phase,
+  authenticated,
+  isSeller,
+  available,
+  onOpen,
+}: {
+  auction: Auction;
+  phase: RoomPhase;
+  authenticated: boolean;
+  isSeller: boolean;
+  available: boolean;
+  onOpen: () => void;
+}) {
+  if (!auction.buyNowPrice || phase === 'closed' || phase === 'closing') {
+    return null;
+  }
+  const price = formatArtacoins(auction.buyNowPrice);
+  if (phase !== 'live') {
+    return <p className="mt-4 border-t border-line pt-4 text-sm text-muted">Compra inmediata al abrir la sala: {price}.</p>;
+  }
+  if (!available) {
+    return (
+      <p className="mt-4 border-t border-line pt-4 text-sm text-muted">
+        La compra inmediata ya no está disponible: las pujas llegaron a {formatArtacoins(Math.ceil(buyNowThreshold(auction.buyNowPrice)))}, el 80 % de {price}.
+      </p>
+    );
+  }
+  if (!authenticated || isSeller) {
+    return <p className="mt-4 border-t border-line pt-4 text-sm text-muted">Compra inmediata: {price}.</p>;
+  }
+  return (
+    <div className="mt-4 border-t border-line pt-4">
+      <p className="text-sm text-muted">¿No quieres esperar? Llévatela ahora y la subasta termina.</p>
+      <Button variant="primary" className="mt-3 w-full" icon={<ShoppingBag aria-hidden="true" className="h-4 w-4" />} onClick={onOpen}>
+        Comprar ahora por {price}
+      </Button>
+    </div>
   );
 }
