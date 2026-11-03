@@ -39,8 +39,8 @@ Nada que tarde más de unos 50 ms corre en el hilo principal. Los mensajes de lo
 ```
 src/app/(public)     landing, catálogo, obra, sala y galería pública
 src/app/(auth)       registro e inicio de sesión
-src/app/(private)    perfil, publicar, galería, feed y avisos
-src/app/admin        cola de revisión manual: tarjetas con los hallazgos de la auditoría y sus evidencias
+src/app/(private)    perfil, publicar y editar obras, mis obras, galería, feed y avisos
+src/app/admin        cola de revisión manual: hallazgos y evidencias, rango de precio, devolución con motivo y re-auditoría
 src/app/api          cookie de refresh y revalidateTag
 src/components/ui    sistema de diseño: botones, campos, avisos, diálogos, toasts y encabezados
 src/components/auctions  cartelera de salas en vivo y próximas (subastas rotativas)
@@ -98,6 +98,16 @@ Copia `.env.example` a `.env.local`. `NEXT_PUBLIC_*` llega al navegador; el rest
 
 El `Dockerfile` es multi-stage y publica el output `standalone` en el puerto `8080` (Cloud Run). La imagen se puede construir cuando existan `package.json` y el build de Next.js.
 
+## Ciclo de revisión
+
+Cuando la auditoría deja una obra en revisión manual, un administrador la resuelve en `/admin`:
+
+- **Aprobar y publicar** con un rango de precio. Viene lleno con la sugerencia de la auditoría; si no la hay (decidió una regla o la auditoría no terminó), es obligatorio.
+- **Devolver al vendedor** con un motivo de 10 a 500 caracteres. La obra vuelve a borrador, el vendedor recibe un aviso que lleva a editarla, y en `/mis-obras` la ve como **Devuelta** con el motivo. La corrige en `/publicar/[id]`, también la imagen, y la reenvía.
+- **Re-auditar con IA**, solo si la decidió la evaluación local (`LOCAL`) o el respaldo (`FALLBACK`), por ejemplo cuando Gemini vuelve a tener cuota.
+
+La ficha de la obra dice quién la evaluó: la IA (con el modelo), la evaluación local sin IA, una regla o un administrador. La lógica está en `src/lib/artwork/lot-review.ts`.
+
 ## Rutas
 
 | Ruta | Render |
@@ -109,6 +119,8 @@ El `Dockerfile` es multi-stage y publica el output `standalone` en el puerto `80
 | `/subasta/[id]` | Esqueleto SSR y sala en cliente |
 | `/entrar` y `/registro` | Cliente. El access token queda en `sessionStorage`; el refresh, en cookie `httpOnly` |
 | `/perfil`, `/galeria`, `/publicar`, `/feed`, `/notificaciones` | Cliente, `Cache-Control: private, no-store` |
+| `/mis-obras` | Obras del vendedor y su estado; las devueltas muestran el motivo. Cliente, `private, no-store` |
+| `/publicar/[id]` | Edita una obra en borrador (imagen incluida) y la reenvía a auditoría. Cliente, `private, no-store` |
 | `/mi-galeria` | Sala 3D personal: recorrido en primera persona y modo de edición del montaje (ver «Galería 3D») |
 | `/mi-galeria/personalizar` | Asistente «Personaliza tu galería» |
 | `/admin` | Cliente, sin caché compartida |

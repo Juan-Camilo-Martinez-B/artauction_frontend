@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: { unoptimized: true },
   async headers() {
-    return ['/perfil', '/galeria', '/publicar', '/feed', '/notificaciones', '/admin'].map((source) => ({
+    return ['/perfil', '/galeria', '/publicar', '/publicar/:id', '/mis-obras', '/feed', '/notificaciones', '/admin'].map((source) => ({
       source,
       headers: [privateHeader],
     }));
