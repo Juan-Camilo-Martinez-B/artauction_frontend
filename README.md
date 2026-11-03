@@ -110,14 +110,30 @@ La ficha de la obra dice quién la evaluó: la IA (con el modelo), la evaluació
 
 ## Mis obras
 
-Una sola página reúne dos fuentes, sin repetir obras:
+Una sola página, para todos los roles, reúne dos fuentes sin repetir obras:
 
-- **Publicadas por mí** (vendedor y admin), desde catalog-service: cada obra con su estado y, si un administrador la devolvió, el motivo, **Editar** y **Reenviar**.
-- **Adquiridas** (todos), desde gallery-service: las ganadas en subasta y las añadidas como prueba. Las obras propias de la galería no se repiten, porque ya están arriba con más detalle.
+- **Creadas por mí**, desde catalog-service: los proyectos propios y las obras del catálogo, cada una con su estado. Si un administrador devolvió una obra, se ve el motivo con **Editar** y **Reenviar**.
+- **Adquiridas**, desde gallery-service: las ganadas en subasta. Lo que la galería registra como propio no se repite, porque ya está arriba con más detalle.
 
-Los chips filtran por etiqueta y muestran cuántas obras tiene cada una; los que están en cero no aparecen. Publicadas: Devueltas, Borrador, En auditoría, Revisión manual, Publicada, En subasta (con sala abierta o programada), Vendida y Cerrada sin venta. Adquiridas: Ganadas en subasta y Añadidas como prueba. El filtro va en la URL (`/mis-obras?estado=devueltas`), así el botón atrás funciona y se puede enlazar. La clasificación vive en `src/lib/artwork/my-works.ts`.
+Acciones según la obra:
+
+| Obra | Acciones |
+|---|---|
+| Proyecto propio | **Editar** (sin auditoría), **Hacer pública/privada**, **Pasar al catálogo** (solo quien vende, con confirmación: se audita y se oculta mientras tanto) |
+| Borrador o devuelta | **Editar** y **Enviar** o **Reenviar** a auditoría |
+| Cualquiera que sea tuya | **Colgar en mi sala** o **Quitar de mi sala** |
+| Vendida | Solo el registro de la venta: ya es de quien la ganó y no se cuelga |
+
+Los chips filtran por etiqueta y muestran cuántas obras tiene cada una; los que están en cero no aparecen. Creadas: Devueltas, Proyectos propios, Borrador, En auditoría, Revisión manual, Publicada, En subasta (con sala abierta o programada), Vendida y Cerrada sin venta. Adquiridas: Ganadas en subasta. El filtro va en la URL (`/mis-obras?estado=devueltas`), así el botón atrás funciona y se puede enlazar. La clasificación vive en `src/lib/artwork/my-works.ts`.
 
 Reemplaza a «Mi colección» (`/galeria`), que listaba las mismas obras propias sin su estado. `/galeria` redirige a las ganadas.
+
+## Proyectos propios y propiedad
+
+- **Nueva obra** (`/publicar`, para todas las cuentas) pregunta primero para qué es la obra: **Solo para mi galería** (proyecto propio, sin auditoría, no se vende) o **Publicar en el catálogo** (solo quien vende). Un proyecto propio pregunta además quién lo ve: solo su autor o también su galería pública.
+- La ficha de un proyecto propio dice **Proyecto propio, sin auditar** y no muestra score, banda de precio ni sala de subasta. La galería pública lo marca igual. Nunca aparece en el catálogo.
+- La sala 3D solo cuelga obras propias. Un proyecto propio y una obra ganada se cuelgan solos; lo publicado que aún no se vende se cuelga desde Mis obras. Al venderse, la obra sale de la sala del autor y entra en la del ganador. El antiguo botón «Añadir a mi galería», que colgaba cualquier obra del catálogo, ya no existe.
+- Los roles que publican al catálogo están en `src/lib/session/roles.ts` y las reglas de la obra en `src/lib/artwork/lot-review.ts` y `my-works.ts`.
 
 ## Rutas
 
@@ -129,8 +145,9 @@ Reemplaza a «Mi colección» (`/galeria`), que listaba las mismas obras propias
 | `/obras/[id]` | SSR con `Suspense` (ficha y puntaje por separado) |
 | `/subasta/[id]` | Esqueleto SSR y sala en cliente |
 | `/entrar` y `/registro` | Cliente. El access token queda en `sessionStorage`; el refresh, en cookie `httpOnly` |
-| `/perfil`, `/publicar`, `/feed`, `/notificaciones` | Cliente, `Cache-Control: private, no-store` |
-| `/mis-obras` | Todas las obras de la persona: las que publicó, con su estado, y las que adquirió. Filtros por etiqueta en `?estado=` (ver «Mis obras»). Cliente, `private, no-store`. `/galeria` redirige aquí |
+| `/perfil`, `/feed`, `/notificaciones` | Cliente, `Cache-Control: private, no-store` |
+| `/publicar` | Nueva obra para cualquier cuenta: proyecto propio o, si vende, obra del catálogo. Cliente, `private, no-store` |
+| `/mis-obras` | Todas las obras de la persona: las que creó, con su estado, y las que ganó. Filtros por etiqueta en `?estado=` (ver «Mis obras»). Cliente, `private, no-store`. `/galeria` redirige aquí |
 | `/publicar/[id]` | Edita una obra en borrador (imagen incluida) y la reenvía a auditoría. Cliente, `private, no-store` |
 | `/mi-galeria` | Sala 3D personal: recorrido en primera persona y modo de edición del montaje (ver «Galería 3D») |
 | `/mi-galeria/personalizar` | Asistente «Personaliza tu galería» |
