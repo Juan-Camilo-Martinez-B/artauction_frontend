@@ -4,6 +4,7 @@ import type { AuctionClosedEvent, AuctionInbound, AuctionOutbound, BidAcceptedEv
 
 const ports = new Set<MessagePort>();
 let socket: Socket | null = null;
+let socketToken: string | null = null;
 let joinedAuction: string | null = null;
 
 function publish(message: AuctionInbound): void {
@@ -17,9 +18,15 @@ function rememberTime(serverTime: string): void {
 }
 
 function ensureSocket(wsUrl: string, token: string): Socket {
+  // Otra cuenta en la misma sesion del navegador: el socket se abre de nuevo con su token.
+  if (socket && socketToken !== token) {
+    socket.disconnect();
+    socket = null;
+  }
   if (socket) {
     return socket;
   }
+  socketToken = token;
   const next = io(wsUrl, {
     transports: ['websocket'],
     auth: { token },
@@ -32,6 +39,10 @@ function ensureSocket(wsUrl: string, token: string): Socket {
     }
   });
   next.on('disconnect', () => {
+    publish({ version: 1, type: 'status', connected: false });
+  });
+  // Socket.IO reintenta solo; mientras tanto la sala muestra que no hay conexion.
+  next.on('connect_error', () => {
     publish({ version: 1, type: 'status', connected: false });
   });
   next.on('serverTime', (event: { serverTime?: string }) => {
@@ -65,6 +76,9 @@ function onPortMessage(event: MessageEvent<unknown>): void {
     const current = ensureSocket(message.wsUrl, message.token);
     if (current.connected) {
       current.emit('auction:join', message.auctionId);
+      // Una pestana que llega con el socket ya abierto no vio el evento connect.
+      const reply = event.target instanceof MessagePort ? event.target : null;
+      reply?.postMessage({ version: 1, type: 'status', connected: true } satisfies AuctionInbound);
     }
     return;
   }
