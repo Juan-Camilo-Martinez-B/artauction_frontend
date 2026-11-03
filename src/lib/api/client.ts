@@ -75,6 +75,27 @@ async function readError(response: Response): Promise<string> {
   return text || 'No se pudo completar la solicitud';
 }
 
+/** Ficha de una obra, al crearla o al editarla en borrador. */
+export interface LotInput {
+  title: string;
+  description: string;
+  materials: string;
+  artistName?: string;
+  creationYear?: number;
+  categorySlug: string;
+  representationKind: 'TWO_D' | 'THREE_D';
+  widthCm: number;
+  heightCm: number;
+  depthCm?: number;
+  provenance?: string;
+}
+
+/** Decision del administrador sobre una obra en revision manual. */
+export type ResolveLotInput =
+  | { verdict: 'APROBADO'; priceMin?: number; priceMax?: number }
+  | { verdict: 'BORRADOR'; reason: string }
+  | { verdict: 'REAUDITAR' };
+
 export const artApi = {
   register(input: { email: string; password: string; displayName: string; role?: 'USER' | 'SELLER' }) {
     return api<AuthUser>('/auth/register', { method: 'POST', body: JSON.stringify(input) });
@@ -103,23 +124,15 @@ export const artApi = {
   lot(id: string, token?: string | null) {
     return api<Lot>(`/lots/${id}`, { token });
   },
-  createLot(
-    token: string,
-    input: {
-      title: string;
-      description: string;
-      materials: string;
-      artistName?: string;
-      creationYear?: number;
-      categorySlug: string;
-      representationKind: 'TWO_D' | 'THREE_D';
-      widthCm: number;
-      heightCm: number;
-      depthCm?: number;
-      provenance?: string;
-    },
-  ) {
+  createLot(token: string, input: LotInput) {
     return api<Lot>('/lots', { method: 'POST', token, body: JSON.stringify(input) });
+  },
+  /** Solo el vendedor y solo en borrador (por ejemplo, una obra devuelta). */
+  updateLot(token: string, lotId: string, input: LotInput) {
+    return api<Lot>(`/lots/${lotId}`, { method: 'PATCH', token, body: JSON.stringify(input) });
+  },
+  myLots(token: string) {
+    return api<Lot[]>('/lots/mine', { token });
   },
   signUpload(token: string, lotId: string, contentType: string, position: number) {
     return api<SignedUpload>(`/lots/${lotId}/uploads`, {
@@ -174,8 +187,8 @@ export const artApi = {
   reviewQueue(token: string) {
     return api<ReviewItem[]>('/admin/reviews', { token });
   },
-  resolveLot(token: string, lotId: string, verdict: 'APROBADO' | 'BORRADOR') {
-    return api<Lot>(`/admin/lots/${lotId}/resolve`, { method: 'POST', token, body: JSON.stringify({ verdict }) });
+  resolveLot(token: string, lotId: string, input: ResolveLotInput) {
+    return api<Lot>(`/admin/lots/${lotId}/resolve`, { method: 'POST', token, body: JSON.stringify(input) });
   },
   myGallery(token: string) {
     return api<PersonalGallery>('/me/gallery', { token });

@@ -6,6 +6,8 @@ import { ScoreRing } from '@/components/score-ring';
 import { StatusPill } from '@/components/status-pill';
 import { ImageFormat, type ImageOrientation } from '@/lib/artwork/image-format';
 import { ButtonLink } from '@/components/ui/button';
+import { Notice } from '@/components/ui/notice';
+import { auditSourceLabel, isReturned } from '@/lib/artwork/lot-review';
 import { formatArtacoins } from '@/lib/auction/policy';
 import { formatDateTime } from '@/lib/format';
 import { formatMoney } from '@/lib/money';
@@ -24,6 +26,7 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
         ? 'Obra bidimensional'
         : 'Formato sin clasificar';
   const summary = lot.auditSummaries?.[0];
+  const source = auditSourceLabel(summary, lot);
 
   return (
     <article className={sheetClass(orientation)}>
@@ -36,8 +39,20 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
       />
       <div className={dossierClass(orientation)}>
         <section className="rounded-panel border border-line bg-surface p-6 shadow-panel sm:p-8">
+          {isReturned(lot) ? (
+            // Una obra en borrador solo la ve quien la publico (o un administrador).
+            <Notice tone="info" className="mb-5">
+              <div>
+                <span className="block font-medium">Un administrador devolvió esta obra</span>
+                {lot.lastReview?.reason ? <span className="block">{lot.lastReview.reason}</span> : null}
+                <ButtonLink href={`/publicar/${lot.id}`} size="sm" className="mt-3">
+                  Editar y reenviar
+                </ButtonLink>
+              </div>
+            </Notice>
+          ) : null}
           <div className="flex flex-wrap items-center gap-2">
-            <StatusPill status={lot.status} />
+            <StatusPill status={isReturned(lot) ? 'DEVUELTA' : lot.status} />
             <span className="text-xs uppercase tracking-[0.18em] text-oxide">{category}</span>
           </div>
           <h1 className="mt-4 font-serif text-4xl leading-tight sm:text-5xl">{lot.title}</h1>
@@ -83,7 +98,7 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
         <ScoreRing score={lot.authenticityScore} verdict={summary?.verdict ?? null} />
         <p className={`px-1 text-sm leading-relaxed text-muted ${orientation === 'landscape' ? 'md:col-span-2' : ''}`}>
           {summary
-            ? `${summary.hasCriticalInconsistency ? 'La auditoría encontró una inconsistencia crítica.' : 'La auditoría no encontró inconsistencias críticas.'} Evaluada con ${summary.modelName}.`
+            ? `${summary.hasCriticalInconsistency ? 'La auditoría encontró una inconsistencia crítica.' : 'La auditoría no encontró inconsistencias críticas.'} ${source ?? ''}.`
             : 'El reporte de autenticidad aparece cuando termina la auditoría.'}
         </p>
       </div>

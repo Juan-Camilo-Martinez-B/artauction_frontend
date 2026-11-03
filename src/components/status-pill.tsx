@@ -1,5 +1,6 @@
 const labels: Record<string, string> = {
   BORRADOR: 'Borrador',
+  DEVUELTA: 'Devuelta',
   PENDIENTE_AUDITORIA: 'En auditoría',
   APROBADO: 'Aprobada',
   PUBLICADA: 'Publicada',
@@ -21,6 +22,7 @@ const tones: Record<string, string> = {
   PROGRAMADA: 'border-ochre/30 bg-ochre-tint text-ochre',
   PENDIENTE_AUDITORIA: 'border-ochre/30 bg-ochre-tint text-ochre',
   REVISION_MANUAL: 'border-ochre/30 bg-ochre-tint text-ochre',
+  DEVUELTA: 'border-oxide/40 bg-oxide-tint text-oxide',
 };
 
 export function statusLabel(status: string): string {

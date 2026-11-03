@@ -14,6 +14,8 @@ export function ConfirmDialog({
   confirmLabel,
   cancelLabel = 'Cancelar',
   tone = 'primary',
+  confirmDisabled = false,
+  confirmLoading = false,
   onConfirm,
   onCancel,
 }: {
@@ -23,6 +25,9 @@ export function ConfirmDialog({
   confirmLabel: string;
   cancelLabel?: string;
   tone?: Extract<ButtonVariant, 'primary' | 'accent' | 'danger'>;
+  /** Por ejemplo, mientras falte un dato obligatorio dentro del dialogo. */
+  confirmDisabled?: boolean;
+  confirmLoading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -58,7 +63,7 @@ export function ConfirmDialog({
         <Button variant="secondary" onClick={onCancel}>
           {cancelLabel}
         </Button>
-        <Button variant={tone} onClick={onConfirm}>
+        <Button variant={tone} disabled={confirmDisabled} loading={confirmLoading} onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </div>
