@@ -76,7 +76,8 @@ class BrowserSession {
       return;
     }
     const response = await fetch('/api/session/refresh', { method: 'POST' });
-    if (!response.ok) {
+    // 204: no hay sesion que renovar.
+    if (!response.ok || response.status === 204) {
       if (!readAccessToken()) {
         this.publish({ status: 'anonymous', profile: null });
       }

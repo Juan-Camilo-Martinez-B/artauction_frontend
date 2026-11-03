@@ -10,6 +10,12 @@ import { useFormValidation } from '@/hooks/use-form-validation';
 import { ApiError, artApi } from '@/lib/api/client';
 import { validateLogin } from '@/lib/forms/validators';
 import { browserSession } from '@/lib/session/browser-session';
+import { safeNextPath } from '@/lib/session/next-path';
+
+/** Pagina a la que volver: la que pidio entrar (?next=) o el catalogo. */
+function destination(): string {
+  return safeNextPath(new URLSearchParams(window.location.search).get('next')) ?? '/catalogo';
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,7 +28,7 @@ export default function LoginPage() {
   useEffect(() => {
     void browserSession.restore().then(() => {
       if (browserSession.current().status === 'authenticated') {
-        router.replace('/catalogo');
+        router.replace(destination());
       }
     });
   }, [router]);
@@ -37,7 +43,7 @@ export default function LoginPage() {
     try {
       const tokens = await artApi.login(email.trim(), password);
       await browserSession.establish(tokens);
-      router.push('/catalogo');
+      router.push(destination());
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'No se pudo entrar. Intenta de nuevo.');
       setPending(false);
