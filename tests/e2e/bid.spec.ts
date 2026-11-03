@@ -14,6 +14,26 @@ test('envía una oferta y muestra que fue aceptada', async ({ page }) => {
     }),
   );
   await page.route('**/wallet', (route) => route.fulfill({ json: { balance: 500, held: 0, entries: [] } }));
+  await page.route('**/lots/22222222-2222-4222-8222-222222222222', (route) =>
+    route.fulfill({
+      json: {
+        id: '22222222-2222-4222-8222-222222222222',
+        sellerId: '55555555-5555-4555-8555-555555555555',
+        title: 'Retrato de la costa',
+        description: 'Marina al óleo.',
+        artistName: 'Elena Vásquez',
+        creationYear: 1925,
+        visibility: 'PUBLIC',
+        materials: 'Óleo sobre lienzo',
+        status: 'EN_SUBASTA',
+        authenticityScore: 82,
+        suggestedPriceMin: null,
+        suggestedPriceMax: null,
+        currency: 'ATC',
+        images: [],
+      },
+    }),
+  );
   await page.route('**/auctions/**', async (route) => {
     const url = route.request().url();
     if (route.request().method() === 'GET') {
@@ -22,6 +42,7 @@ test('envía una oferta y muestra que fue aceptada', async ({ page }) => {
           auction: {
             id: auctionId,
             lotId: '22222222-2222-4222-8222-222222222222',
+            sellerId: '55555555-5555-4555-8555-555555555555',
             startPrice: '100.00',
             currentPrice: '100.00',
             minIncrement: '10.00',
@@ -55,10 +76,14 @@ test('envía una oferta y muestra que fue aceptada', async ({ page }) => {
   });
 
   await page.goto(`/subasta/${auctionId}`);
-  await expect(page.getByRole('heading', { name: 'La puja' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Retrato de la costa' })).toBeVisible();
+  // Sin pujas, la oferta minima es la salida.
+  await expect(page.getByText('Mínimo 100 artacoins.')).toBeVisible();
   // Las ofertas son en artacoins enteras.
   await page.getByLabel('Tu oferta en artacoins').fill('120');
-  await page.getByRole('button', { name: 'Ofertar' }).click();
-  await expect(page.getByRole('status')).toContainText('Oferta aceptada');
-  await expect(page.getByText(/120/)).toBeVisible();
+  await page.getByRole('button', { name: /^Ofertar/ }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Oferta aceptada' })).toBeVisible();
+  // El precio de la sala y el historial muestran la oferta nueva.
+  await expect(page.getByText('Oferta más alta')).toBeVisible();
+  await expect(page.getByRole('listitem').filter({ hasText: 'Tú' })).toContainText('120 artacoins');
 });

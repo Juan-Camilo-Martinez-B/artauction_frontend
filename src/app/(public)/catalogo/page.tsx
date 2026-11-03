@@ -1,4 +1,7 @@
 import type { Metadata } from 'next';
+import { LiveAuctions } from '@/components/auctions/live-auctions';
+import { PageHeader } from '@/components/ui/layout';
+import { Notice } from '@/components/ui/notice';
 import { getCategories, getPublicLots } from '@/lib/api/server';
 import { CatalogExhibit } from './catalog-exhibit';
 
@@ -33,14 +36,13 @@ export default async function CatalogPage({
 
   return (
     <section>
-      <header className="mb-8 max-w-2xl">
-        <p className="text-xs uppercase tracking-[0.22em] text-oxide">Exposición</p>
-        <h1 className="mt-2 font-serif text-5xl">Catálogo</h1>
-        <p className="mt-3 text-muted">
-          Una sala editorial de pinturas y objetos. El filtro vive en el servidor; la página se regenera cada minuto.
-        </p>
-      </header>
-      {error ? <p role="alert">{error}</p> : null}
+      <PageHeader
+        eyebrow="Exposición"
+        title="Catálogo"
+        description="Pinturas, fotografías y objetos con auditoría de autenticidad. Cada pocos minutos una obra sale a subasta."
+      />
+      <LiveAuctions />
+      {error ? <Notice tone="error" className="mb-6">{error}</Notice> : null}
       <CatalogExhibit
         lots={catalog.items}
         categories={categories}

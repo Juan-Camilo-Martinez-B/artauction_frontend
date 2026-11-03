@@ -1,16 +1,44 @@
 'use client';
 
+import { Bell, ClipboardCheck, Images, LogOut, Newspaper, Settings, Upload, User, Wallet, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
+import { ButtonLink } from '@/components/ui/button';
+import { loginHref } from '@/lib/session/next-path';
 import { browserSession, type SessionSnapshot } from '@/lib/session/browser-session';
 import { ProfileMark } from './profile-mark';
 
+interface MenuEntry {
+  href: string;
+  label: string;
+  Icon: LucideIcon;
+  roles?: readonly string[];
+}
+
+// Un solo lugar para las secciones de la cuenta: el menu y la pagina /perfil usan la misma lista.
+export const ACCOUNT_SECTIONS: readonly MenuEntry[] = [
+  { href: '/perfil', label: 'Mi cuenta', Icon: User },
+  { href: '/bolsillo', label: 'Bolsillo', Icon: Wallet },
+  { href: '/galeria', label: 'Mi colección', Icon: Images },
+  { href: '/feed', label: 'Actividad', Icon: Newspaper },
+  { href: '/notificaciones', label: 'Avisos', Icon: Bell },
+  { href: '/publicar', label: 'Publicar obra', Icon: Upload, roles: ['SELLER', 'ADMIN'] },
+  { href: '/admin', label: 'Revisión manual', Icon: ClipboardCheck, roles: ['ADMIN'] },
+  { href: '/ajustes', label: 'Ajustes', Icon: Settings },
+];
+
+export function sectionsFor(role: string): MenuEntry[] {
+  return ACCOUNT_SECTIONS.filter((entry) => !entry.roles || entry.roles.includes(role));
+}
+
 export function AccountMenu() {
   const router = useRouter();
+  const pathname = usePathname();
   const menuId = useId();
   const root = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const [snapshot, setSnapshot] = useState<SessionSnapshot>({ status: 'unknown', profile: null });
 
   useEffect(() => browserSession.subscribe(setSnapshot), []);
@@ -18,6 +46,10 @@ export function AccountMenu() {
   useEffect(() => {
     void browserSession.restore();
   }, []);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!open) {
@@ -42,22 +74,24 @@ export function AccountMenu() {
   }, [open]);
 
   if (snapshot.status === 'unknown') {
-    return <span className="h-9 w-9 rounded-full bg-line" aria-hidden="true" />;
+    return <span className="h-9 w-9 animate-pulse rounded-full bg-line" aria-hidden="true" />;
   }
 
   if (snapshot.status === 'anonymous' || !snapshot.profile) {
     return (
-      <Link href="/entrar" className="rounded-full bg-ink px-3 py-1.5 text-paper">
+      <ButtonLink href={loginHref(pathname)} size="sm">
         Entrar
-      </Link>
+      </ButtonLink>
     );
   }
 
   const profile = snapshot.profile;
 
   async function signOut() {
-    setOpen(false);
+    setLeaving(true);
     await browserSession.signOut();
+    setOpen(false);
+    setLeaving(false);
     router.push('/');
     router.refresh();
   }
@@ -66,7 +100,7 @@ export function AccountMenu() {
     <div ref={root} className="relative">
       <button
         type="button"
-        className="rounded-full"
+        className="rounded-full ring-offset-2 ring-offset-paper hover:ring-2 hover:ring-line-strong"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
@@ -76,43 +110,37 @@ export function AccountMenu() {
         <ProfileMark name={profile.displayName} avatarUrl={profile.avatarUrl} />
       </button>
       {open ? (
-        <div id={menuId} role="menu" className="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-line bg-paper p-2 shadow-lg">
-          <p className="px-3 py-2 text-sm">
+        <div id={menuId} role="menu" className="absolute right-0 z-50 mt-2 w-64 rounded-panel border border-line bg-surface p-2 shadow-lift">
+          <div className="border-b border-line px-3 pb-3 pt-2 text-sm">
             <span className="block font-medium">{profile.displayName}</span>
             <span className="block truncate text-muted">{profile.email}</span>
-          </p>
-          <MenuLink href="/bolsillo" onNavigate={() => { setOpen(false); }}>
-            Bolsillo
-          </MenuLink>
-          <MenuLink href="/ajustes" onNavigate={() => { setOpen(false); }}>
-            Ajustes
-          </MenuLink>
-          <MenuLink href="/perfil" onNavigate={() => { setOpen(false); }}>
-            Cuenta
-          </MenuLink>
-          {profile.role === 'SELLER' || profile.role === 'ADMIN' ? (
-            <MenuLink href="/publicar" onNavigate={() => { setOpen(false); }}>
-              Publicar
-            </MenuLink>
-          ) : null}
-          {profile.role === 'ADMIN' ? (
-            <MenuLink href="/admin" onNavigate={() => { setOpen(false); }}>
-              Revisión
-            </MenuLink>
-          ) : null}
-          <button type="button" role="menuitem" className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-white" onClick={() => void signOut()}>
-            Cerrar sesión
+          </div>
+          <div className="py-1">
+            {sectionsFor(profile.role).map(({ href, label, Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                role="menuitem"
+                aria-current={pathname === href ? 'page' : undefined}
+                className={`flex items-center gap-3 rounded-field px-3 py-2 text-sm hover:bg-paper-deep ${pathname === href ? 'bg-paper-deep font-medium' : ''}`}
+              >
+                <Icon aria-hidden="true" className="h-4 w-4 text-muted" />
+                {label}
+              </Link>
+            ))}
+          </div>
+          <button
+            type="button"
+            role="menuitem"
+            disabled={leaving}
+            className="flex w-full items-center gap-3 rounded-field border-t border-line px-3 py-2.5 text-left text-sm text-oxide hover:bg-oxide-tint disabled:opacity-60"
+            onClick={() => void signOut()}
+          >
+            <LogOut aria-hidden="true" className="h-4 w-4" />
+            {leaving ? 'Cerrando sesión…' : 'Cerrar sesión'}
           </button>
         </div>
       ) : null}
     </div>
-  );
-}
-
-function MenuLink({ href, children, onNavigate }: { href: string; children: string; onNavigate: () => void }) {
-  return (
-    <Link href={href} role="menuitem" className="block rounded-lg px-3 py-2 text-sm hover:bg-white" onClick={onNavigate}>
-      {children}
-    </Link>
   );
 }

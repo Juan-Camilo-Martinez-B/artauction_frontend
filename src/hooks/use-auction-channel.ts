@@ -32,10 +32,13 @@ export function useAuctionChannel(onMessage: (message: AuctionInbound) => void):
   return { send };
 }
 
+// webpack solo empaqueta el worker si `new URL(...)` va escrito dentro de
+// `new SharedWorker(...)` o `new Worker(...)`. Con la URL en una variable lo
+// trataba como archivo estatico: servia el .ts sin compilar y la sala nunca
+// recibia eventos en vivo.
 function openAuctionWorker(): { port: MessagePort; close: () => void } {
-  const url = new URL('../workers/auction.worker.ts', import.meta.url);
   if (typeof SharedWorker !== 'undefined') {
-    const shared = new SharedWorker(url);
+    const shared = new SharedWorker(new URL('../workers/auction.worker.ts', import.meta.url));
     return {
       port: shared.port,
       close() {
@@ -43,7 +46,7 @@ function openAuctionWorker(): { port: MessagePort; close: () => void } {
       },
     };
   }
-  const dedicated = new Worker(url);
+  const dedicated = new Worker(new URL('../workers/auction.worker.ts', import.meta.url));
   const bridge = new MessageChannel();
   dedicated.postMessage({ version: 1, type: 'join', auctionId: '', token: '', wsUrl: '' }, [bridge.port1]);
   return {

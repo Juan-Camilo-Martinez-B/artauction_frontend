@@ -25,6 +25,8 @@ ENV HOSTNAME=0.0.0.0
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=builder --chown=app:app /app/.next/standalone ./
 COPY --from=builder --chown=app:app /app/.next/static ./.next/static
+# El output standalone no incluye public/: ahí viven las texturas de la sala 3D.
+COPY --from=builder --chown=app:app /app/public ./public
 USER app
 EXPOSE 8080
 CMD ["node", "server.js"]

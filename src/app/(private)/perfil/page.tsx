@@ -1,57 +1,60 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { sectionsFor } from '@/components/account/account-menu';
 import { ProfileMark } from '@/components/account/profile-mark';
-import { browserSession, type AccountProfile } from '@/lib/session/browser-session';
+import { RequireSession } from '@/components/session/require-session';
+import { PageHeader } from '@/components/ui/layout';
+
+const ROLE_LABEL: Record<string, string> = {
+  USER: 'Coleccionista',
+  SELLER: 'Vendedor',
+  ADMIN: 'Administración',
+};
+
+const DESCRIPTIONS: Record<string, string> = {
+  '/bolsillo': 'Saldo de artacoins, recargas y lo retenido en salas.',
+  '/galeria': 'Las obras que ganaste o publicaste, y quién puede verlas.',
+  '/feed': 'Lo que hacen las personas que sigues.',
+  '/notificaciones': 'Resultados de auditorías y cierres de subasta.',
+  '/publicar': 'Envía una obra nueva a auditoría.',
+  '/admin': 'Obras que esperan una decisión manual.',
+  '/ajustes': 'Tu nombre y tu imagen de perfil.',
+};
 
 export default function ProfilePage() {
-  const router = useRouter();
-  const [user, setUser] = useState<AccountProfile | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    void browserSession.restore().then(() => {
-      const profile = browserSession.current().profile;
-      if (!profile) {
-        setError('Entra para ver tu cuenta.');
-        return;
-      }
-      setUser(profile);
-    });
-  }, []);
-
-  async function logout() {
-    await browserSession.signOut();
-    router.push('/');
-    router.refresh();
-  }
-
   return (
-    <section>
-      <h1 className="font-serif text-4xl">Cuenta</h1>
-      {error ? <p className="mt-4">{error}</p> : null}
-      {user ? (
-        <div className="mt-6 space-y-3">
-          <ProfileMark name={user.displayName} avatarUrl={user.avatarUrl} />
-          <p className="font-medium">{user.displayName}</p>
-          <p>{user.email}</p>
-          <p className="text-sm text-muted">Rol {user.role}</p>
-          <div className="flex flex-wrap gap-3 text-sm">
-            <Link href="/bolsillo">Bolsillo</Link>
-            <Link href="/ajustes">Ajustes</Link>
-            <Link href="/mi-galeria">Mi galería</Link>
-            <Link href="/galeria">Galería social</Link>
-            <Link href="/feed">Actividad</Link>
-            <Link href="/notificaciones">Avisos</Link>
-            {user.role === 'SELLER' || user.role === 'ADMIN' ? <Link href="/publicar">Publicar</Link> : null}
-          </div>
-          <button type="button" onClick={() => void logout()} className="rounded-full border border-line px-4 py-2">
-            Cerrar sesión
-          </button>
-        </div>
-      ) : null}
-    </section>
+    <RequireSession title="Entra para ver tu cuenta">
+      {(profile) => (
+        <>
+          <PageHeader
+            eyebrow={ROLE_LABEL[profile.role] ?? 'Cuenta'}
+            title={profile.displayName}
+            description={profile.email}
+            actions={<ProfileMark name={profile.displayName} avatarUrl={profile.avatarUrl} />}
+          />
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {sectionsFor(profile.role)
+              .filter((section) => section.href !== '/perfil')
+              .map(({ href, label, Icon }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="group flex h-full gap-4 rounded-panel border border-line bg-surface p-5 shadow-panel transition-shadow hover:shadow-lift"
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-paper-deep text-oxide">
+                      <Icon aria-hidden="true" className="h-5 w-5" />
+                    </span>
+                    <span>
+                      <span className="block font-serif text-xl group-hover:underline">{label}</span>
+                      <span className="mt-1 block text-sm text-muted">{DESCRIPTIONS[href]}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </>
+      )}
+    </RequireSession>
   );
 }

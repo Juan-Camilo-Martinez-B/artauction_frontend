@@ -1,17 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { ArrowLeft, ArrowRight, Check, Shuffle, Sparkles, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { RequireSession } from '@/components/session/require-session';
+import { Button } from '@/components/ui/button';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { PageHeader } from '@/components/ui/layout';
+import { Notice } from '@/components/ui/notice';
 import { ApiError, artApi } from '@/lib/api/client';
 import { STEPS, emptyAnswers, stepComplete, toPreferences, type AnswerMap } from '@/lib/gallery/steps';
 import { browserSession } from '@/lib/session/browser-session';
 
+/** Etiqueta visible de una respuesta: el cuestionario guarda claves (clasico), no textos. */
+export function answerLabel(key: string, value: string): string {
+  for (const step of STEPS) {
+    for (const question of step.questions) {
+      if (question.key === key) {
+        const option = question.options.find(([optionValue]) => optionValue === value);
+        if (option) {
+          return option[1];
+        }
+      }
+    }
+  }
+  return value;
+}
+
 export function PersonalizaForm() {
+  return (
+    <RequireSession title="Entra para diseñar tu galería">{() => <Wizard />}</RequireSession>
+  );
+}
+
+function Wizard() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<AnswerMap>(emptyAnswers);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [conflict, setConflict] = useState<{ random: boolean } | null>(null);
   const current = STEPS[step];
   const reviewing = step >= STEPS.length;
 
@@ -32,56 +60,57 @@ export function PersonalizaForm() {
     });
   }
 
-  async function generate(random: boolean) {
+  async function generate(random: boolean, replace = false) {
     const token = await browserSession.accessToken();
     if (!token) {
-      router.push('/entrar');
       return;
     }
     setPending(true);
     setError(null);
     try {
-      await artApi.generateGallery(token, random ? {} : toPreferences(answers), random, false);
+      await artApi.generateGallery(token, random ? {} : toPreferences(answers), random, replace);
       router.push('/mi-galeria');
     } catch (caught) {
-      if (caught instanceof ApiError && caught.status === 409) {
-        const confirmed = window.confirm('Hay cambios manuales en la sala. ¿Quieres reemplazarlos con una propuesta nueva?');
-        if (confirmed) {
-          await artApi.generateGallery(token, random ? {} : toPreferences(answers), random, true);
-          router.push('/mi-galeria');
-          return;
-        }
+      if (caught instanceof ApiError && caught.status === 409 && !replace) {
+        // La sala tiene cambios manuales: se pregunta antes de reemplazarlos.
+        setConflict({ random });
+      } else {
+        setError(caught instanceof ApiError ? caught.message : 'No se pudo diseñar la galería.');
       }
-      setError(caught instanceof ApiError ? caught.message : 'No se pudo diseñar la galería.');
-    } finally {
       setPending(false);
     }
   }
 
   return (
-    <section className="mx-auto max-w-3xl">
-      <p className="text-xs uppercase tracking-[0.22em] text-oxide">Asistente</p>
-      <h1 className="mt-2 font-serif text-5xl">Personaliza tu galería</h1>
-      <p className="mt-3 text-muted">Tus respuestas se guardan y la IA las convierte en colores, materiales y luz de tu sala.</p>
-      <ol className="mt-6 flex gap-2" aria-label="Progreso">
+    <div className="mx-auto max-w-3xl">
+      <PageHeader
+        eyebrow="Asistente"
+        title="Diseña tu galería"
+        description="Responde unas preguntas y el asistente propone paredes, suelo, luz y recorrido para tu sala."
+      />
+      <ol className="flex gap-2" aria-label={`Paso ${String(Math.min(step + 1, STEPS.length))} de ${String(STEPS.length)}`}>
         {STEPS.map((item, index) => (
-          <li key={item.id} className={`h-1 flex-1 ${index <= step ? 'bg-oxide' : 'bg-line'}`} />
+          <li key={item.id} className={`h-1.5 flex-1 rounded-full ${index < step || reviewing ? 'bg-oxide' : index === step ? 'bg-ink' : 'bg-line'}`} />
         ))}
       </ol>
       {reviewing ? (
         <Review answers={answers} pending={pending} error={error} onBack={() => { setStep(STEPS.length - 1); }} onGenerate={(random) => void generate(random)} />
       ) : current ? (
         <div className="mt-8">
-          <h2 className="font-serif text-3xl">{current.title}</h2>
+          <p className="text-sm text-muted">
+            Paso {step + 1} de {STEPS.length}
+          </p>
+          <h2 className="mt-1 font-serif text-3xl">{current.title}</h2>
           {current.questions.map((question) => (
             <fieldset key={question.key} className="mt-6">
-              <legend className="font-medium">{question.prompt}</legend>
+              <legend className="font-medium">
+                {question.prompt}
+                {question.multiple ? <span className="ml-2 text-sm font-normal text-muted">Puedes elegir varias.</span> : null}
+              </legend>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {question.options.map(([value, label]) => {
                   const stored = answers[question.key];
-                  const selected = question.multiple
-                    ? Array.isArray(stored) && stored.includes(value)
-                    : stored === value;
+                  const selected = question.multiple ? Array.isArray(stored) && stored.includes(value) : stored === value;
                   const favorite = question.key === 'artStyles' && answers['favoriteStyle'] === value;
                   return (
                     <button
@@ -89,24 +118,35 @@ export function PersonalizaForm() {
                       type="button"
                       aria-pressed={selected}
                       onClick={() => { toggle(question.key, value, question.multiple); }}
-                      className={`rounded-xl border px-4 py-3 text-left ${selected ? 'border-ink bg-white' : 'border-line bg-paper'}`}
+                      className={`flex items-center justify-between gap-3 rounded-field border px-4 py-3 text-left transition-colors ${
+                        selected ? 'border-ink bg-surface shadow-panel' : 'border-line bg-paper hover:border-line-strong'
+                      }`}
                     >
-                      <span className="block font-serif text-lg">{label}</span>
-                      {favorite ? <span className="text-xs uppercase tracking-wider text-oxide">Preferido</span> : null}
+                      <span className="font-serif text-lg">{label}</span>
+                      <span className="flex items-center gap-1.5">
+                        {favorite ? (
+                          <span className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-oxide">
+                            <Star aria-hidden="true" className="h-3.5 w-3.5" /> Preferido
+                          </span>
+                        ) : null}
+                        {selected ? <Check aria-hidden="true" className="h-4 w-4 text-ink" /> : null}
+                      </span>
                     </button>
                   );
                 })}
               </div>
-              {question.key === 'artStyles' ? (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {(Array.isArray(answers['artStyles']) ? answers['artStyles'] : []).map((style) => (
+              {question.key === 'artStyles' && Array.isArray(answers['artStyles']) && answers['artStyles'].length > 1 ? (
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                  <span className="text-muted">Tu preferido:</span>
+                  {answers['artStyles'].map((style) => (
                     <button
                       key={style}
                       type="button"
-                      className="text-sm underline"
+                      aria-pressed={answers['favoriteStyle'] === style}
+                      className={`rounded-full border px-3 py-1 ${answers['favoriteStyle'] === style ? 'border-oxide bg-oxide-tint text-oxide' : 'border-line hover:border-line-strong'}`}
                       onClick={() => { setAnswers((previous) => ({ ...previous, favoriteStyle: style })); }}
                     >
-                      Marcar {style} como preferido
+                      {answerLabel('artStyles', style)}
                     </button>
                   ))}
                 </div>
@@ -114,31 +154,42 @@ export function PersonalizaForm() {
             </fieldset>
           ))}
           {current.id === 'color' ? (
-            <label className="mt-4 flex items-center gap-2 text-sm">
+            <label className="mt-5 flex items-center gap-3 rounded-field border border-line bg-paper px-4 py-3 text-sm">
               <input
                 type="checkbox"
+                className="h-4 w-4 accent-oxide"
                 checked={answers['contrastWithArt'] === true}
                 onChange={(event) => { setAnswers((previous) => ({ ...previous, contrastWithArt: event.target.checked })); }}
               />
               Quiero que los colores del espacio contrasten con las obras
             </label>
           ) : null}
-          <div className="mt-8 flex justify-between">
-            <button type="button" className="text-sm" disabled={step === 0} onClick={() => { setStep((value) => value - 1); }}>
+          <div className="mt-8 flex justify-between border-t border-line pt-5">
+            <Button variant="secondary" icon={<ArrowLeft aria-hidden="true" className="h-4 w-4" />} disabled={step === 0} onClick={() => { setStep((value) => value - 1); }}>
               Anterior
-            </button>
-            <button
-              type="button"
-              className="rounded-full bg-ink px-5 py-2 text-paper disabled:opacity-40"
-              disabled={!stepComplete(step, answers)}
-              onClick={() => { setStep((value) => value + 1); }}
-            >
-              Siguiente
-            </button>
+            </Button>
+            <Button disabled={!stepComplete(step, answers)} onClick={() => { setStep((value) => value + 1); }}>
+              {step === STEPS.length - 1 ? 'Ver resumen' : 'Siguiente'}
+              <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       ) : null}
-    </section>
+      <ConfirmDialog
+        open={conflict !== null}
+        title="¿Reemplazar tu sala?"
+        confirmLabel="Reemplazar"
+        tone="danger"
+        onCancel={() => { setConflict(null); }}
+        onConfirm={() => {
+          const random = conflict?.random ?? false;
+          setConflict(null);
+          void generate(random, true);
+        }}
+      >
+        Hiciste cambios a mano en tu sala. La propuesta nueva los reemplaza; las obras colgadas no cambian.
+      </ConfirmDialog>
+    </div>
   );
 }
 
@@ -155,46 +206,48 @@ function Review({
   onBack: () => void;
   onGenerate: (random: boolean) => void;
 }) {
-  const rows = [
-    ['Estilos', list(answers['artStyles'])],
-    ['Paleta', text(answers['paletteId'])],
-    ['Arquitectura', text(answers['architecture'])],
-    ['Distribución', text(answers['layout'])],
-    ['Iluminación', text(answers['light'])],
-    ['Materiales', list(answers['materials'])],
-    ['Recorrido', text(answers['tour'])],
+  const rows: Array<[string, string]> = [
+    ['Estilos', list('artStyles', answers['artStyles'])],
+    ['Paleta', text('paletteId', answers['paletteId'])],
+    ['Arquitectura', text('architecture', answers['architecture'])],
+    ['Distribución', text('layout', answers['layout'])],
+    ['Iluminación', text('light', answers['light'])],
+    ['Materiales', list('materials', answers['materials'])],
+    ['Recorrido', text('tour', answers['tour'])],
   ];
   return (
     <div className="mt-8">
       <h2 className="font-serif text-3xl">Resumen</h2>
-      <p className="mt-2 text-sm text-muted">La IA usará estas respuestas para proponer una sala concreta. No se aplica nada hasta que el servidor responda.</p>
+      <p className="mt-2 text-sm text-muted">El asistente usará estas respuestas para proponer tu sala. Nada se aplica hasta que la propuesta esté lista.</p>
       <dl className="mt-6 grid gap-3 sm:grid-cols-2">
         {rows.map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-line bg-white p-4">
+          <div key={label} className="rounded-panel border border-line bg-surface p-4">
             <dt className="text-xs uppercase tracking-wider text-muted">{label}</dt>
             <dd className="mt-1 font-serif text-xl">{value || '—'}</dd>
           </div>
         ))}
       </dl>
-      {error ? <p role="alert" className="mt-4">{error}</p> : null}
-      {pending ? <p className="mt-4">Diseñando el espacio según tus preferencias…</p> : null}
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={onBack}>Volver a editar</button>
-        <button type="button" className="rounded-full bg-ink px-5 py-2 text-paper" disabled={pending} onClick={() => { onGenerate(false); }}>
+      {error ? <Notice tone="error" className="mt-4">{error}</Notice> : null}
+      {pending ? <Notice className="mt-4">Diseñando el espacio según tus preferencias…</Notice> : null}
+      <div className="mt-6 flex flex-wrap gap-3 border-t border-line pt-5">
+        <Button variant="secondary" icon={<ArrowLeft aria-hidden="true" className="h-4 w-4" />} disabled={pending} onClick={onBack}>
+          Volver a editar
+        </Button>
+        <Button loading={pending} icon={<Sparkles aria-hidden="true" className="h-4 w-4" />} onClick={() => { onGenerate(false); }}>
           Generar mi galería
-        </button>
-        <button type="button" className="rounded-full border border-ink px-5 py-2" disabled={pending} onClick={() => { onGenerate(true); }}>
-          Usar una configuración aleatoria
-        </button>
+        </Button>
+        <Button variant="ghost" disabled={pending} icon={<Shuffle aria-hidden="true" className="h-4 w-4" />} onClick={() => { onGenerate(true); }}>
+          Sorpréndeme
+        </Button>
       </div>
     </div>
   );
 }
 
-function text(value: string | string[] | boolean | undefined): string {
-  return typeof value === 'string' ? value : '';
+function text(key: string, value: string | string[] | boolean | undefined): string {
+  return typeof value === 'string' && value ? answerLabel(key, value) : '';
 }
 
-function list(value: string | string[] | boolean | undefined): string {
-  return Array.isArray(value) ? value.join(', ') : '';
+function list(key: string, value: string | string[] | boolean | undefined): string {
+  return Array.isArray(value) ? value.map((item) => answerLabel(key, item)).join(', ') : '';
 }
