@@ -1,8 +1,9 @@
 'use client';
 
-import { Pencil, Send, Upload } from 'lucide-react';
+import { Box, Eye, EyeOff, Images, Pencil, Send, Share2, Upload } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { ArtworkImage } from '@/components/artwork-image';
 import { RequireSession } from '@/components/session/require-session';
 import { StatusPill } from '@/components/status-pill';
@@ -11,10 +12,24 @@ import { EmptyState, LoadingState, PageHeader } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { useToast } from '@/components/ui/toast';
 import { ApiError, artApi } from '@/lib/api/client';
-import type { Lot } from '@/lib/api/types';
+import type { GalleryItem, Lot } from '@/lib/api/types';
 import { isReturned, sellerStatus } from '@/lib/artwork/lot-review';
+import {
+  ACQUIRED_FILTERS,
+  applyFilter,
+  collectWorks,
+  countByFilter,
+  parseFilter,
+  PUBLISHED_FILTERS,
+  type FilterGroup,
+  type MyWork,
+  type WorkFilter,
+} from '@/lib/artwork/my-works';
 import { formatDateTime } from '@/lib/format';
-import { browserSession } from '@/lib/session/browser-session';
+import { browserSession, type AccountProfile } from '@/lib/session/browser-session';
+import { canShowGalleryItem } from '@/lib/visibility';
+
+const SELLER_ROLES = new Set(['SELLER', 'ADMIN']);
 
 /** Lo que significa cada estado para quien publico la obra. */
 const STATUS_HINT: Record<string, string> = {
@@ -22,22 +37,37 @@ const STATUS_HINT: Record<string, string> = {
   BORRADOR: 'Aún no se ha enviado a auditoría.',
   PENDIENTE_AUDITORIA: 'La auditoría la está revisando.',
   REVISION_MANUAL: 'Un administrador la revisará pronto.',
+  APROBADO: 'Está en el catálogo.',
   PUBLICADA: 'Está en el catálogo.',
   EN_SUBASTA: 'Tiene una sala de subasta.',
   VENDIDA: 'Se vendió en subasta.',
+  CERRADO: 'La subasta cerró sin venta.',
 };
 
-export default function MyLotsPage() {
+const SOURCE_LABEL: Record<GalleryItem['source'], string> = {
+  GANADA: 'Ganada en subasta',
+  PROPIA: 'Publicada por ti',
+  GRATUITA: 'Añadida como prueba',
+};
+
+export default function MyWorksPage() {
   return (
-    <RequireSession roles={['SELLER', 'ADMIN']} title="Entra para ver tus obras">
-      {() => <MyLots />}
+    <RequireSession title="Entra para ver tus obras">
+      {(profile) => (
+        // useSearchParams necesita un limite de Suspense en una pagina de cliente.
+        <Suspense fallback={<LoadingState label="Cargando tus obras…" />}>
+          <MyWorks profile={profile} />
+        </Suspense>
+      )}
     </RequireSession>
   );
 }
 
-function MyLots() {
+function MyWorks({ profile }: { profile: AccountProfile }) {
   const notify = useToast();
-  const [lots, setLots] = useState<Lot[] | null>(null);
+  const filter = parseFilter(useSearchParams().get('estado'));
+  const sells = SELLER_ROLES.has(profile.role);
+  const [works, setWorks] = useState<MyWork[] | null>(null);
   const [busyLot, setBusyLot] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,13 +76,22 @@ function MyLots() {
     if (!token) {
       return;
     }
-    try {
-      setLots(await artApi.myLots(token));
-    } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'No se pudieron cargar tus obras.');
-      setLots([]);
+    // Cada fuente falla por separado: sin galeria se ven igual las publicadas, y al reves.
+    const [lots, items] = await Promise.allSettled([
+      sells ? artApi.myLots(token) : Promise.resolve([] as Lot[]),
+      artApi.gallery(profile.userId, token),
+    ]);
+    const failed: unknown = lots.status === 'rejected' ? lots.reason : items.status === 'rejected' ? items.reason : null;
+    if (failed !== null) {
+      setError(failed instanceof ApiError ? failed.message : 'No se pudieron cargar todas tus obras.');
     }
-  }, []);
+    setWorks(
+      collectWorks(
+        lots.status === 'fulfilled' ? lots.value : [],
+        items.status === 'fulfilled' ? items.value.filter((item) => canShowGalleryItem(item, profile.userId)) : [],
+      ),
+    );
+  }, [profile.userId, sells]);
 
   useEffect(() => {
     void load();
@@ -76,40 +115,115 @@ function MyLots() {
     }
   }
 
-  // Las devueltas primero: son las que piden algo a la persona.
-  const ordered = lots ? [...lots].sort((left, right) => Number(isReturned(right)) - Number(isReturned(left))) : null;
+  const counts = works ? countByFilter(works) : new Map<WorkFilter, number>();
+  const shown = works ? applyFilter(works, filter) : null;
 
   return (
     <>
       <PageHeader
-        eyebrow="Vendedor"
+        eyebrow="Tu cuenta"
         title="Mis obras"
-        description="Todas las obras que publicaste y en qué paso están. Las devueltas se pueden corregir y reenviar."
-        actions={<ButtonLink href="/publicar" icon={<Upload aria-hidden="true" className="h-4 w-4" />}>Publicar obra</ButtonLink>}
+        description={
+          sells
+            ? 'Lo que publicaste, en qué paso está, y lo que adquiriste. Las devueltas se pueden corregir y reenviar.'
+            : 'Las obras que ganaste en subasta o añadiste a tu galería.'
+        }
+        actions={
+          <>
+            {sells ? (
+              <ButtonLink href="/publicar" icon={<Upload aria-hidden="true" className="h-4 w-4" />}>
+                Publicar obra
+              </ButtonLink>
+            ) : null}
+            <ButtonLink href="/mi-galeria" variant="secondary" icon={<Box aria-hidden="true" className="h-4 w-4" />}>
+              Sala 3D
+            </ButtonLink>
+            <ButtonLink href={`/galerias/${profile.userId}`} variant="secondary" icon={<Share2 aria-hidden="true" className="h-4 w-4" />}>
+              Galería pública
+            </ButtonLink>
+          </>
+        }
       />
       {error ? <Notice tone="error" className="mb-6">{error}</Notice> : null}
-      {ordered === null ? <LoadingState label="Cargando tus obras…" /> : null}
-      {ordered?.length === 0 ? (
+      {works === null ? <LoadingState label="Cargando tus obras…" /> : null}
+      {works?.length === 0 ? (
         <EmptyState
-          title="Todavía no publicas obras"
-          description="Cuando publiques una, aquí verás su auditoría y su subasta."
-          action={<ButtonLink href="/publicar">Publicar la primera</ButtonLink>}
+          icon={<Images aria-hidden="true" className="h-6 w-6" />}
+          title="Todavía no tienes obras"
+          description={sells ? 'Publica una o gana una subasta: aquí verás su estado.' : 'Las obras que ganes en subasta llegan aquí y a tu sala 3D.'}
+          action={sells ? <ButtonLink href="/publicar">Publicar la primera</ButtonLink> : <ButtonLink href="/catalogo">Ver salas en vivo</ButtonLink>}
         />
       ) : null}
-      {ordered && ordered.length > 0 ? (
-        <ul className="max-w-4xl space-y-4">
-          {ordered.map((lot) => (
-            <li key={lot.id}>
-              <LotRow lot={lot} busy={busyLot === lot.id} onResubmit={() => void resubmit(lot)} />
-            </li>
-          ))}
-        </ul>
+      {works && works.length > 0 ? (
+        <>
+          <nav aria-label="Filtrar por estado" className="mb-6 space-y-3">
+            <FilterChips groups={[{ label: '', filters: [{ key: 'todas', label: 'Todas' }] }]} counts={counts} active={filter} />
+            {sells ? <FilterChips groups={[PUBLISHED_FILTERS]} counts={counts} active={filter} /> : null}
+            <FilterChips groups={[ACQUIRED_FILTERS]} counts={counts} active={filter} />
+          </nav>
+          {shown?.length === 0 ? (
+            <EmptyState title="No hay obras con esta etiqueta" action={<ButtonLink href="/mis-obras" variant="secondary">Ver todas</ButtonLink>} />
+          ) : (
+            <ul className="max-w-4xl space-y-4">
+              {shown?.map((work) =>
+                work.kind === 'published' ? (
+                  <li key={`lot-${work.lot.id}`}>
+                    <PublishedRow lot={work.lot} busy={busyLot === work.lot.id} onResubmit={() => void resubmit(work.lot)} />
+                  </li>
+                ) : (
+                  <li key={`item-${work.item.lotId ?? work.item.title}-${work.item.acquiredAt}`}>
+                    <AcquiredRow item={work.item} />
+                  </li>
+                ),
+              )}
+            </ul>
+          )}
+        </>
       ) : null}
     </>
   );
 }
 
-function LotRow({ lot, busy, onResubmit }: { lot: Lot; busy: boolean; onResubmit: () => void }) {
+/** Chips con contador; los que no tienen obras no se muestran. */
+function FilterChips({ groups, counts, active }: { groups: FilterGroup[]; counts: Map<WorkFilter, number>; active: WorkFilter }) {
+  return (
+    <>
+      {groups.map((group) => {
+        const visible = group.filters.filter((filter) => (counts.get(filter.key) ?? 0) > 0 || filter.key === active);
+        if (visible.length === 0) {
+          return null;
+        }
+        return (
+          <div key={group.label || 'todas'} className="flex items-center gap-3">
+            {group.label ? <span className="shrink-0 text-xs uppercase tracking-[0.16em] text-muted">{group.label}</span> : null}
+            <ul className="flex gap-2 overflow-x-auto pb-1">
+              {visible.map((filter) => {
+                const selected = filter.key === active;
+                return (
+                  <li key={filter.key} className="shrink-0">
+                    <Link
+                      href={filter.key === 'todas' ? '/mis-obras' : `/mis-obras?estado=${filter.key}`}
+                      aria-current={selected ? 'page' : undefined}
+                      scroll={false}
+                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors ${
+                        selected ? 'border-ink bg-ink text-paper' : 'border-line-strong bg-surface hover:border-ink'
+                      }`}
+                    >
+                      {filter.label}
+                      <span className={`text-xs ${selected ? 'text-paper/80' : 'text-muted'}`}>{counts.get(filter.key) ?? 0}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function PublishedRow({ lot, busy, onResubmit }: { lot: Lot; busy: boolean; onResubmit: () => void }) {
   const status = sellerStatus(lot);
   const hasImage = Boolean(lot.images?.some((image) => image.url));
   return (
@@ -151,6 +265,31 @@ function LotRow({ lot, busy, onResubmit }: { lot: Lot; busy: boolean; onResubmit
             </Button>
           </div>
         ) : null}
+      </div>
+    </article>
+  );
+}
+
+function AcquiredRow({ item }: { item: GalleryItem }) {
+  return (
+    <article className="rounded-panel border border-line bg-surface p-4 shadow-panel">
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-oxide">{SOURCE_LABEL[item.source]}</p>
+      <h2 className="mt-1 font-serif text-xl leading-snug">
+        {item.lotId ? (
+          <Link href={`/obras/${item.lotId}`} className="hover:underline">
+            {item.title}
+          </Link>
+        ) : (
+          item.title
+        )}
+      </h2>
+      <p className="text-sm text-muted">{item.artistName ?? 'Artista sin atribuir'}</p>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
+        <span className="inline-flex items-center gap-1.5">
+          {item.visibility === 'PUBLIC' ? <Eye aria-hidden="true" className="h-3.5 w-3.5" /> : <EyeOff aria-hidden="true" className="h-3.5 w-3.5" />}
+          {item.visibility === 'PUBLIC' ? 'Pública en tu galería' : 'Solo tú la ves'}
+        </span>
+        <time dateTime={item.acquiredAt}>{formatDateTime(item.acquiredAt)}</time>
       </div>
     </article>
   );

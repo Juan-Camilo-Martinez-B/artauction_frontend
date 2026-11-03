@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, ClipboardCheck, Images, LogOut, Newspaper, Palette, Settings, Upload, User, Wallet, type LucideIcon } from 'lucide-react';
+import { Bell, ClipboardCheck, LogOut, Newspaper, Palette, Settings, Upload, User, Wallet, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
@@ -20,10 +20,9 @@ interface MenuEntry {
 export const ACCOUNT_SECTIONS: readonly MenuEntry[] = [
   { href: '/perfil', label: 'Mi cuenta', Icon: User },
   { href: '/bolsillo', label: 'Bolsillo', Icon: Wallet },
-  { href: '/galeria', label: 'Mi colección', Icon: Images },
+  { href: '/mis-obras', label: 'Mis obras', Icon: Palette },
   { href: '/feed', label: 'Actividad', Icon: Newspaper },
   { href: '/notificaciones', label: 'Avisos', Icon: Bell },
-  { href: '/mis-obras', label: 'Mis obras', Icon: Palette, roles: ['SELLER', 'ADMIN'] },
   { href: '/publicar', label: 'Publicar obra', Icon: Upload, roles: ['SELLER', 'ADMIN'] },
   { href: '/admin', label: 'Revisión manual', Icon: ClipboardCheck, roles: ['ADMIN'] },
   { href: '/ajustes', label: 'Ajustes', Icon: Settings },

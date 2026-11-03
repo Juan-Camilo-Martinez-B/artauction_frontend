@@ -14,7 +14,7 @@ const ROLE_LABEL: Record<string, string> = {
 
 const DESCRIPTIONS: Record<string, string> = {
   '/bolsillo': 'Saldo de artacoins, recargas y lo retenido en salas.',
-  '/galeria': 'Las obras que ganaste o publicaste, y quién puede verlas.',
+  '/mis-obras': 'Lo que publicaste con su estado, y lo que ganaste en subasta.',
   '/feed': 'Lo que hacen las personas que sigues.',
   '/notificaciones': 'Resultados de auditorías y cierres de subasta.',
   '/publicar': 'Envía una obra nueva a auditoría.',
