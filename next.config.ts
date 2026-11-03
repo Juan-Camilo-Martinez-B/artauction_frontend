@@ -7,10 +7,14 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: { unoptimized: true },
   async headers() {
-    return ['/perfil', '/galeria', '/publicar', '/feed', '/notificaciones', '/admin'].map((source) => ({
+    return ['/perfil', '/publicar', '/publicar/:id', '/mis-obras', '/feed', '/notificaciones', '/admin'].map((source) => ({
       source,
       headers: [privateHeader],
     }));
+  },
+  // "Mi coleccion" se unio a "Mis obras": los enlaces viejos siguen funcionando.
+  async redirects() {
+    return [{ source: '/galeria', destination: '/mis-obras?estado=ganadas', permanent: true }];
   },
 };
 

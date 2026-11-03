@@ -23,6 +23,16 @@ export function describeNotification(item: NotificationItem, userId: string): Ev
     }
     return { title: 'Terminó la auditoría de tu obra', body: verdict ? `Resultado: ${verdict.toLowerCase()}.` : 'Revisa la ficha para ver el resultado.', href: lotHref, tone: 'info' };
   }
+  if (item.kind === 'LOT_RETURNED') {
+    const reason = item.payload['reason'];
+    const title = item.payload['title'] ?? 'Tu obra';
+    return {
+      title: `${title} volvió a borrador`,
+      body: reason ? `Motivo: ${reason} Corrígela y reenvíala a auditoría.` : 'Un administrador la devolvió. Corrígela y reenvíala a auditoría.',
+      href: item.payload['lotId'] ? `/publicar/${item.payload['lotId']}` : '/mis-obras',
+      tone: 'warning',
+    };
+  }
   if (item.kind === 'AUCTION_CLOSED') {
     const amount = formatArtacoins(item.payload['amount']);
     if (item.payload['winnerId'] === userId) {

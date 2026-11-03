@@ -51,6 +51,13 @@ export interface CatalogPage {
   pageSize: number;
 }
 
+/** Ultima decision de un administrador sobre la obra. */
+export interface LotReview {
+  decision: 'APPROVE' | 'RETURN_TO_DRAFT' | 'REAUDIT';
+  reason: string | null;
+  createdAt: string | null;
+}
+
 export interface Lot {
   id: string;
   sellerId: string;
@@ -73,6 +80,7 @@ export interface Lot {
   images?: LotImage[];
   auditSummaries?: AuditSummary[];
   categories?: LotCategoryLink[];
+  lastReview?: LotReview | null;
   auction?: {
     id: string;
     status: string;
@@ -175,7 +183,7 @@ export interface ReviewItem {
   audit: {
     summaryId: string;
     score: number;
-    decidedBy: 'RULES' | 'AI' | 'FALLBACK' | null;
+    decidedBy: 'RULES' | 'AI' | 'LOCAL' | 'FALLBACK' | null;
     modelName: string;
     createdAt: string | null;
     findings: ReviewFinding[];
