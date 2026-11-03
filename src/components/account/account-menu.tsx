@@ -23,7 +23,7 @@ export const ACCOUNT_SECTIONS: readonly MenuEntry[] = [
   { href: '/mis-obras', label: 'Mis obras', Icon: Palette },
   { href: '/feed', label: 'Actividad', Icon: Newspaper },
   { href: '/notificaciones', label: 'Avisos', Icon: Bell },
-  { href: '/publicar', label: 'Publicar obra', Icon: Upload, roles: ['SELLER', 'ADMIN'] },
+  { href: '/publicar', label: 'Nueva obra', Icon: Upload },
   { href: '/admin', label: 'Revisión manual', Icon: ClipboardCheck, roles: ['ADMIN'] },
   { href: '/ajustes', label: 'Ajustes', Icon: Settings },
 ];

@@ -75,7 +75,7 @@ async function readError(response: Response): Promise<string> {
   return text || 'No se pudo completar la solicitud';
 }
 
-/** Ficha de una obra, al crearla o al editarla en borrador. */
+/** Ficha de una obra, al crearla o al editarla en borrador o como proyecto propio. */
 export interface LotInput {
   title: string;
   description: string;
@@ -88,6 +88,13 @@ export interface LotInput {
   heightCm: number;
   depthCm?: number;
   provenance?: string;
+}
+
+/** Al crear: al catalogo (auditoria y subasta) o solo a la galeria propia. */
+export interface NewLotInput extends LotInput {
+  destination: 'CATALOG' | 'PERSONAL';
+  /** Solo cuenta en un proyecto propio. */
+  visibility?: 'PUBLIC' | 'PRIVATE';
 }
 
 /** Decision del administrador sobre una obra en revision manual. */
@@ -124,7 +131,7 @@ export const artApi = {
   lot(id: string, token?: string | null) {
     return api<Lot>(`/lots/${id}`, { token });
   },
-  createLot(token: string, input: LotInput) {
+  createLot(token: string, input: NewLotInput) {
     return api<Lot>('/lots', { method: 'POST', token, body: JSON.stringify(input) });
   },
   /** Solo el vendedor y solo en borrador (por ejemplo, una obra devuelta). */
@@ -133,6 +140,10 @@ export const artApi = {
   },
   myLots(token: string) {
     return api<Lot[]>('/lots/mine', { token });
+  },
+  /** Muestra u oculta un proyecto propio en la galeria publica del autor. */
+  setLotVisibility(token: string, lotId: string, visibility: 'PUBLIC' | 'PRIVATE') {
+    return api<Lot>(`/lots/${lotId}/visibility`, { method: 'PATCH', token, body: JSON.stringify({ visibility }) });
   },
   signUpload(token: string, lotId: string, contentType: string, position: number) {
     return api<SignedUpload>(`/lots/${lotId}/uploads`, {
@@ -206,6 +217,7 @@ export const artApi = {
   restoreGallery(token: string) {
     return api<PersonalGallery>('/me/gallery/restore', { method: 'POST', token });
   },
+  /** Cuelga en la sala 3D una obra propia (proyecto, publicada sin vender o ganada). */
   addToGallery(token: string, lotId: string) {
     return api<PersonalGallery>('/me/gallery/artworks', { method: 'POST', token, body: JSON.stringify({ lotId }) });
   },

@@ -139,8 +139,9 @@ export interface PlacedBid {
 
 export interface GalleryItem {
   ownerId: string;
-  lotId: string | null;
-  source: 'PROPIA' | 'GANADA' | 'GRATUITA';
+  lotId: string;
+  /** PROYECTO: proyecto propio sin auditar; PROPIA: obra suya en el catalogo; GANADA: ganada en subasta. */
+  source: 'PROYECTO' | 'PROPIA' | 'GANADA';
   visibility: 'PUBLIC' | 'PRIVATE';
   title: string;
   artistName: string | null;

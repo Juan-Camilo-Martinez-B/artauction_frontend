@@ -3,6 +3,16 @@ import type { AuditSummary, Lot } from '@/lib/api/types';
 /** Modelo con el que ai-service marca su evaluacion local, sin IA. */
 const LOCAL_MODEL = 'local-rules';
 
+/** Proyecto propio: solo para la galeria de su autor, sin auditoria ni subasta. */
+export function isPersonal(lot: Pick<Lot, 'status'>): boolean {
+  return lot.status === 'PERSONAL';
+}
+
+/** El autor puede cambiar ficha e imagen: en borrador o en un proyecto propio. */
+export function isEditable(lot: Pick<Lot, 'status'>): boolean {
+  return lot.status === 'BORRADOR' || lot.status === 'PERSONAL';
+}
+
 /** Obra en borrador porque un administrador la devolvio con un motivo. */
 export function isReturned(lot: Pick<Lot, 'status' | 'lastReview'>): boolean {
   return lot.status === 'BORRADOR' && lot.lastReview?.decision === 'RETURN_TO_DRAFT';
@@ -18,6 +28,9 @@ export function sellerStatus(lot: Pick<Lot, 'status' | 'lastReview'>): string {
  * la auditoria, eso es lo que cuenta para quien la mira.
  */
 export function auditSourceLabel(summary: Pick<AuditSummary, 'modelName'> | undefined, lot: Pick<Lot, 'lastReview' | 'status'>): string | null {
+  if (isPersonal(lot)) {
+    return 'Proyecto propio, sin auditar';
+  }
   if (lot.lastReview?.decision === 'APPROVE' && lot.status !== 'BORRADOR') {
     return 'Aprobada por revisión manual de un administrador';
   }

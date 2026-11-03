@@ -1,16 +1,18 @@
 import type { GalleryItem, Lot } from '@/lib/api/types';
 import { isReturned } from './lot-review';
 
-// "Mis obras" reune en una sola lista lo que la persona publico (catalogo, con
-// su estado) y lo que adquirio (galeria: ganadas en subasta o anadidas como
-// prueba). Las obras propias de la galeria no se repiten: ya estan en el
-// catalogo con mas detalle.
+// "Mis obras" reune en una sola lista lo que la persona creo (proyectos propios
+// y obras del catalogo, con su estado) y lo que gano en subasta. Lo propio de la
+// galeria no se repite: ya esta en el catalogo con mas detalle.
+// Una obra vendida sigue en la lista del autor como registro de la venta, pero
+// ya no es suya: no se cuelga en su sala.
 
 export type MyWork = { kind: 'published'; lot: Lot } | { kind: 'acquired'; item: GalleryItem };
 
 export type WorkFilter =
   | 'todas'
   | 'devueltas'
+  | 'proyectos'
   | 'borrador'
   | 'auditoria'
   | 'revision'
@@ -18,8 +20,7 @@ export type WorkFilter =
   | 'subasta'
   | 'vendida'
   | 'cerrada'
-  | 'ganadas'
-  | 'anadidas';
+  | 'ganadas';
 
 export interface FilterGroup {
   label: string;
@@ -28,9 +29,10 @@ export interface FilterGroup {
 
 /** Orden y nombre de los filtros; el primer grupo solo existe para quien vende. */
 export const PUBLISHED_FILTERS: FilterGroup = {
-  label: 'Publicadas por mí',
+  label: 'Creadas por mí',
   filters: [
     { key: 'devueltas', label: 'Devueltas' },
+    { key: 'proyectos', label: 'Proyectos propios' },
     { key: 'borrador', label: 'Borrador' },
     { key: 'auditoria', label: 'En auditoría' },
     { key: 'revision', label: 'Revisión manual' },
@@ -43,10 +45,7 @@ export const PUBLISHED_FILTERS: FilterGroup = {
 
 export const ACQUIRED_FILTERS: FilterGroup = {
   label: 'Adquiridas',
-  filters: [
-    { key: 'ganadas', label: 'Ganadas en subasta' },
-    { key: 'anadidas', label: 'Añadidas como prueba' },
-  ],
+  filters: [{ key: 'ganadas', label: 'Ganadas en subasta' }],
 };
 
 const ALL_FILTERS = new Set<string>(['todas', ...[PUBLISHED_FILTERS, ACQUIRED_FILTERS].flatMap((group) => group.filters.map((filter) => filter.key))]);
@@ -63,13 +62,15 @@ function liveAuction(lot: Lot): boolean {
 /** Etiqueta de una obra; cada obra cae en exactamente una. */
 export function filterOf(work: MyWork): Exclude<WorkFilter, 'todas'> {
   if (work.kind === 'acquired') {
-    return work.item.source === 'GANADA' ? 'ganadas' : 'anadidas';
+    return 'ganadas';
   }
   const { lot } = work;
   if (isReturned(lot)) {
     return 'devueltas';
   }
   switch (lot.status) {
+    case 'PERSONAL':
+      return 'proyectos';
     case 'BORRADOR':
       return 'borrador';
     case 'PENDIENTE_AUDITORIA':
@@ -88,12 +89,21 @@ export function filterOf(work: MyWork): Exclude<WorkFilter, 'todas'> {
   }
 }
 
-/** Une lo publicado y lo adquirido, sin repetir las obras propias de la galeria. */
+/** Une lo creado y lo ganado, sin repetir lo que la galeria ya registra como propio. */
 export function collectWorks(lots: readonly Lot[], items: readonly GalleryItem[]): MyWork[] {
   return [
     ...lots.map((lot): MyWork => ({ kind: 'published', lot })),
-    ...items.filter((item) => item.source !== 'PROPIA').map((item): MyWork => ({ kind: 'acquired', item })),
+    ...items.filter((item) => item.source === 'GANADA').map((item): MyWork => ({ kind: 'acquired', item })),
   ];
+}
+
+/** Se cuelga en la sala lo que es de uno: todo lo creado salvo lo vendido, y lo ganado. */
+export function canHang(work: MyWork): boolean {
+  return work.kind === 'acquired' || work.lot.status !== 'VENDIDA';
+}
+
+export function lotIdOf(work: MyWork): string {
+  return work.kind === 'published' ? work.lot.id : work.item.lotId;
 }
 
 export function countByFilter(works: readonly MyWork[]): Map<WorkFilter, number> {

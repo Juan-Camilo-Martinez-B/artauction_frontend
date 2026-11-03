@@ -7,12 +7,11 @@ import { StatusPill } from '@/components/status-pill';
 import { ImageFormat, type ImageOrientation } from '@/lib/artwork/image-format';
 import { ButtonLink } from '@/components/ui/button';
 import { Notice } from '@/components/ui/notice';
-import { auditSourceLabel, isReturned } from '@/lib/artwork/lot-review';
+import { auditSourceLabel, isPersonal, isReturned } from '@/lib/artwork/lot-review';
 import { formatArtacoins } from '@/lib/auction/policy';
 import { formatDateTime } from '@/lib/format';
 import { formatMoney } from '@/lib/money';
 import type { Lot } from '@/lib/api/types';
-import { AddToGalleryButton } from './add-to-gallery';
 
 export function ArtworkExhibit({ lot }: { lot: Lot }) {
   const image = lot.images?.find((item) => item.url)?.url ?? null;
@@ -27,6 +26,8 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
         : 'Formato sin clasificar';
   const summary = lot.auditSummaries?.[0];
   const source = auditSourceLabel(summary, lot);
+  // Un proyecto propio no se audita ni se vende: no tiene score, precio ni sala.
+  const personal = isPersonal(lot);
 
   return (
     <article className={sheetClass(orientation)}>
@@ -53,6 +54,7 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
           ) : null}
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={isReturned(lot) ? 'DEVUELTA' : lot.status} />
+            {personal ? <span className="text-xs uppercase tracking-[0.18em] text-muted">Sin auditar</span> : null}
             <span className="text-xs uppercase tracking-[0.18em] text-oxide">{category}</span>
           </div>
           <h1 className="mt-4 font-serif text-4xl leading-tight sm:text-5xl">{lot.title}</h1>
@@ -66,10 +68,12 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
             <Fact label="Presentación" value={representation} />
             <Fact label="Medidas" value={measures(lot)} />
             <Fact label="Procedencia" value={lot.provenance?.trim() || 'Sin procedencia en la ficha'} />
-            <Fact
-              label="Banda sugerida"
-              value={`${formatMoney(lot.suggestedPriceMin)} – ${formatMoney(lot.suggestedPriceMax)}`}
-            />
+            {personal ? null : (
+              <Fact
+                label="Banda sugerida"
+                value={`${formatMoney(lot.suggestedPriceMin)} – ${formatMoney(lot.suggestedPriceMax)}`}
+              />
+            )}
           </dl>
           {lot.auction?.saleDescription ? (
             <p className="mt-6 max-w-prose leading-relaxed">{lot.auction.saleDescription}</p>
@@ -91,16 +95,24 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
               </ButtonLink>
             </div>
           ) : null}
-          <div className="mt-6">
-            <AddToGalleryButton lotId={lot.id} />
-          </div>
         </section>
-        <ScoreRing score={lot.authenticityScore} verdict={summary?.verdict ?? null} />
-        <p className={`px-1 text-sm leading-relaxed text-muted ${orientation === 'landscape' ? 'md:col-span-2' : ''}`}>
-          {summary
-            ? `${summary.hasCriticalInconsistency ? 'La auditoría encontró una inconsistencia crítica.' : 'La auditoría no encontró inconsistencias críticas.'} ${source ?? ''}.`
-            : 'El reporte de autenticidad aparece cuando termina la auditoría.'}
-        </p>
+        {personal ? (
+          <Notice tone="info" className={orientation === 'landscape' ? 'md:col-span-2' : ''}>
+            <div>
+              <span className="block font-medium">Proyecto propio, sin auditar</span>
+              Su autor la subió para su galería personal. No pasó por la auditoría de autenticidad y no está a la venta.
+            </div>
+          </Notice>
+        ) : (
+          <>
+            <ScoreRing score={lot.authenticityScore} verdict={summary?.verdict ?? null} />
+            <p className={`px-1 text-sm leading-relaxed text-muted ${orientation === 'landscape' ? 'md:col-span-2' : ''}`}>
+              {summary
+                ? `${summary.hasCriticalInconsistency ? 'La auditoría encontró una inconsistencia crítica.' : 'La auditoría no encontró inconsistencias críticas.'} ${source ?? ''}.`
+                : 'El reporte de autenticidad aparece cuando termina la auditoría.'}
+            </p>
+          </>
+        )}
       </div>
     </article>
   );

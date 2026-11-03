@@ -1,8 +1,8 @@
 'use client';
 
-import { ImageUp } from 'lucide-react';
+import { Gavel, ImageUp, Palette } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState, type SubmitEvent } from 'react';
+import { useEffect, useMemo, useState, type ReactNode, type SubmitEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
@@ -14,6 +14,8 @@ import type { Category, Lot } from '@/lib/api/types';
 import { browserSession } from '@/lib/session/browser-session';
 
 type Representation = 'TWO_D' | 'THREE_D';
+type Destination = 'CATALOG' | 'PERSONAL';
+type Visibility = 'PUBLIC' | 'PRIVATE';
 type Stage = 'idle' | 'saving' | 'uploading' | 'submitting';
 /** Que hace el envio: guardar y mandar a auditoria, o solo guardar el borrador. */
 type Intent = 'submit' | 'save';
@@ -87,16 +89,22 @@ function inputFrom(draft: Draft): LotInput {
 }
 
 /**
- * Ficha de una obra. Sin `lot` crea una nueva; con `lot` (en borrador, por
- * ejemplo devuelta por un administrador) la edita, puede cambiar la imagen y
- * la reenvia a auditoria.
+ * Ficha de una obra. Sin `lot` crea una nueva y pregunta su destino: el
+ * catalogo (auditoria y subasta) o solo la galeria propia. Con `lot` edita una
+ * obra en borrador (por ejemplo devuelta por un administrador), que se reenvia
+ * a auditoria, o un proyecto propio, que se guarda sin auditar.
  */
-export function LotForm({ lot = null }: { lot?: Lot | null }) {
+export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: boolean }) {
   const router = useRouter();
   const processImage = useImageProcessor();
   const editing = lot !== null;
   const initial = useMemo(() => draftFrom(lot), [lot]);
   const [draft, setDraft] = useState<Draft>(initial);
+  // Quien no vende solo crea proyectos propios.
+  const [destination, setDestination] = useState<Destination>(lot ? (lot.status === 'PERSONAL' ? 'PERSONAL' : 'CATALOG') : canSell ? 'CATALOG' : 'PERSONAL');
+  const initialVisibility: Visibility = lot?.visibility === 'PUBLIC' ? 'PUBLIC' : 'PRIVATE';
+  const [visibility, setVisibility] = useState<Visibility>(initialVisibility);
+  const personal = destination === 'PERSONAL';
   const [categories, setCategories] = useState<Category[]>([]);
   const savedImage = lot?.images?.find((image) => image.url)?.url ?? null;
   const [preview, setPreview] = useState<string | null>(null);
@@ -110,7 +118,9 @@ export function LotForm({ lot = null }: { lot?: Lot | null }) {
   const set = <Key extends keyof Draft>(key: Key) => (value: Draft[Key]) => {
     setDraft((current) => ({ ...current, [key]: value }));
   };
-  const dirty = file !== null || (Object.keys(initial) as Array<keyof Draft>).some((key) => draft[key] !== initial[key]);
+  const fieldsDirty = (Object.keys(initial) as Array<keyof Draft>).some((key) => draft[key] !== initial[key]);
+  const visibilityDirty = personal && editing && visibility !== initialVisibility;
+  const dirty = file !== null || fieldsDirty || visibilityDirty;
 
   const currentYear = new Date().getFullYear();
   const { touch, visibleError, attemptSubmit } = useFormValidation({
@@ -190,8 +200,20 @@ export function LotForm({ lot = null }: { lot?: Lot | null }) {
     }
     try {
       setStage('saving');
-      const saved = lot ? (dirty ? await artApi.updateLot(token, lot.id, inputFrom(draft)) : lot) : await artApi.createLot(token, inputFrom(draft));
+      const saved = lot
+        ? fieldsDirty
+          ? await artApi.updateLot(token, lot.id, inputFrom(draft))
+          : lot
+        : await artApi.createLot(token, { ...inputFrom(draft), destination, visibility: personal ? visibility : undefined });
       await uploadImage(token, saved.id);
+      if (personal) {
+        // Un proyecto propio no se audita: se guarda y queda en la galeria (y en la sala) del autor.
+        if (visibilityDirty) {
+          await artApi.setLotVisibility(token, saved.id, visibility);
+        }
+        router.push('/mis-obras?estado=proyectos');
+        return;
+      }
       if (chosen === 'submit') {
         setStage('submitting');
         await artApi.submitLot(token, saved.id);
@@ -208,7 +230,7 @@ export function LotForm({ lot = null }: { lot?: Lot | null }) {
   const pending = stage !== 'idle';
   const shownImage = preview ?? savedImage;
   const submitLabel: Record<Stage, string> = {
-    idle: editing ? 'Guardar y reenviar a auditoría' : 'Enviar a auditoría',
+    idle: personal ? (editing ? 'Guardar cambios' : 'Guardar en mi galería') : editing ? 'Guardar y reenviar a auditoría' : 'Enviar a auditoría',
     saving: 'Guardando la ficha…',
     uploading: 'Subiendo la imagen…',
     submitting: 'Enviando a auditoría…',
@@ -222,6 +244,47 @@ export function LotForm({ lot = null }: { lot?: Lot | null }) {
           <Notice tone="info">
             <span className="font-medium">Motivo de la devolución:</span> {returned}
           </Notice>
+        ) : null}
+        {!editing ? (
+          <Panel as="section">
+            <h2 className="font-serif text-2xl">¿Para qué es esta obra?</h2>
+            <div role="radiogroup" aria-label="Destino de la obra" className="mt-4 grid gap-3 sm:grid-cols-2">
+              <DestinationOption
+                selected={personal}
+                onSelect={() => { setDestination('PERSONAL'); }}
+                icon={<Palette aria-hidden="true" className="h-5 w-5" />}
+                title="Solo para mi galería"
+                description="Un proyecto propio: se cuelga en tu sala 3D sin auditoría. No se vende."
+              />
+              <DestinationOption
+                selected={!personal}
+                disabled={!canSell}
+                onSelect={() => { setDestination('CATALOG'); }}
+                icon={<Gavel aria-hidden="true" className="h-5 w-5" />}
+                title="Publicar en el catálogo"
+                description={canSell ? 'Pasa por la auditoría y, si la aprueba, recibe su sala de subasta.' : 'Solo para cuentas de vendedor.'}
+              />
+            </div>
+          </Panel>
+        ) : null}
+        {personal ? (
+          <Panel as="section">
+            <h2 className="font-serif text-2xl">¿Quién la ve?</h2>
+            <div role="radiogroup" aria-label="Visibilidad del proyecto" className="mt-4 grid gap-3 sm:grid-cols-2">
+              <DestinationOption
+                selected={visibility === 'PRIVATE'}
+                onSelect={() => { setVisibility('PRIVATE'); }}
+                title="Solo yo"
+                description="En tu sala 3D y en Mis obras."
+              />
+              <DestinationOption
+                selected={visibility === 'PUBLIC'}
+                onSelect={() => { setVisibility('PUBLIC'); }}
+                title="Pública en mi galería"
+                description="Aparece en tu galería pública como «Proyecto propio, sin auditar». Nunca en el catálogo."
+              />
+            </div>
+          </Panel>
         ) : null}
         <Panel as="section">
           <h2 className="font-serif text-2xl">La obra</h2>
@@ -309,13 +372,14 @@ export function LotForm({ lot = null }: { lot?: Lot | null }) {
           type="submit"
           variant="accent"
           loading={(pending && intent === 'submit') || processing}
-          disabled={pending}
+          // Editar un proyecto sin cambios no tiene nada que guardar.
+          disabled={pending || (personal && editing && !dirty)}
           className="w-full"
           data-intent="submit"
         >
           {intent === 'submit' ? submitLabel[stage] : submitLabel.idle}
         </Button>
-        {editing ? (
+        {editing && !personal ? (
           // Guardar sin reenviar solo tiene sentido si algo cambio.
           <Button
             type="submit"
@@ -330,5 +394,41 @@ export function LotForm({ lot = null }: { lot?: Lot | null }) {
         ) : null}
       </div>
     </form>
+  );
+}
+
+/** Opcion de una eleccion excluyente, como tarjeta: titulo, explicacion e icono. */
+function DestinationOption({
+  selected,
+  disabled = false,
+  onSelect,
+  icon,
+  title,
+  description,
+}: {
+  selected: boolean;
+  disabled?: boolean;
+  onSelect: () => void;
+  icon?: ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      disabled={disabled}
+      onClick={onSelect}
+      className={`flex h-full flex-col items-start gap-1 rounded-field border p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+        selected ? 'border-ink bg-paper-deep' : 'border-line-strong bg-surface hover:border-ink'
+      }`}
+    >
+      <span className="flex items-center gap-2 font-medium">
+        {icon}
+        {title}
+      </span>
+      <span className="text-sm text-muted">{description}</span>
+    </button>
   );
 }
