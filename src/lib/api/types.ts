@@ -89,17 +89,22 @@ export interface Bid {
   bidderId: string;
   amount: string;
   createdAt: string;
+  /** false si el postor se retiro o la sala se reprogramo. */
+  active?: boolean;
 }
 
 export interface Auction {
   id: string;
   lotId: string;
+  sellerId?: string;
   startPrice: string;
   currentPrice: string;
   minIncrement: string;
+  startsAt?: string | null;
   endsAt: string;
   status: string;
   winnerId: string | null;
+  saleDescription?: string | null;
   bids?: Bid[];
 }
 
