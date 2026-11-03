@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { GalleryItem, Lot } from '@/lib/api/types';
-import { applyFilter, collectWorks, countByFilter, filterOf, parseFilter } from '@/lib/artwork/my-works';
+import { applyFilter, canHang, collectWorks, countByFilter, filterOf, parseFilter } from '@/lib/artwork/my-works';
+import { auditSourceLabel, isEditable } from '@/lib/artwork/lot-review';
+import { canSell } from '@/lib/session/roles';
 import { sectionsFor } from '@/components/account/account-menu';
 
 function lot(id: string, status: string, extra: Partial<Lot> = {}): Lot {
@@ -37,15 +39,16 @@ describe('mis obras', () => {
     expect(filterOf({ kind: 'published', lot: scheduled })).toBe('subasta');
     expect(filterOf({ kind: 'published', lot: lot('v', 'VENDIDA') })).toBe('vendida');
     expect(filterOf({ kind: 'published', lot: lot('c', 'CERRADO') })).toBe('cerrada');
+    expect(filterOf({ kind: 'published', lot: lot('own', 'PERSONAL') })).toBe('proyectos');
     expect(filterOf({ kind: 'acquired', item: item('g', 'GANADA') })).toBe('ganadas');
-    expect(filterOf({ kind: 'acquired', item: item('x', 'GRATUITA') })).toBe('anadidas');
   });
 
-  it('une lo publicado y lo adquirido sin repetir las obras propias de la galeria', () => {
-    const works = collectWorks([lot('p', 'PUBLICADA'), returned], [item('p', 'PROPIA'), item('g', 'GANADA')]);
-    expect(works).toHaveLength(3);
+  it('une lo creado y lo ganado sin repetir lo que la galeria registra como propio', () => {
+    const works = collectWorks([lot('p', 'PUBLICADA'), returned, lot('own', 'PERSONAL')], [item('p', 'PROPIA'), item('own', 'PROYECTO'), item('g', 'GANADA')]);
+    expect(works).toHaveLength(4);
+    expect(countByFilter(works).get('proyectos')).toBe(1);
     const counts = countByFilter(works);
-    expect(counts.get('todas')).toBe(3);
+    expect(counts.get('todas')).toBe(4);
     expect(counts.get('publicada')).toBe(1);
     expect(counts.get('ganadas')).toBe(1);
     // Las devueltas van primero porque piden algo a la persona.
@@ -65,5 +68,20 @@ describe('mis obras', () => {
       expect(hrefs).toContain('/mis-obras');
       expect(hrefs).not.toContain('/galeria');
     }
+  });
+
+  it('solo se cuelga lo propio: lo vendido ya es de quien lo gano', () => {
+    expect(canHang({ kind: 'published', lot: lot('own', 'PERSONAL') })).toBe(true);
+    expect(canHang({ kind: 'published', lot: lot('p', 'PUBLICADA') })).toBe(true);
+    expect(canHang({ kind: 'published', lot: lot('v', 'VENDIDA') })).toBe(false);
+    expect(canHang({ kind: 'acquired', item: item('g', 'GANADA') })).toBe(true);
+  });
+
+  it('un proyecto propio se edita siempre, se marca sin auditar y lo crea cualquier cuenta', () => {
+    expect(isEditable(lot('own', 'PERSONAL'))).toBe(true);
+    expect(isEditable(lot('p', 'PUBLICADA'))).toBe(false);
+    expect(auditSourceLabel({ modelName: 'gemini-x' }, lot('own', 'PERSONAL'))).toBe('Proyecto propio, sin auditar');
+    expect(canSell('USER')).toBe(false);
+    expect(canSell('SELLER')).toBe(true);
   });
 });

@@ -16,7 +16,8 @@ export function generateStaticParams(): { ownerId: string }[] {
 const SOURCE_LABEL: Record<string, string> = {
   GANADA: 'Ganada en subasta',
   PROPIA: 'De su autoría',
-  GRATUITA: 'En exhibición',
+  // Sin auditoria: quien la mira debe saberlo.
+  PROYECTO: 'Proyecto propio, sin auditar',
 };
 
 export default async function PublicGalleryPage({ params }: { params: Promise<{ ownerId: string }> }) {
@@ -27,7 +28,7 @@ export default async function PublicGalleryPage({ params }: { params: Promise<{ 
       <PageHeader
         eyebrow="Colección"
         title="Galería pública"
-        description="Las obras públicas de esta colección. Síguela para ver en tu feed lo que gana."
+        description="Las obras públicas de esta colección: lo que su dueño ganó, publicó o creó para su galería. Síguela para ver en tu feed lo que gana."
         actions={<FollowButton ownerId={ownerId} />}
       />
       {items.length === 0 ? (
@@ -38,13 +39,9 @@ export default async function PublicGalleryPage({ params }: { params: Promise<{ 
             <li key={`${item.title}-${item.acquiredAt}`} className="rounded-panel border border-line bg-surface p-5 shadow-panel">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-oxide">{SOURCE_LABEL[item.source] ?? 'En la colección'}</p>
               <h2 className="mt-2 font-serif text-xl leading-snug">
-                {item.lotId ? (
-                  <Link href={`/obras/${item.lotId}`} className="hover:underline">
-                    {item.title}
-                  </Link>
-                ) : (
-                  item.title
-                )}
+                <Link href={`/obras/${item.lotId}`} className="hover:underline">
+                  {item.title}
+                </Link>
               </h2>
               <p className="text-sm text-muted">{item.artistName ?? 'Artista sin atribuir'}</p>
             </li>

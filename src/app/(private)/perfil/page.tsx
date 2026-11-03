@@ -17,7 +17,7 @@ const DESCRIPTIONS: Record<string, string> = {
   '/mis-obras': 'Lo que publicaste con su estado, y lo que ganaste en subasta.',
   '/feed': 'Lo que hacen las personas que sigues.',
   '/notificaciones': 'Resultados de auditorías y cierres de subasta.',
-  '/publicar': 'Envía una obra nueva a auditoría.',
+  '/publicar': 'Sube un proyecto propio para tu galería o, si vendes, una obra para el catálogo.',
   '/admin': 'Obras que esperan una decisión manual.',
   '/ajustes': 'Tu nombre y tu imagen de perfil.',
 };

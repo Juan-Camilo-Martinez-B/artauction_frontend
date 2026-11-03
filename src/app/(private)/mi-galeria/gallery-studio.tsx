@@ -314,10 +314,17 @@ function Studio() {
           <div className="absolute inset-x-0 bottom-6 flex justify-center px-4">
             <div className="max-w-md rounded-panel bg-surface/95 p-5 text-center shadow-lift">
               <p className="font-serif text-xl">Tu sala está vacía</p>
-              <p className="mt-1 text-sm text-muted">Las obras que ganes en subasta se cuelgan aquí solas.</p>
-              <ButtonLink href="/catalogo" size="sm" className="mt-3">
-                Ir al catálogo
-              </ButtonLink>
+              <p className="mt-1 text-sm text-muted">
+                Tus proyectos propios y las obras que ganes en subasta se cuelgan aquí solos. Lo que publicaste y aún no se vende lo cuelgas desde Mis obras.
+              </p>
+              <div className="mt-3 flex flex-wrap justify-center gap-2">
+                <ButtonLink href="/publicar" size="sm">
+                  Subir un proyecto propio
+                </ButtonLink>
+                <ButtonLink href="/mis-obras" size="sm" variant="secondary">
+                  Mis obras
+                </ButtonLink>
+              </div>
             </div>
           </div>
         ) : null}

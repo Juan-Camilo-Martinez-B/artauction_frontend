@@ -6,21 +6,23 @@ import { ButtonLink } from '@/components/ui/button';
 import { EmptyState, LoadingState, PageHeader } from '@/components/ui/layout';
 import { artApi } from '@/lib/api/client';
 import type { Lot } from '@/lib/api/types';
+import { isEditable } from '@/lib/artwork/lot-review';
 import { browserSession } from '@/lib/session/browser-session';
+import { canSell } from '@/lib/session/roles';
 import { LotForm } from '../lot-form';
 
 export default function EditLotPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   return (
-    <RequireSession roles={['SELLER', 'ADMIN']} title="Entra para editar tu obra">
-      {(profile) => <EditLot id={id} userId={profile.userId} />}
+    <RequireSession title="Entra para editar tu obra">
+      {(profile) => <EditLot id={id} userId={profile.userId} sells={canSell(profile.role)} />}
     </RequireSession>
   );
 }
 
 type Loaded = { kind: 'loading' } | { kind: 'ready'; lot: Lot } | { kind: 'locked'; lot: Lot } | { kind: 'missing' };
 
-function EditLot({ id, userId }: { id: string; userId: string }) {
+function EditLot({ id, userId, sells }: { id: string; userId: string; sells: boolean }) {
   const [state, setState] = useState<Loaded>({ kind: 'loading' });
 
   useEffect(() => {
@@ -37,7 +39,7 @@ function EditLot({ id, userId }: { id: string; userId: string }) {
           setState({ kind: 'missing' });
           return;
         }
-        setState(lot.status === 'BORRADOR' ? { kind: 'ready', lot } : { kind: 'locked', lot });
+        setState(isEditable(lot) ? { kind: 'ready', lot } : { kind: 'locked', lot });
       } catch {
         setState({ kind: 'missing' });
       }
@@ -60,7 +62,7 @@ function EditLot({ id, userId }: { id: string; userId: string }) {
     return (
       <EmptyState
         title="Esta obra ya no se puede editar"
-        description="Solo se editan las obras en borrador, por ejemplo las que un administrador devolvió. Una obra en auditoría o publicada conserva su ficha."
+        description="Solo se editan los proyectos propios y las obras en borrador, por ejemplo las que un administrador devolvió. Una obra en auditoría o publicada conserva su ficha."
         action={<ButtonLink href={`/obras/${state.lot.id}`} variant="secondary">Ver la ficha</ButtonLink>}
       />
     );
@@ -70,9 +72,13 @@ function EditLot({ id, userId }: { id: string; userId: string }) {
       <PageHeader
         eyebrow="Mis obras"
         title={`Editar «${state.lot.title}»`}
-        description="Corrige la ficha o cambia la imagen. Al reenviarla, la auditoría la revisa de nuevo."
+        description={
+          state.lot.status === 'PERSONAL'
+            ? 'Cambia la ficha, la imagen o quién la ve. Un proyecto propio no pasa por auditoría.'
+            : 'Corrige la ficha o cambia la imagen. Al reenviarla, la auditoría la revisa de nuevo.'
+        }
       />
-      <LotForm lot={state.lot} />
+      <LotForm lot={state.lot} canSell={sells} />
     </>
   );
 }
