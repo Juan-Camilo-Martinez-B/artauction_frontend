@@ -1,41 +1,48 @@
-import Link from 'next/link';
+import { ArrowRight, Box, Gavel, ShieldCheck } from 'lucide-react';
 import { LiveAuctions } from '@/components/auctions/live-auctions';
+import { ButtonLink } from '@/components/ui/button';
+
+const STEPS = [
+  { Icon: ShieldCheck, title: 'Auditamos', text: 'Cada obra pasa una auditoría de autenticidad: material, época e imagen deben coincidir.' },
+  { Icon: Gavel, title: 'Subastamos', text: 'Salas en vivo con el reloj del servidor. Una puja en el último instante alarga el cierre.' },
+  { Icon: Box, title: 'Exhibes', text: 'La obra que ganas cuelga en tu galería 3D, que puedes recorrer y montar a tu gusto.' },
+];
 
 export default function HomePage() {
   return (
     <>
       <section className="grid gap-10 md:grid-cols-[1.4fr_1fr] md:items-end">
         <div>
-          <p className="text-sm uppercase tracking-[0.2em] text-oxide">Sala de arte</p>
+          <p className="text-xs font-medium uppercase tracking-[0.22em] text-oxide">Sala de arte</p>
           <h1 className="mt-3 font-serif text-5xl leading-tight md:text-6xl">La obra entra cuando el material y el siglo coinciden.</h1>
           <p className="mt-6 max-w-xl text-lg text-muted">
-            Cada lote pasa por una auditoría antes de la sala. El precio solo sube, el cierre se alarga si alguien puja en el último instante y el reloj que ves es el del servidor.
+            Subastas de arte y antigüedades con auditoría de autenticidad. El precio solo sube, el cierre se alarga si alguien puja en el último instante y lo que ganas se exhibe en tu propia sala.
           </p>
-          <div className="mt-8 flex gap-3">
-            <Link href="/catalogo" className="rounded-full bg-oxide px-5 py-2 text-white">
-              Ver catálogo
-            </Link>
-            <Link href="/como-funciona" className="rounded-full border border-line px-5 py-2">
+          <div className="mt-8 flex flex-wrap gap-3">
+            <ButtonLink href="/catalogo" variant="accent">
+              Ver el catálogo
+              <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            </ButtonLink>
+            <ButtonLink href="/como-funciona" variant="secondary">
               Cómo funciona
-            </Link>
+            </ButtonLink>
           </div>
         </div>
-        <aside className="rounded-2xl border border-line bg-white p-6">
-          <ol className="space-y-4 text-sm">
-            <li>
-              <strong className="block font-serif text-xl">1. Publicas</strong>
-              La imagen se prepara en tu navegador antes de salir.
+        <ol className="space-y-4 rounded-panel border border-line bg-surface p-6 shadow-panel">
+          {STEPS.map(({ Icon, title, text }, index) => (
+            <li key={title} className="flex gap-4">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-paper-deep text-oxide">
+                <Icon aria-hidden="true" className="h-5 w-5" />
+              </span>
+              <span>
+                <strong className="block font-serif text-xl">
+                  {index + 1}. {title}
+                </strong>
+                <span className="text-sm text-muted">{text}</span>
+              </span>
             </li>
-            <li>
-              <strong className="block font-serif text-xl">2. Auditamos</strong>
-              Un anacronismo grave deja la obra en revisión, no en la sala.
-            </li>
-            <li>
-              <strong className="block font-serif text-xl">3. Subastas</strong>
-              La puja ganadora queda en la galería de quien se la llevó.
-            </li>
-          </ol>
-        </aside>
+          ))}
+        </ol>
       </section>
       <LiveAuctions showCatalogLink />
     </>

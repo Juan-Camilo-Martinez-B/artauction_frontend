@@ -5,11 +5,11 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, type RefObject } from 'react';
 import { ACESFilmicToneMapping } from 'three';
 import type { GalleryConfig, Lot } from '@/lib/api/types';
-import { artworkSize, isObjectLot, type ArtworkSize, type Placement, type Room as RoomSize } from '@/lib/gallery/layout';
+import { artworkSize, footprintRadius, isObjectLot, roomOf, type Placement, type Room as RoomSize } from '@/lib/gallery/layout';
 import { kelvinToHex } from '@/lib/gallery/materials';
 import { FramedArtwork } from './framed-artwork';
 import { Room } from './room';
-import { pedestalHeight, Sculpture } from './sculpture';
+import { Sculpture } from './sculpture';
 import { TourControls, type MoveIntent, type Obstacle, type Viewpoint } from './tour-controls';
 
 /** Focos por tipo de pieza: cada foco encarece el render, asi que se limitan. */
@@ -23,10 +23,6 @@ export interface SceneArtwork {
 }
 
 export type SceneMode = 'tour' | 'edit';
-
-export function roomOf(config: GalleryConfig): RoomSize {
-  return { width: config.architecture.roomWidth, depth: config.architecture.roomDepth, height: config.architecture.roomHeight };
-}
 
 export function GalleryScene({
   config,
@@ -142,13 +138,4 @@ function EditView({ room }: { room: RoomSize }) {
     camera.position.set(0, Math.min(room.height - 0.4, 3.4), room.depth / 2 - 0.6);
   }, [camera, room.height, room.depth]);
   return null;
-}
-
-export function footprintRadius(size: ArtworkSize, scale: number): number {
-  return (Math.max(0.45, Math.max(size.width, size.depth) + 0.3) * scale) / Math.SQRT2 + 0.05;
-}
-
-/** Altura total de un objeto sobre el suelo, con su pedestal. */
-export function objectTop(size: ArtworkSize, scale: number): number {
-  return (pedestalHeight(size.height) + size.height) * scale;
 }

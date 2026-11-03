@@ -5,6 +5,7 @@ import type { ThreeEvent } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { DoubleSide, Float32BufferAttribute, LatheGeometry, SRGBColorSpace, Texture, Vector2, type Object3D, type SpotLight } from 'three';
 import { textureSource } from '@/lib/gallery/image-source';
+import { pedestalHeight } from '@/lib/gallery/layout';
 import { PLASTER } from '@/lib/gallery/materials';
 import { objectModelProvider, type ObjectModel } from '@/lib/gallery/object-models';
 import { CLICK_TOLERANCE_PX, type ArtworkViewProps } from './framed-artwork';
@@ -13,17 +14,6 @@ import { SceneBoundary } from './scene-boundary';
 import { SurfaceMaterialView } from './surface-material';
 
 type ModelState = { status: 'loading' } | { status: 'ready'; model: ObjectModel };
-
-/** Altura del pedestal segun la pieza: lo chico se eleva a la vista, lo grande va casi al suelo. */
-export function pedestalHeight(objectHeight: number): number {
-  if (objectHeight >= 1.5) {
-    return 0.1;
-  }
-  if (objectHeight >= 0.8) {
-    return 0.45;
-  }
-  return 0.95;
-}
 
 /** Acabado segun el material declarado: brillo de esmalte, bronce, piedra o madera. */
 function surfaceFinish(materials: string): { roughness: number; metalness: number } {

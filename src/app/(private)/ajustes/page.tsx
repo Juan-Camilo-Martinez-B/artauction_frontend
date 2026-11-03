@@ -1,79 +1,109 @@
 'use client';
 
-import { useEffect, useState, type SubmitEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, type SubmitEvent } from 'react';
+import { ProfileMark } from '@/components/account/profile-mark';
+import { RequireSession } from '@/components/session/require-session';
+import { Button } from '@/components/ui/button';
+import { PageHeader, Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { TextField } from '@/components/ui/text-field';
-import { ProfileMark } from '@/components/account/profile-mark';
+import { useToast } from '@/components/ui/toast';
+import { useFormValidation } from '@/hooks/use-form-validation';
 import { ApiError, artApi } from '@/lib/api/client';
-import { browserSession } from '@/lib/session/browser-session';
+import { displayNameError } from '@/lib/forms/validators';
+import { browserSession, type AccountProfile } from '@/lib/session/browser-session';
 
 export default function SettingsPage() {
-  const router = useRouter();
-  const [displayName, setDisplayName] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  return <RequireSession title="Entra para cambiar tus ajustes">{(profile) => <SettingsForm profile={profile} />}</RequireSession>;
+}
 
-  useEffect(() => {
-    void browserSession.restore().then(() => {
-      const profile = browserSession.current().profile;
-      if (!profile) {
-        router.replace('/entrar');
-        return;
-      }
-      setDisplayName(profile.displayName);
-      setAvatarUrl(profile.avatarUrl ?? '');
-    });
-  }, [router]);
+function avatarError(value: string): string | undefined {
+  const trimmed = value.trim();
+  if (trimmed === '') {
+    return undefined;
+  }
+  try {
+    return new URL(trimmed).protocol === 'https:' ? undefined : 'La imagen debe ser una dirección https.';
+  } catch {
+    return 'Escribe una dirección completa, por ejemplo https://…';
+  }
+}
+
+function SettingsForm({ profile }: { profile: AccountProfile }) {
+  const notify = useToast();
+  const [displayName, setDisplayName] = useState(profile.displayName);
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl ?? '');
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const { touch, visibleError, attemptSubmit } = useFormValidation({
+    displayName: displayNameError(displayName),
+    avatarUrl: avatarError(avatarUrl),
+  });
+  const dirty = displayName.trim() !== profile.displayName || avatarUrl.trim() !== (profile.avatarUrl ?? '');
 
   async function onSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    const token = await browserSession.accessToken();
-    if (!token) {
-      router.replace('/entrar');
+    setError(null);
+    if (!attemptSubmit()) {
       return;
     }
-    setError(null);
-    setMessage(null);
+    const token = await browserSession.accessToken();
+    if (!token) {
+      return;
+    }
+    setPending(true);
     try {
-      const profile = await artApi.updateMe(token, { displayName, avatarUrl });
+      const updated = await artApi.updateMe(token, { displayName: displayName.trim(), avatarUrl: avatarUrl.trim() });
       browserSession.replace({
-        userId: profile.userId,
-        email: profile.email,
-        role: profile.role,
-        displayName: profile.displayName ?? displayName,
-        avatarUrl: profile.avatarUrl ?? null,
+        userId: updated.userId,
+        email: updated.email,
+        role: updated.role,
+        displayName: updated.displayName ?? displayName.trim(),
+        avatarUrl: updated.avatarUrl ?? null,
       });
-      setMessage('Los cambios quedaron guardados.');
+      notify('Tus ajustes quedaron guardados.', 'success');
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'No se pudieron guardar los ajustes.');
+    } finally {
+      setPending(false);
     }
   }
 
   return (
-    <section className="mx-auto max-w-md">
-      <h1 className="font-serif text-4xl">Ajustes</h1>
-      <p className="mt-3 text-sm text-muted">El nombre y la imagen se guardan en tu cuenta y se ven en la cabecera.</p>
-      <div className="mt-6">
-        <ProfileMark name={displayName || 'Cuenta'} avatarUrl={avatarUrl.trim() || null} />
-      </div>
-      <form onSubmit={(event) => void onSubmit(event)} className="mt-6 space-y-4">
-        <TextField id="display-name" label="Nombre" required minLength={2} maxLength={80} value={displayName} onValueChange={setDisplayName} />
-        <TextField
-          id="avatar-url"
-          label="Imagen de perfil"
-          type="url"
-          hint="Una dirección https. Si la dejas vacía, la cabecera usa tus iniciales."
-          value={avatarUrl}
-          onValueChange={setAvatarUrl}
-        />
-        {error ? <Notice tone="error">{error}</Notice> : null}
-        {message ? <p className="text-sm">{message}</p> : null}
-        <button type="submit" className="rounded-full bg-ink px-5 py-2 text-paper">
-          Guardar
-        </button>
-      </form>
-    </section>
+    <>
+      <PageHeader eyebrow="Tu cuenta" title="Ajustes" description="El nombre y la imagen se ven en la cabecera y en tu galería pública." />
+      <Panel className="max-w-xl">
+        <div className="flex items-center gap-4">
+          <ProfileMark name={displayName || 'Cuenta'} avatarUrl={avatarError(avatarUrl) ? null : avatarUrl.trim() || null} />
+          <p className="text-sm text-muted">Así te verán las demás personas.</p>
+        </div>
+        <form noValidate onSubmit={(event) => void onSubmit(event)} className="mt-6 space-y-4">
+          <TextField
+            id="display-name"
+            label="Nombre"
+            required
+            maxLength={80}
+            value={displayName}
+            onValueChange={setDisplayName}
+            onBlur={() => { touch('displayName'); }}
+            error={visibleError('displayName')}
+          />
+          <TextField
+            id="avatar-url"
+            label="Imagen de perfil"
+            type="url"
+            hint="Una dirección https. Si la dejas vacía, se usan tus iniciales."
+            value={avatarUrl}
+            onValueChange={setAvatarUrl}
+            onBlur={() => { touch('avatarUrl'); }}
+            error={visibleError('avatarUrl')}
+          />
+          {error ? <Notice tone="error">{error}</Notice> : null}
+          <Button type="submit" loading={pending} disabled={!dirty}>
+            {pending ? 'Guardando…' : 'Guardar cambios'}
+          </Button>
+        </form>
+      </Panel>
+    </>
   );
 }

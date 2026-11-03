@@ -1,28 +1,19 @@
 import Link from 'next/link';
 import { AccountMenu } from './account/account-menu';
-
-const links = [
-  { href: '/catalogo', label: 'Catálogo' },
-  { href: '/mi-galeria', label: 'Mi galería' },
-  { href: '/como-funciona', label: 'Cómo funciona' },
-];
+import { MainNav } from './main-nav';
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-line bg-paper/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4">
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
+      <nav aria-label="Principal" className="relative mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3.5">
         <Link href="/" className="font-serif text-xl tracking-tight">
           ArtAuction
         </Link>
-        <nav aria-label="Principal" className="flex items-center gap-5 text-sm">
-          {links.map((link) => (
-            <Link key={link.href} href={link.href} className="text-muted hover:text-ink">
-              {link.label}
-            </Link>
-          ))}
+        <div className="flex items-center gap-3 md:gap-6">
+          <MainNav />
           <AccountMenu />
-        </nav>
-      </div>
+        </div>
+      </nav>
     </header>
   );
 }

@@ -5,19 +5,20 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArtworkCard } from '@/components/gallery3d/artwork-card';
 import { AmbiencePanel } from '@/components/gallery3d/ambience-panel';
-import { objectTop, roomOf, type SceneArtwork, type SceneMode } from '@/components/gallery3d/gallery-scene';
+import type { SceneArtwork, SceneMode } from '@/components/gallery3d/gallery-scene';
 import { PlacementPanel } from '@/components/gallery3d/placement-panel';
+import { RequireSession } from '@/components/session/require-session';
 import { TouchPad } from '@/components/gallery3d/touch-pad';
 import type { MoveIntent, Viewpoint } from '@/components/gallery3d/tour-controls';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import { EmptyState, LoadingState, PageHeader, Panel } from '@/components/ui/layout';
+import { LoadingState, PageHeader, Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { useToast } from '@/components/ui/toast';
 import { ApiError, artApi } from '@/lib/api/client';
 import type { GalleryConfig, PersonalGallery } from '@/lib/api/types';
 import { DEFAULT_GALLERY_CONFIG, sameConfig } from '@/lib/gallery/default-config';
-import { artworkSize, hangingPlan, hasOverlaps, isObjectLot, viewpointFor, type Placement } from '@/lib/gallery/layout';
+import { artworkSize, hangingPlan, hasOverlaps, isObjectLot, objectTop, roomOf, viewpointFor, type Placement } from '@/lib/gallery/layout';
 import { browserSession } from '@/lib/session/browser-session';
 
 // La escena 3D solo existe en el navegador: se carga aparte para no pesar en el primer render.
@@ -26,7 +27,7 @@ const GalleryScene = dynamic(() => import('@/components/gallery3d/gallery-scene'
   loading: () => <div className="flex h-full items-center justify-center text-sm text-paper/80">Preparando la sala…</div>,
 });
 
-type LoadState = { status: 'loading' } | { status: 'anonymous' } | { status: 'error'; message: string } | { status: 'ready'; gallery: PersonalGallery };
+type LoadState = { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; gallery: PersonalGallery };
 
 type GalleryArtwork = PersonalGallery['artworks'][number];
 
@@ -52,6 +53,14 @@ function usePrefersReducedMotion(): boolean {
 }
 
 export function GalleryStudio() {
+  return (
+    <RequireSession title="Entra para ver tu galería" description="Tu sala 3D guarda las obras que ganas en subasta.">
+      {() => <Studio />}
+    </RequireSession>
+  );
+}
+
+function Studio() {
   const notify = useToast();
   const [state, setState] = useState<LoadState>({ status: 'loading' });
   const [configDraft, setConfigDraft] = useState<GalleryConfig | null>(null);
@@ -75,7 +84,6 @@ export function GalleryStudio() {
   useEffect(() => {
     void browserSession.accessToken().then(async (token) => {
       if (!token) {
-        setState({ status: 'anonymous' });
         return;
       }
       try {
@@ -252,9 +260,6 @@ export function GalleryStudio() {
 
   if (state.status === 'loading') {
     return <LoadingState label="Abriendo tu galería…" />;
-  }
-  if (state.status === 'anonymous') {
-    return <EmptyState title="Entra para ver tu galería" description="Tu sala 3D guarda las obras que ganas en subasta." action={<ButtonLink href="/entrar">Entrar</ButtonLink>} />;
   }
   if (state.status === 'error' || !gallery) {
     return <Notice tone="error">{state.status === 'error' ? state.message : 'No se pudo abrir la galería.'}</Notice>;

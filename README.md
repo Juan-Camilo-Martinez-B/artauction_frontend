@@ -54,6 +54,14 @@ src/hooks            filtro, imagen, canal de subasta y validación de formulari
 tests                pruebas de unidad y smoke e2e
 ```
 
+## Consistencia de la interfaz
+
+- **Componentes.** Toda página usa `src/components/ui`: `PageHeader`, `Panel`, `Button` y `ButtonLink` (primaria, acento para dinero, secundaria, fantasma y peligro), campos con validación en línea, `Notice` para errores en línea, toasts para confirmar acciones, `ConfirmDialog` para lo destructivo, y `LoadingState` y `EmptyState` con un siguiente paso.
+- **Sesión.** Las páginas privadas van dentro de `RequireSession`: el mismo estado de carga, la misma invitación a entrar y la vuelta a la página tras el login (`/entrar?next=`, solo rutas internas). Las secciones que dependen del rol (publicar, revisión) lo explican en vez de fallar. `/api/session/refresh` responde 204 a un visitante anónimo.
+- **Navegación.** La cabecera marca la sección activa y tiene menú móvil. El menú de cuenta y `/perfil` comparten la lista de secciones (`ACCOUNT_SECTIONS`).
+- **Textos.** Avisos, actividad, estados y veredictos se muestran en palabras (`describe-events.ts`, `StatusPill`), y las fechas en un solo formato (`lib/format.ts`).
+- **Sala de subasta.** Muestra la obra, la oferta mínima siguiente, ofertas rápidas, el saldo con enlace a recargar, la cuenta regresiva de apertura o cierre, el historial con postores anónimos ("Tú", "Postor 1"…) y la confirmación antes de retirarse. Las reglas viven en `lib/auction/room.ts`.
+
 ## Galería 3D
 
 La sala personal (`/mi-galeria`) simula una galería real con React Three Fiber.

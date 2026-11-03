@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ButtonLink } from '@/components/ui/button';
+import { EmptyState, LoadingState } from '@/components/ui/layout';
 import { artApi } from '@/lib/api/client';
 import type { Lot } from '@/lib/api/types';
 import { browserSession } from '@/lib/session/browser-session';
@@ -28,7 +30,13 @@ export function OwnLot({ id }: { id: string }) {
     return <ArtworkExhibit lot={lot} />;
   }
   if (missing) {
-    return <p>Esta obra no está en el catálogo público.</p>;
+    return (
+      <EmptyState
+        title="Esta obra no está disponible"
+        description="Puede que sea privada, que se haya vendido o que el enlace esté mal."
+        action={<ButtonLink href="/catalogo" variant="secondary">Volver al catálogo</ButtonLink>}
+      />
+    );
   }
-  return <p>Abriendo la ficha…</p>;
+  return <LoadingState label="Abriendo la ficha…" />;
 }

@@ -1,5 +1,10 @@
+import { ChevronLeft, ChevronRight, SearchX } from 'lucide-react';
 import Link from 'next/link';
 import { ArtworkImage } from '@/components/artwork-image';
+import { ButtonLink } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/layout';
+import { catalogHref } from '@/lib/catalog-href';
+import { CatalogSearch } from './catalog-search';
 import type { Category, Lot } from '@/lib/api/types';
 
 export function CatalogExhibit({
@@ -26,41 +31,25 @@ export function CatalogExhibit({
 
   return (
     <div>
-      <form className="mb-8 grid gap-3 md:grid-cols-[1fr_12rem]" action="/catalogo" role="search">
-        {activeCategory ? <input type="hidden" name="category" value={activeCategory} /> : null}
-        <label className="text-sm">
-          <span className="mb-1 block">Buscar obra, artista o material</span>
-          <input
-            name="q"
-            defaultValue={query}
-            className="w-full rounded-md border border-line bg-white px-3 py-2"
-            placeholder="Retrato, óleo, Vásquez…"
-          />
-        </label>
-        <label className="text-sm">
-          <span className="mb-1 block">Formato</span>
-          <select name="representation" defaultValue={representation} className="w-full rounded-md border border-line bg-white px-3 py-2">
-            <option value="">Todos</option>
-            <option value="TWO_D">Bidimensional</option>
-            <option value="THREE_D">Tridimensional</option>
-          </select>
-        </label>
-      </form>
+      <CatalogSearch key={query} query={query} representation={representation} category={activeCategory} />
       <nav aria-label="Categorías" className="mb-8 flex flex-wrap gap-2">
-        <CategoryLink href={hrefFor('', query, representation)} active={!activeCategory} label="Todo el catálogo" />
+        <CategoryLink href={catalogHref({ query, representation })} active={!activeCategory} label="Todo el catálogo" />
         {categories.map((category) => (
           <CategoryLink
             key={category.slug}
-            href={hrefFor(category.slug, query, representation)}
+            href={catalogHref({ category: category.slug, query, representation })}
             active={activeCategory === category.slug}
             label={category.name}
           />
         ))}
       </nav>
       {lots.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-line px-6 py-16 text-center text-muted">
-          No hay obras con ese criterio. Prueba otra categoría o borra la búsqueda.
-        </p>
+        <EmptyState
+          icon={<SearchX aria-hidden="true" className="h-6 w-6" />}
+          title="No hay obras con ese criterio"
+          description="Prueba otra categoría, otro formato o una búsqueda más corta."
+          action={<ButtonLink href="/catalogo" variant="secondary">Ver todo el catálogo</ButtonLink>}
+        />
       ) : null}
       {featured ? (
         <article className="mb-10 grid gap-6 border-y border-line py-8 md:grid-cols-[1.1fr_0.9fr] md:items-end">
@@ -98,7 +87,7 @@ function CategoryLink({ href, label, active }: { href: string; label: string; ac
   return (
     <Link
       href={href}
-      className={active ? 'rounded-full bg-ink px-3 py-1 text-sm text-paper' : 'rounded-full border border-line px-3 py-1 text-sm'}
+      className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${active ? 'bg-ink text-paper' : 'border border-line-strong hover:border-ink'}`}
       aria-current={active ? 'page' : undefined}
     >
       {label}
@@ -112,12 +101,12 @@ function WorkSurface({ lot, featured = false }: { lot: Lot; featured?: boolean }
   return (
     <Link
       href={`/obras/${lot.id}`}
-      className="relative block w-full overflow-hidden border border-line bg-paper"
+      className="relative block w-full overflow-hidden rounded-panel border border-line bg-paper-deep shadow-panel transition-shadow hover:shadow-lift"
       aria-label={lot.title}
     >
       <ArtworkImage src={lot.images?.[0]?.url ?? null} alt="" featured={featured} />
       {threeD && !lot.images?.[0]?.url ? <span className="absolute bottom-8 left-1/2 h-16 w-10 -translate-x-1/2 bg-ink/80" aria-hidden="true" /> : null}
-      <span className="absolute left-3 top-3 bg-paper/90 px-2 py-1 text-[10px] uppercase tracking-wider">
+      <span className="absolute left-3 top-3 rounded-full bg-surface/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider">
         {threeD ? 'Objeto' : 'Obra mural'}
         {primary ? ` · ${primary}` : ''}
       </span>
@@ -150,32 +139,20 @@ function CatalogPager({
   }
   return (
     <nav aria-label="Páginas del catálogo" className="mt-4 flex items-center gap-3 text-sm">
-      {page > 1 ? <Link href={pageHref(page - 1, category, query, representation)}>Anterior</Link> : null}
-      <span>
+      {page > 1 ? (
+        <ButtonLink href={catalogHref({ category, query, representation, page: page - 1 })} variant="secondary" size="sm" icon={<ChevronLeft aria-hidden="true" className="h-4 w-4" />}>
+          Anterior
+        </ButtonLink>
+      ) : null}
+      <span className="text-muted">
         Página {page} de {pages}
       </span>
-      {page < pages ? <Link href={pageHref(page + 1, category, query, representation)}>Siguiente</Link> : null}
+      {page < pages ? (
+        <ButtonLink href={catalogHref({ category, query, representation, page: page + 1 })} variant="secondary" size="sm">
+          Siguiente
+          <ChevronRight aria-hidden="true" className="h-4 w-4" />
+        </ButtonLink>
+      ) : null}
     </nav>
   );
-}
-
-function pageHref(page: number, category: string, query: string, representation: string): string {
-  const href = hrefFor(category, query, representation);
-  const joiner = href.includes('?') ? '&' : '?';
-  return `${href}${joiner}page=${String(page)}`;
-}
-
-function hrefFor(category: string, query: string, representation: string): string {
-  const params = new URLSearchParams();
-  if (category) {
-    params.set('category', category);
-  }
-  if (query) {
-    params.set('q', query);
-  }
-  if (representation) {
-    params.set('representation', representation);
-  }
-  const text = params.toString();
-  return text ? `/catalogo?${text}` : '/catalogo';
 }

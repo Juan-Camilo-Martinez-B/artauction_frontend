@@ -1,4 +1,4 @@
-import type { Lot } from '@/lib/api/types';
+import type { GalleryConfig, Lot } from '@/lib/api/types';
 
 // Montaje de la sala: tamano real de cada obra, geometria de las paredes y el
 // plan de colgado automatico. Todo en metros, con el origen en el centro del
@@ -278,4 +278,29 @@ export function viewpointFor(
     position: [clamp(placement.posX + normal.x * distance, limitX), VISITOR_EYE, clamp(placement.posZ + normal.z * distance, limitZ)],
     target: [placement.posX, targetY, placement.posZ],
   };
+}
+
+export function roomOf(config: GalleryConfig): Room {
+  return { width: config.architecture.roomWidth, depth: config.architecture.roomDepth, height: config.architecture.roomHeight };
+}
+
+/** Altura del pedestal segun la pieza: lo chico se eleva a la vista, lo grande va casi al suelo. */
+export function pedestalHeight(objectHeight: number): number {
+  if (objectHeight >= 1.5) {
+    return 0.1;
+  }
+  if (objectHeight >= 0.8) {
+    return 0.45;
+  }
+  return 0.95;
+}
+
+/** Radio que ocupa un pedestal en el suelo, para que el visitante no lo atraviese. */
+export function footprintRadius(size: ArtworkSize, scale: number): number {
+  return (Math.max(0.45, Math.max(size.width, size.depth) + 0.3) * scale) / Math.SQRT2 + 0.05;
+}
+
+/** Altura total de un objeto sobre el suelo, con su pedestal. */
+export function objectTop(size: ArtworkSize, scale: number): number {
+  return (pedestalHeight(size.height) + size.height) * scale;
 }

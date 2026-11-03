@@ -1,10 +1,12 @@
+import { statusLabel } from './status-pill';
+
 export function ScoreRing({ score, verdict }: { score: number | null; verdict: string | null }) {
   const value = score ?? 0;
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
   const dash = (Math.max(0, Math.min(100, value)) / 100) * circumference;
   return (
-    <figure className="flex items-center gap-5 rounded-xl border border-line bg-white p-4">
+    <figure className="flex items-center gap-5 rounded-panel border border-line bg-surface p-5 shadow-panel">
       <svg viewBox="0 0 140 140" className="h-28 w-28" role="img" aria-label={score === null ? 'Puntaje de autenticidad sin dato' : `Puntaje de autenticidad ${String(score)}`}>
         <circle cx="70" cy="70" r={radius} fill="none" stroke="#d8d0c2" strokeWidth="10" />
         <circle
@@ -24,7 +26,7 @@ export function ScoreRing({ score, verdict }: { score: number | null; verdict: s
       </svg>
       <figcaption>
         <p className="font-serif text-2xl">Autenticidad</p>
-        <p className="text-sm text-muted">{verdict ?? 'Todavía sin veredicto'}</p>
+        <p className="text-sm text-muted">{verdict ? statusLabel(verdict) : 'Todavía sin veredicto'}</p>
       </figcaption>
     </figure>
   );

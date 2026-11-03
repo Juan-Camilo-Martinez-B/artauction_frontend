@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { CardPreview } from '@/components/payments/card-preview';
-import { Button, ButtonLink } from '@/components/ui/button';
-import { EmptyState, LoadingState, PageHeader, Panel } from '@/components/ui/layout';
+import { RequireSession } from '@/components/session/require-session';
+import { Button } from '@/components/ui/button';
+import { LoadingState, PageHeader, Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { TextField } from '@/components/ui/text-field';
 import { useToast } from '@/components/ui/toast';
@@ -42,9 +43,13 @@ const CREDIT_KINDS = new Set<WalletEntry['kind']>(['RECARGA', 'LIBERACION', 'VEN
 
 const dateFormat = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 
-type WalletState = { status: 'loading' } | { status: 'anonymous' } | { status: 'error'; message: string } | { status: 'ready'; wallet: WalletSnapshot };
+type WalletState = { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; wallet: WalletSnapshot };
 
 export default function WalletPage() {
+  return <RequireSession title="Entra para ver tu bolsillo">{() => <Wallet />}</RequireSession>;
+}
+
+function Wallet() {
   const notify = useToast();
   const [state, setState] = useState<WalletState>({ status: 'loading' });
   const [coins, setCoins] = useState(250);
@@ -73,7 +78,6 @@ export default function WalletPage() {
   useEffect(() => {
     void browserSession.accessToken().then(async (token) => {
       if (!token) {
-        setState({ status: 'anonymous' });
         return;
       }
       try {
@@ -99,7 +103,6 @@ export default function WalletPage() {
     }
     const token = await browserSession.accessToken();
     if (!token) {
-      setState({ status: 'anonymous' });
       return;
     }
     setPending(true);
@@ -127,15 +130,6 @@ export default function WalletPage() {
 
   if (state.status === 'loading') {
     return <LoadingState label="Abriendo tu bolsillo…" />;
-  }
-  if (state.status === 'anonymous') {
-    return (
-      <EmptyState
-        title="Entra para ver tu bolsillo"
-        description="Tus artacoins, lo retenido en salas y tus recargas viven en tu cuenta."
-        action={<ButtonLink href="/entrar">Entrar</ButtonLink>}
-      />
-    );
   }
   if (state.status === 'error') {
     return <Notice tone="error">{state.message}</Notice>;

@@ -1,11 +1,13 @@
 'use client';
 
-import Link from 'next/link';
+import { Gavel } from 'lucide-react';
 import { useState } from 'react';
 import { ScoreRing } from '@/components/score-ring';
 import { StatusPill } from '@/components/status-pill';
 import { ImageFormat, type ImageOrientation } from '@/lib/artwork/image-format';
+import { ButtonLink } from '@/components/ui/button';
 import { formatArtacoins } from '@/lib/auction/policy';
+import { formatDateTime } from '@/lib/format';
 import { formatMoney } from '@/lib/money';
 import type { Lot } from '@/lib/api/types';
 import { AddToGalleryButton } from './add-to-gallery';
@@ -33,7 +35,7 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
         onMeasure={(width, height) => { setFormat(new ImageFormat(width, height)); }}
       />
       <div className={dossierClass(orientation)}>
-        <section className="rounded-[1.75rem] border border-line bg-white p-6 shadow-[0_18px_40px_-32px_rgba(27,24,20,0.45)] sm:p-8">
+        <section className="rounded-panel border border-line bg-surface p-6 shadow-panel sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={lot.status} />
             <span className="text-xs uppercase tracking-[0.18em] text-oxide">{category}</span>
@@ -57,26 +59,32 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
           {lot.auction?.saleDescription ? (
             <p className="mt-6 max-w-prose leading-relaxed">{lot.auction.saleDescription}</p>
           ) : null}
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <AddToGalleryButton lotId={lot.id} />
-            {lot.auction && (lot.status === 'EN_SUBASTA' || lot.status === 'PUBLICADA') ? (
-              <Link href={`/subasta/${lot.auction.id}`} className="rounded-full bg-ink px-5 py-2 text-sm text-paper">
-                {lot.status === 'EN_SUBASTA' ? 'Entrar a la sala' : 'Ver la subasta'}
-              </Link>
-            ) : null}
-          </div>
-          {lot.auction ? (
-            <p className="mt-4 text-sm text-muted">
-              {formatArtacoins(lot.auction.currentPrice)}
-              {lot.auction.startsAt ? ` · abre ${new Date(lot.auction.startsAt).toLocaleString('es-CO')}` : ''}
-            </p>
+          {lot.auction && lot.auction.status !== 'CERRADA' ? (
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-field border border-line bg-paper p-4">
+              <p className="text-sm">
+                <span className="block font-medium">
+                  {lot.auction.status === 'ACTIVA' ? 'Sala abierta ahora' : 'Subasta programada'}
+                </span>
+                <span className="text-muted">
+                  {lot.auction.status === 'ACTIVA'
+                    ? `Va en ${formatArtacoins(lot.auction.currentPrice)}`
+                    : `Sale en ${formatArtacoins(lot.auction.currentPrice)}${lot.auction.startsAt ? ` · abre el ${formatDateTime(lot.auction.startsAt)}` : ''}`}
+                </span>
+              </p>
+              <ButtonLink href={`/subasta/${lot.auction.id}`} variant={lot.auction.status === 'ACTIVA' ? 'accent' : 'secondary'} icon={<Gavel aria-hidden="true" className="h-4 w-4" />}>
+                {lot.auction.status === 'ACTIVA' ? 'Entrar a la sala' : 'Ver la sala'}
+              </ButtonLink>
+            </div>
           ) : null}
+          <div className="mt-6">
+            <AddToGalleryButton lotId={lot.id} />
+          </div>
         </section>
         <ScoreRing score={lot.authenticityScore} verdict={summary?.verdict ?? null} />
         <p className={`px-1 text-sm leading-relaxed text-muted ${orientation === 'landscape' ? 'md:col-span-2' : ''}`}>
           {summary
-            ? `Modelo ${summary.modelName}, prompt ${summary.promptVersion}. ${summary.hasCriticalInconsistency ? 'Hay una inconsistencia crítica.' : 'Sin inconsistencia crítica.'}`
-            : 'El reporte completo llega cuando termina la auditoría.'}
+            ? `${summary.hasCriticalInconsistency ? 'La auditoría encontró una inconsistencia crítica.' : 'La auditoría no encontró inconsistencias críticas.'} Evaluada con ${summary.modelName}.`
+            : 'El reporte de autenticidad aparece cuando termina la auditoría.'}
         </p>
       </div>
     </article>
@@ -97,8 +105,8 @@ function ArtworkFrame({
   onMeasure: (width: number, height: number) => void;
 }) {
   return (
-    <figure className={`rounded-[1.75rem] bg-white p-3 shadow-[0_24px_60px_-36px_rgba(27,24,20,0.7)] sm:p-5 ${orientation === 'portrait' ? 'lg:sticky lg:top-6' : ''}`}>
-      <div className="overflow-hidden rounded-[1.25rem] bg-[#e7e0d2]">
+    <figure className={`rounded-panel border border-line bg-surface p-3 shadow-panel sm:p-5 ${orientation === 'portrait' ? 'lg:sticky lg:top-24' : ''}`}>
+      <div className="overflow-hidden rounded-field bg-paper-deep">
         {src ? (
           <img
             src={src}
@@ -122,7 +130,7 @@ function ArtworkFrame({
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-paper px-4 py-3">
+    <div className="rounded-field bg-paper px-4 py-3">
       <dt className="text-[11px] uppercase tracking-[0.16em] text-muted">{label}</dt>
       <dd className="mt-1 text-sm leading-snug">{value}</dd>
     </div>
