@@ -3,9 +3,10 @@
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Button, ButtonLink } from '@/components/ui/button';
 import type { Lot } from '@/lib/api/types';
+import { sheetHref } from '@/lib/artwork/sheet-href';
 
-/** Ficha de la obra que se esta mirando de cerca, sobre la sala. */
-export function ArtworkCard({ lot, onBack }: { lot: Lot; onBack: () => void }) {
+/** Ficha de la obra que se esta mirando de cerca, sobre la sala de `ownerId`. */
+export function ArtworkCard({ lot, ownerId, onBack }: { lot: Lot; ownerId: string; onBack: () => void }) {
   const dimensions = [lot.widthCm, lot.heightCm, lot.depthCm].filter((value): value is string => Boolean(value));
   return (
     <aside
@@ -35,7 +36,7 @@ export function ArtworkCard({ lot, onBack }: { lot: Lot; onBack: () => void }) {
         <Button variant="secondary" size="sm" icon={<ArrowLeft aria-hidden="true" className="h-4 w-4" />} onClick={onBack}>
           Seguir el recorrido
         </Button>
-        <ButtonLink href={`/obras/${lot.id}`} variant="ghost" size="sm" icon={<ExternalLink aria-hidden="true" className="h-4 w-4" />}>
+        <ButtonLink href={sheetHref(lot, ownerId)} variant="ghost" size="sm" icon={<ExternalLink aria-hidden="true" className="h-4 w-4" />}>
           Ver ficha completa
         </ButtonLink>
       </div>

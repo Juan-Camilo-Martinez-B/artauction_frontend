@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { EmptyState, PageHeader } from '@/components/ui/layout';
 import { getPublicGallery } from '@/lib/api/server';
+import { purchasedSheetHref } from '@/lib/artwork/sheet-href';
 import { FollowButton } from './follow-button';
 
 export const revalidate = 60;
@@ -39,7 +40,7 @@ export default async function PublicGalleryPage({ params }: { params: Promise<{ 
             <li key={`${item.title}-${item.acquiredAt}`} className="rounded-panel border border-line bg-surface p-5 shadow-panel">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-oxide">{SOURCE_LABEL[item.source] ?? 'En la colección'}</p>
               <h2 className="mt-2 font-serif text-xl leading-snug">
-                <Link href={`/obras/${item.lotId}`} className="hover:underline">
+                <Link href={item.source === 'GANADA' ? purchasedSheetHref(item.ownerId, item.lotId) : `/obras/${item.lotId}`} className="hover:underline">
                   {item.title}
                 </Link>
               </h2>
