@@ -37,24 +37,3 @@ export function fitModel(bounds: ModelBounds, targetHeight: number, maxWidth?: n
 
 /** Ruta local del decodificador Draco (copiado de three.js en public/draco). */
 export const DRACO_DECODER_PATH = '/draco/';
-
-/** Limites del modelo que el navegador revisa antes de subirlo; el catalogo vuelve a validarlo. */
-export const MODEL_UPLOAD_LIMITS = { maxBytes: 30 * 1024 * 1024 } as const;
-
-/**
- * Revision rapida de un archivo .glb antes de subirlo: extension, tamano y la
- * firma `glTF` de la cabecera. Devuelve el mensaje de error o null si pasa.
- */
-export function checkGlbFile(name: string, size: number, header: Uint8Array): string | null {
-  if (!/\.glb$/i.test(name)) {
-    return 'El modelo debe ser un archivo .glb (en Blender: Archivo > Exportar > glTF 2.0, formato binario).';
-  }
-  if (size > MODEL_UPLOAD_LIMITS.maxBytes) {
-    return 'El modelo supera los 30 MB. Reducelo con el modificador Decimate de Blender o exporta con compresion Draco.';
-  }
-  const magic = String.fromCharCode(...header.slice(0, 4));
-  if (magic !== 'glTF') {
-    return 'El archivo no es un GLB valido: le falta la cabecera glTF.';
-  }
-  return null;
-}

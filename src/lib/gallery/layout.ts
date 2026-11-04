@@ -61,6 +61,11 @@ export function isObjectLot(lot: Pick<Lot, 'representationKind'>): boolean {
   return lot.representationKind === 'THREE_D';
 }
 
+/** Un objeto solo se expone en la sala con su modelo 3D real; una obra plana, siempre. */
+export function canExhibit(lot: Pick<Lot, 'representationKind' | 'model'>): boolean {
+  return !isObjectLot(lot) || Boolean(lot.model?.url);
+}
+
 /** Lo mas grande que entra en cualquier sala: ancho, alto y fondo en metros. */
 const MAX_SIZE: ArtworkSize = { width: 4, height: 2.6, depth: 3 };
 

@@ -172,8 +172,8 @@ function ArtworkFrame({
   caption: string;
   onMeasure: (width: number, height: number) => void;
 }) {
-  // Sin foto, el modelo es la unica vista posible.
-  const [view, setView] = useState<'photo' | 'model'>(src ? 'photo' : 'model');
+  // Un objeto se presenta por su modelo 3D; la foto queda como segunda vista.
+  const [view, setView] = useState<'photo' | 'model'>(model?.url ? 'model' : 'photo');
   const showModel = model?.url != null && view === 'model';
   return (
     <figure className={`rounded-panel border border-line bg-surface p-3 shadow-panel sm:p-5 ${orientation === 'portrait' ? 'lg:sticky lg:top-24' : ''}`}>
