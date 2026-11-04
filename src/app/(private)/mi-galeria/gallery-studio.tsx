@@ -345,7 +345,7 @@ function Studio() {
         ) : null}
 
         <div className="absolute bottom-3 right-3 top-16 flex items-end justify-end">
-          {mode === 'tour' && focused ? <ArtworkCard lot={focused.lot} onBack={() => { setFocusId(null); }} /> : null}
+          {mode === 'tour' && focused ? <ArtworkCard lot={focused.lot} ownerId={gallery.ownerId} onBack={() => { setFocusId(null); }} /> : null}
           {mode === 'edit' && selected ? (
             <PlacementPanel
               lot={selected.lot}

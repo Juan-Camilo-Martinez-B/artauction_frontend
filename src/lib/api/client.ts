@@ -11,6 +11,7 @@ import type {
   NotificationItem,
   PersonalGallery,
   PlacedBid,
+  PurchasedSheet,
   ReviewItem,
   SignedUpload,
   TokenPair,
@@ -190,6 +191,10 @@ export const artApi = {
   },
   gallery(ownerId: string, token?: string | null) {
     return api<GalleryItem[]>(`/galleries/${ownerId}`, { token });
+  },
+  /** Ficha guardada de una obra comprada; sin sesion solo responde si la obra es publica. */
+  purchasedSheet(ownerId: string, lotId: string, token?: string | null) {
+    return api<PurchasedSheet>(`/galleries/${ownerId}/works/${lotId}`, { token });
   },
   follow(token: string, userId: string) {
     return api<{ status: string }>(`/users/${userId}/follow`, { method: 'POST', token });

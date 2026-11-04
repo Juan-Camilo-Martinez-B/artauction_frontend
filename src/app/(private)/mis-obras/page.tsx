@@ -28,6 +28,7 @@ import {
   type MyWork,
   type WorkFilter,
 } from '@/lib/artwork/my-works';
+import { purchasedSheetHref } from '@/lib/artwork/sheet-href';
 import { formatDateTime } from '@/lib/format';
 import { browserSession, type AccountProfile } from '@/lib/session/browser-session';
 import { canSell } from '@/lib/session/roles';
@@ -376,7 +377,8 @@ function WonRow({ item, actions }: { item: GalleryItem; actions: WorkActions }) 
     <article className="rounded-panel border border-line bg-surface p-4 shadow-panel">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-oxide">Ganada en subasta</p>
       <h2 className="mt-1 font-serif text-xl leading-snug">
-        <Link href={`/obras/${item.lotId}`} className="hover:underline">
+        {/* La ficha original ya no es publica: se abre la que guardo la galeria. */}
+        <Link href={purchasedSheetHref(item.ownerId, item.lotId)} className="hover:underline">
           {item.title}
         </Link>
       </h2>

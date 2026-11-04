@@ -13,7 +13,14 @@ import { formatDateTime } from '@/lib/format';
 import { formatMoney } from '@/lib/money';
 import type { Lot } from '@/lib/api/types';
 
-export function ArtworkExhibit({ lot }: { lot: Lot }) {
+/** Datos de la compra cuando la ficha es la que guardo la galeria del comprador. */
+export interface PurchaseInfo {
+  pricePaid: string | null;
+  buyNow: boolean | null;
+  acquiredAt: string | null;
+}
+
+export function ArtworkExhibit({ lot, purchase = null }: { lot: Lot; purchase?: PurchaseInfo | null }) {
   const image = lot.images?.find((item) => item.url)?.url ?? null;
   const [format, setFormat] = useState<ImageFormat | null>(null);
   const orientation = format?.orientation() ?? 'pending';
@@ -102,6 +109,7 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
             </div>
           ) : null}
         </section>
+        {purchase ? <PurchaseNotice purchase={purchase} wide={orientation === 'landscape'} /> : null}
         {personal ? (
           <Notice tone="info" className={orientation === 'landscape' ? 'md:col-span-2' : ''}>
             <div>
@@ -115,12 +123,29 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
             <p className={`px-1 text-sm leading-relaxed text-muted ${orientation === 'landscape' ? 'md:col-span-2' : ''}`}>
               {summary
                 ? `${summary.hasCriticalInconsistency ? 'La auditoría encontró una inconsistencia crítica.' : 'La auditoría no encontró inconsistencias críticas.'} ${source ?? ''}.`
-                : 'El reporte de autenticidad aparece cuando termina la auditoría.'}
+                : purchase
+                  ? 'Score de autenticidad con el que se vendió la obra.'
+                  : 'El reporte de autenticidad aparece cuando termina la auditoría.'}
             </p>
           </>
         )}
       </div>
     </article>
+  );
+}
+
+/** Certificado de la compra: como se compro, cuando y, solo para su duena, por cuanto. */
+function PurchaseNotice({ purchase, wide }: { purchase: PurchaseInfo; wide: boolean }) {
+  const how = purchase.buyNow === true ? 'por compra inmediata' : purchase.buyNow === false ? 'en subasta' : 'en ArtAuction';
+  return (
+    <Notice tone="success" className={wide ? 'md:col-span-2' : ''}>
+      <div>
+        <span className="block font-medium">Ficha guardada de la compra</span>
+        Comprada {how}
+        {purchase.acquiredAt ? ` el ${formatDateTime(purchase.acquiredAt)}` : ''}
+        {purchase.pricePaid ? ` por ${formatArtacoins(purchase.pricePaid)}` : ''}. Es la ficha de la obra tal como estaba al venderse.
+      </div>
+    </Notice>
   );
 }
 

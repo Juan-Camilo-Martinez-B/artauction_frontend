@@ -252,8 +252,19 @@ export interface TopUpResult {
   orderId: string;
 }
 
+/** Ficha guardada de una obra comprada: la copia que conserva su galeria. */
+export interface PurchasedSheet {
+  ownerId: string;
+  lot: Lot | null;
+  /** Solo para la duena; null en compras anteriores a la ficha guardada. */
+  pricePaid: string | null;
+  buyNow: boolean | null;
+  acquiredAt: string | null;
+}
+
 export interface PersonalGallery {
   id: string;
+  ownerId: string;
   name: string;
   customizationStatus: 'SIN_PERSONALIZAR' | 'PERSONALIZADA' | 'EDITADA';
   preferences: Record<string, unknown>;
