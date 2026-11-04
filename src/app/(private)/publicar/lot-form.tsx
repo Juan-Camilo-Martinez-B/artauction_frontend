@@ -1,6 +1,7 @@
 'use client';
 
-import { Gavel, ImageUp, Palette } from 'lucide-react';
+import { Box, Gavel, ImageUp, Palette } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState, type ReactNode, type SubmitEvent } from 'react';
 import { Button } from '@/components/ui/button';
@@ -11,12 +12,18 @@ import { useFormValidation } from '@/hooks/use-form-validation';
 import { useImageProcessor } from '@/hooks/use-image-processor';
 import { ApiError, artApi, type LotInput } from '@/lib/api/client';
 import type { Category, Lot } from '@/lib/api/types';
+import { checkGlbFile } from '@/lib/gallery/model-fit';
 import { browserSession } from '@/lib/session/browser-session';
+
+const ModelViewer = dynamic(() => import('@/components/gallery3d/model-viewer').then((module) => module.ModelViewer), {
+  ssr: false,
+  loading: () => <div className="grid h-full place-items-center text-sm text-muted">Preparando la vista previa…</div>,
+});
 
 type Representation = 'TWO_D' | 'THREE_D';
 type Destination = 'CATALOG' | 'PERSONAL';
 type Visibility = 'PUBLIC' | 'PRIVATE';
-type Stage = 'idle' | 'saving' | 'uploading' | 'submitting';
+type Stage = 'idle' | 'saving' | 'uploading' | 'modeling' | 'submitting';
 /** Que hace el envio: guardar y mandar a auditoria, o solo guardar el borrador. */
 type Intent = 'submit' | 'save';
 
@@ -114,13 +121,23 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
   const [error, setError] = useState<string | null>(null);
   const [stage, setStage] = useState<Stage>('idle');
   const [intent, setIntent] = useState<Intent>('submit');
+  // Obra ya creada en un intento anterior: si fallo una subida, el reintento la reutiliza en vez de duplicarla.
+  const [created, setCreated] = useState<Lot | null>(null);
+  const savedModel = lot?.model ?? null;
+  const [modelFile, setModelFile] = useState<File | null>(null);
+  const [modelPreview, setModelPreview] = useState<string | null>(null);
+  const [modelRemoved, setModelRemoved] = useState(false);
+  const [modelError, setModelError] = useState<string | null>(null);
+  const threeD = draft.representation === 'THREE_D';
+  // El modelo solo existe en obras tridimensionales: pasar a obra plana lo quita.
+  const dropModel = savedModel !== null && (modelRemoved || !threeD);
 
   const set = <Key extends keyof Draft>(key: Key) => (value: Draft[Key]) => {
     setDraft((current) => ({ ...current, [key]: value }));
   };
   const fieldsDirty = (Object.keys(initial) as Array<keyof Draft>).some((key) => draft[key] !== initial[key]);
   const visibilityDirty = personal && editing && visibility !== initialVisibility;
-  const dirty = file !== null || fieldsDirty || visibilityDirty;
+  const dirty = file !== null || fieldsDirty || visibilityDirty || (threeD && modelFile !== null) || dropModel;
 
   const currentYear = new Date().getFullYear();
   const { touch, visibleError, attemptSubmit } = useFormValidation({
@@ -170,6 +187,51 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
     }
   }
 
+  useEffect(() => () => {
+    if (modelPreview) {
+      URL.revokeObjectURL(modelPreview);
+    }
+  }, [modelPreview]);
+
+  async function onModelFile(next: File) {
+    setModelError(null);
+    const header = new Uint8Array(await next.slice(0, 4).arrayBuffer());
+    const problem = checkGlbFile(next.name, next.size, header);
+    if (problem) {
+      setModelError(problem);
+      return;
+    }
+    setModelFile(next);
+    setModelRemoved(false);
+    setModelPreview(URL.createObjectURL(next));
+  }
+
+  function clearModel() {
+    setModelFile(null);
+    setModelPreview(null);
+    setModelError(null);
+    setModelRemoved(true);
+  }
+
+  /** Quita el modelo anterior si se pidio y sube el nuevo: el catalogo lo valida y lo mide. */
+  async function syncModel(token: string, lotId: string) {
+    if (dropModel && !(threeD && modelFile)) {
+      setStage('modeling');
+      await artApi.removeModel(token, lotId);
+    }
+    if (!threeD || !modelFile) {
+      return;
+    }
+    setStage('modeling');
+    const signed = await artApi.signModelUpload(token, lotId);
+    const uploaded = await fetch(signed.uploadUrl, { method: 'PUT', headers: { 'content-type': 'model/gltf-binary' }, body: modelFile });
+    if (!uploaded.ok) {
+      throw new Error('No se pudo guardar el modelo 3D.');
+    }
+    // Registrar reemplaza el modelo anterior de la obra.
+    await artApi.registerModel(token, lotId, signed.objectKey);
+  }
+
   async function uploadImage(token: string, lotId: string) {
     if (!file || !hash) {
       return;
@@ -200,12 +262,17 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
     }
     try {
       setStage('saving');
-      const saved = lot
+      const base = lot ?? created;
+      const saved = base
         ? fieldsDirty
-          ? await artApi.updateLot(token, lot.id, inputFrom(draft))
-          : lot
+          ? await artApi.updateLot(token, base.id, inputFrom(draft))
+          : base
         : await artApi.createLot(token, { ...inputFrom(draft), destination, visibility: personal ? visibility : undefined });
+      if (!base) {
+        setCreated(saved);
+      }
       await uploadImage(token, saved.id);
+      await syncModel(token, saved.id);
       if (personal) {
         // Un proyecto propio no se audita: se guarda y queda en la galeria (y en la sala) del autor.
         if (visibilityDirty) {
@@ -233,6 +300,7 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
     idle: personal ? (editing ? 'Guardar cambios' : 'Guardar en mi galería') : editing ? 'Guardar y reenviar a auditoría' : 'Enviar a auditoría',
     saving: 'Guardando la ficha…',
     uploading: 'Subiendo la imagen…',
+    modeling: 'Revisando el modelo 3D…',
     submitting: 'Enviando a auditoría…',
   };
   const returned = lot?.lastReview?.decision === 'RETURN_TO_DRAFT' ? lot.lastReview.reason : null;
@@ -367,6 +435,17 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
             </p>
           ) : null}
         </Panel>
+        {threeD ? (
+          <ModelPanel
+            preview={modelPreview ?? (modelRemoved ? null : (savedModel?.url ?? null))}
+            savedTriangles={!modelFile && !modelRemoved ? (savedModel?.triangleCount ?? null) : null}
+            fileName={modelFile?.name ?? null}
+            error={modelError}
+            title={draft.title || 'la obra'}
+            onFile={(next) => void onModelFile(next)}
+            onClear={clearModel}
+          />
+        ) : null}
         {error ? <Notice tone="error">{error}</Notice> : null}
         <Button
           type="submit"
@@ -394,6 +473,76 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
         ) : null}
       </div>
     </form>
+  );
+}
+
+/**
+ * Modelo 3D opcional de un objeto: un .glb exportado de Blender. Con modelo, la
+ * sala 3D y la ficha muestran la pieza completa en lugar de la foto.
+ */
+function ModelPanel({
+  preview,
+  savedTriangles,
+  fileName,
+  error,
+  title,
+  onFile,
+  onClear,
+}: {
+  preview: string | null;
+  savedTriangles: number | null;
+  fileName: string | null;
+  error: string | null;
+  title: string;
+  onFile: (file: File) => void;
+  onClear: () => void;
+}) {
+  return (
+    <Panel as="section">
+      <h2 className="font-serif text-2xl">Modelo 3D <span className="text-base text-muted">(opcional)</span></h2>
+      <p className="mt-2 text-sm text-muted">
+        Un archivo .glb (en Blender: Archivo › Exportar › glTF 2.0, formato binario). Entre 1.000 y 300.000 triángulos y hasta 30 MB.
+        Con modelo, tu sala 3D y la ficha muestran la pieza completa y se puede girar.
+      </p>
+      {preview ? (
+        <div className="mt-4 overflow-hidden rounded-field border border-line bg-paper-deep">
+          <ModelViewer url={preview} title={title} className="h-64 w-full" />
+        </div>
+      ) : null}
+      {savedTriangles !== null ? <p className="mt-2 text-xs text-moss">Modelo verificado · {savedTriangles.toLocaleString('es-CO')} triángulos</p> : null}
+      {fileName ? <p className="mt-2 text-xs text-muted">{fileName} · se revisa al guardar</p> : null}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <label htmlFor="model" className="inline-flex cursor-pointer items-center gap-2 rounded-field border border-line-strong px-3 py-2 text-sm hover:border-ink">
+          <Box aria-hidden="true" className="h-4 w-4" />
+          {preview ? 'Cambiar modelo' : 'Elegir modelo .glb'}
+          <input
+            id="model"
+            type="file"
+            accept=".glb,model/gltf-binary"
+            className="sr-only"
+            aria-describedby={error ? 'model-error' : undefined}
+            onChange={(event) => {
+              const next = event.target.files?.[0];
+              // Vaciar el campo deja elegir de nuevo el mismo archivo.
+              event.target.value = '';
+              if (next) {
+                onFile(next);
+              }
+            }}
+          />
+        </label>
+        {preview ? (
+          <Button type="button" variant="ghost" size="sm" onClick={onClear}>
+            Quitar modelo
+          </Button>
+        ) : null}
+      </div>
+      {error ? (
+        <p id="model-error" role="alert" className="mt-2 text-sm text-oxide">
+          {error}
+        </p>
+      ) : null}
+    </Panel>
   );
 }
 

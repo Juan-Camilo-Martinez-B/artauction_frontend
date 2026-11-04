@@ -75,10 +75,19 @@ La sala personal (`/mi-galeria`) simula una galería real con React Three Fiber.
   - marco flotante para arte digital;
   - nogal para el resto.
   Las piezas diminutas reciben un paspartú ancho. Cada obra lleva su cartela.
-- **Objetos 3D.** Un worker (`silhouette.worker.ts`) recorta el fondo de la foto y mide la simetría de la silueta.
-  - Si es simétrica (jarrones, copas), se tornea un sólido de revolución con la foto proyectada.
+- **Objetos 3D.** Si la obra trae modelo 3D (GLB), la sala lo expone tal cual (ver más abajo). Si no, un worker (`silhouette.worker.ts`) recorta el fondo de la foto y mide la simetría de la silueta.
+  - Conserva todas las piezas grandes de la silueta (asas, peanas sueltas) y descarta solo motas sueltas. El fondo se recorre por pasos pequeños de color, para no comerse un mármol claro.
+  - Si el recorte cubre muy poco o casi toda la foto, no es fiable y se usa la foto completa.
+  - Si la silueta es simétrica (jarrones, copas), se tornea un sólido de revolución con la foto proyectada.
   - Si no, la pieza recortada se expone en una vitrina sobre pedestal.
+  - Las piezas muy grandes se reducen en proporción (las tres medidas con el mismo factor), nunca recortadas.
   - `ObjectModelProvider` permite conectar después una IA de imagen a 3D sin tocar la escena.
+- **Modelo 3D (GLB).** Quien publica un objeto puede subir, además de la foto, un `.glb` exportado de Blender (glTF 2.0 binario). Es opcional.
+  - En el formulario, el navegador revisa la extensión, el tamaño (hasta 30 MB) y la cabecera `glTF`, y muestra una vista previa que se puede girar. Al guardar, el archivo se sube con una URL firmada y catalog-service lo valida y lo mide: entre 1.000 y 300.000 triángulos, sin archivos externos.
+  - En la sala, `GlbObject` escala el modelo sin deformarlo a la altura declarada y lo apoya centrado en el pedestal (`fitModel`). Si no carga, se muestra la foto.
+  - En la ficha, el marco tiene dos vistas, **Foto** y **Modelo 3D**, con un visor que gira solo y se orbita con el mouse o el dedo, y el sello «Modelo 3D verificado · N triángulos».
+  - Los triángulos son evidencia y límite técnico, no cambian el precio. La auditoría compara las proporciones del modelo con las medidas declaradas.
+  - El decodificador Draco se sirve desde `public/draco` (copiado de three.js), sin CDN externo.
 - **Imágenes.** WebGL exige CORS. Las imágenes de Garage se piden con `?texture=1` para no reutilizar la copia sin CORS que dejó el catálogo. Las del Met pasan por `/api/artwork-image`, un proxy con lista de hosts permitidos, sin redirecciones y con límite de tamaño.
 - **Recorrido.** Se arrastra para mirar. WASD o flechas para caminar (Shift corre), Q/E para girar, o los botones en pantalla. Hay colisión con paredes y pedestales. Un clic en una obra lleva hasta ella y abre su ficha. Con `prefers-reduced-motion`, el salto es instantáneo.
 - **Montaje.** En **Editar montaje** se elige una obra para cambiarla de pared, moverla, subirla o escalarla. **Organizar automáticamente** reparte todo según las medidas reales. Ambiente y montaje son un borrador: **Guardar cambios** solo aparece si hay cambios, y avisa antes de cerrar la pestaña.

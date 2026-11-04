@@ -9,6 +9,7 @@ import { pedestalHeight } from '@/lib/gallery/layout';
 import { PLASTER } from '@/lib/gallery/materials';
 import { objectModelProvider, type ObjectModel } from '@/lib/gallery/object-models';
 import { CLICK_TOLERANCE_PX, type ArtworkViewProps } from './framed-artwork';
+import { GlbObject } from './glb-object';
 import { LABEL_ASPECT, labelTexture } from './label-texture';
 import { SceneBoundary } from './scene-boundary';
 import { SurfaceMaterialView } from './surface-material';
@@ -52,17 +53,27 @@ function useObjectModel(url: string | null): ModelState {
 }
 
 /**
- * Objeto 3D sobre su pedestal. Si la silueta de la foto es simetrica se
- * tornea un solido de revolucion; si no, la pieza recortada va en una vitrina.
+ * Objeto 3D sobre su pedestal. Si la obra trae modelo 3D (GLB) se expone ese
+ * modelo; si no, y la silueta de la foto es simetrica, se tornea un solido de
+ * revolucion; si tampoco, la pieza recortada va en una vitrina.
  */
 export function Sculpture(props: ArtworkViewProps & { pedestalColor: string; support: string }) {
   const { id, lot, placement, size, onSelect, pedestalColor } = props;
   const source = textureSource(lot.images?.[0]?.url);
-  const state = useObjectModel(source);
+  const glbUrl = lot.model?.url ?? null;
+  // Con modelo 3D no hace falta analizar la foto.
+  const state = useObjectModel(glbUrl ? null : source);
   const baseHeight = pedestalHeight(size.height);
   const footprint = Math.max(0.45, Math.max(size.width, size.depth) + 0.3);
-  const model = state.status === 'ready' ? state.model : null;
-  const inVitrine = model !== null && (model.kind !== 'lathe' || props.support === 'vitrine');
+  const model = glbUrl ? null : state.status === 'ready' ? state.model : null;
+  const inVitrine = glbUrl ? props.support === 'vitrine' : model !== null && (model.kind !== 'lathe' || props.support === 'vitrine');
+  const photoFallback = source ? (
+    <SceneBoundary fallback={null}>
+      <Suspense fallback={null}>
+        <PhotoStand url={source} height={size.height} />
+      </Suspense>
+    </SceneBoundary>
+  ) : null;
 
   function onClick(event: ThreeEvent<MouseEvent>) {
     event.stopPropagation();
@@ -81,13 +92,15 @@ export function Sculpture(props: ArtworkViewProps & { pedestalColor: string; sup
         <group position={[0, baseHeight, 0]}>
           {model?.kind === 'lathe' ? <LatheObject model={model} width={size.width} height={size.height} materials={lot.materials} /> : null}
           {model?.kind === 'cutout' ? <Cutout image={model.image} aspect={model.aspect} height={size.height} /> : null}
-          {model?.kind === 'photo' && source ? (
-            <SceneBoundary fallback={null}>
+          {glbUrl ? (
+            // Si el modelo no carga, la foto ocupa su lugar.
+            <SceneBoundary fallback={photoFallback}>
               <Suspense fallback={null}>
-                <PhotoStand url={source} height={size.height} />
+                <GlbObject url={glbUrl} height={size.height} maxWidth={footprint - 0.12} />
               </Suspense>
             </SceneBoundary>
           ) : null}
+          {model?.kind === 'photo' ? photoFallback : null}
           {inVitrine ? <Vitrine width={footprint - 0.08} height={size.height + 0.18} /> : null}
         </group>
         {props.selected ? (

@@ -1,6 +1,7 @@
 'use client';
 
-import { Gavel } from 'lucide-react';
+import { BadgeCheck, Gavel } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { ScoreRing } from '@/components/score-ring';
 import { StatusPill } from '@/components/status-pill';
@@ -11,7 +12,13 @@ import { auditSourceLabel, isPersonal, isReturned } from '@/lib/artwork/lot-revi
 import { formatArtacoins } from '@/lib/auction/policy';
 import { formatDateTime } from '@/lib/format';
 import { formatMoney } from '@/lib/money';
-import type { Lot } from '@/lib/api/types';
+import type { Lot, LotModel } from '@/lib/api/types';
+
+// WebGL solo existe en el navegador: el visor se carga aparte y sin SSR.
+const ModelViewer = dynamic(() => import('@/components/gallery3d/model-viewer').then((module) => module.ModelViewer), {
+  ssr: false,
+  loading: () => <div className="grid h-full place-items-center text-sm text-muted">Preparando el modelo 3D…</div>,
+});
 
 /** Datos de la compra cuando la ficha es la que guardo la galeria del comprador. */
 export interface PurchaseInfo {
@@ -40,6 +47,7 @@ export function ArtworkExhibit({ lot, purchase = null }: { lot: Lot; purchase?: 
     <article className={sheetClass(orientation)}>
       <ArtworkFrame
         src={image}
+        model={lot.model?.url ? lot.model : null}
         alt={lot.title}
         orientation={orientation}
         caption={format?.label() ?? 'Obra'}
@@ -151,21 +159,43 @@ function PurchaseNotice({ purchase, wide }: { purchase: PurchaseInfo; wide: bool
 
 function ArtworkFrame({
   src,
+  model,
   alt,
   orientation,
   caption,
   onMeasure,
 }: {
   src: string | null;
+  model: LotModel | null;
   alt: string;
   orientation: ImageOrientation | 'pending';
   caption: string;
   onMeasure: (width: number, height: number) => void;
 }) {
+  // Sin foto, el modelo es la unica vista posible.
+  const [view, setView] = useState<'photo' | 'model'>(src ? 'photo' : 'model');
+  const showModel = model?.url != null && view === 'model';
   return (
     <figure className={`rounded-panel border border-line bg-surface p-3 shadow-panel sm:p-5 ${orientation === 'portrait' ? 'lg:sticky lg:top-24' : ''}`}>
+      {model?.url && src ? (
+        <div className="mb-3 inline-flex rounded-field border border-line bg-paper p-1 text-sm" role="group" aria-label="Vista de la obra">
+          {(['photo', 'model'] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={view === option}
+              onClick={() => { setView(option); }}
+              className={`rounded-[0.6rem] px-3 py-1.5 transition ${view === option ? 'bg-ink text-paper' : 'text-muted hover:text-ink'}`}
+            >
+              {option === 'photo' ? 'Foto' : 'Modelo 3D'}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div className="overflow-hidden rounded-field bg-paper-deep">
-        {src ? (
+        {showModel && model.url ? (
+          <ModelViewer url={model.url} title={alt} className="h-[60vh] min-h-80 w-full" />
+        ) : src ? (
           <img
             src={src}
             alt={alt}
@@ -178,10 +208,16 @@ function ArtworkFrame({
           </div>
         )}
       </div>
-      <figcaption className="mt-3 flex items-center justify-between gap-3 px-1 text-[11px] uppercase tracking-[0.18em] text-muted">
-        <span>{caption}</span>
+      <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-3 px-1 text-[11px] uppercase tracking-[0.18em] text-muted">
+        <span>{showModel ? 'Modelo 3D' : caption}</span>
         <span>{alt}</span>
       </figcaption>
+      {model ? (
+        <p className="mt-2 flex items-center gap-1.5 px-1 text-xs text-moss">
+          <BadgeCheck aria-hidden="true" className="h-4 w-4" />
+          Modelo 3D verificado · {model.triangleCount.toLocaleString('es-CO')} triángulos
+        </p>
+      ) : null}
     </figure>
   );
 }

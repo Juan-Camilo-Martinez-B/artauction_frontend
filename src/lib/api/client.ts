@@ -8,6 +8,7 @@ import type {
   GalleryItem,
   LiveAuctions,
   Lot,
+  LotModel,
   NotificationItem,
   PersonalGallery,
   PlacedBid,
@@ -153,6 +154,17 @@ export const artApi = {
       token,
       body: JSON.stringify({ contentType, position }),
     });
+  },
+  /** URL firmada para subir el modelo 3D (.glb) de una obra tridimensional. */
+  signModelUpload(token: string, lotId: string) {
+    return api<SignedUpload>(`/lots/${lotId}/model-uploads`, { method: 'POST', token, body: JSON.stringify({ contentType: 'model/gltf-binary' }) });
+  },
+  /** El catalogo lee el modelo subido, lo valida y lo mide. */
+  registerModel(token: string, lotId: string, objectKey: string) {
+    return api<LotModel>(`/lots/${lotId}/model`, { method: 'POST', token, body: JSON.stringify({ objectKey }) });
+  },
+  removeModel(token: string, lotId: string) {
+    return api<undefined>(`/lots/${lotId}/model`, { method: 'DELETE', token });
   },
   registerImage(token: string, lotId: string, input: { objectKey: string; position: number; perceptualHash?: string }) {
     return api<Lot>(`/lots/${lotId}/images`, { method: 'POST', token, body: JSON.stringify(input) });
