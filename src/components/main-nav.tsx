@@ -1,15 +1,16 @@
 'use client';
 
 import { Menu, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const LINKS = [
-  { href: '/catalogo', label: 'Catálogo' },
-  { href: '/mi-galeria', label: 'Mi galería' },
-  { href: '/como-funciona', label: 'Cómo funciona' },
-];
+  { href: '/catalogo', label: 'catalog' },
+  { href: '/mi-galeria', label: 'myGallery' },
+  { href: '/como-funciona', label: 'howItWorks' },
+] as const;
 
 /** Una seccion esta activa en su ruta y en sus subrutas (por ejemplo, /mi-galeria/personalizar). */
 export function isActive(pathname: string, href: string): boolean {
@@ -18,6 +19,7 @@ export function isActive(pathname: string, href: string): boolean {
 
 /** Enlaces principales: en linea desde md, y en un menu desplegable en pantallas chicas. */
 export function MainNav() {
+  const t = useTranslations('Nav');
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -37,7 +39,7 @@ export function MainNav() {
         {LINKS.map((link) => (
           <li key={link.href}>
             <Link href={link.href} className={linkClass(link.href)} aria-current={isActive(pathname, link.href) ? 'page' : undefined}>
-              {link.label}
+              {t(link.label)}
             </Link>
           </li>
         ))}
@@ -47,7 +49,7 @@ export function MainNav() {
         className="rounded-full p-2 text-ink hover:bg-paper-deep md:hidden"
         aria-expanded={open}
         aria-controls="mobile-nav"
-        aria-label={open ? 'Cerrar el menú' : 'Abrir el menú'}
+        aria-label={open ? t('closeMenu') : t('openMenu')}
         onClick={() => { setOpen((current) => !current); }}
       >
         {open ? <X aria-hidden="true" className="h-5 w-5" /> : <Menu aria-hidden="true" className="h-5 w-5" />}
@@ -61,7 +63,7 @@ export function MainNav() {
                 className={`block rounded-field px-3 py-2.5 ${isActive(pathname, link.href) ? 'bg-paper-deep font-medium text-ink' : 'text-ink'}`}
                 aria-current={isActive(pathname, link.href) ? 'page' : undefined}
               >
-                {link.label}
+                {t(link.label)}
               </Link>
             </li>
           ))}

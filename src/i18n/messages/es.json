@@ -1,0 +1,89 @@
+{
+  "Meta": {
+    "title": "ArtAuction AI",
+    "description": "Subastas de arte y antigüedades con auditoría de autenticidad."
+  },
+  "Layout": {
+    "skipToContent": "Saltar al contenido",
+    "mainNavigation": "Principal"
+  },
+  "Nav": {
+    "catalog": "Catálogo",
+    "myGallery": "Mi galería",
+    "howItWorks": "Cómo funciona",
+    "openMenu": "Abrir el menú",
+    "closeMenu": "Cerrar el menú"
+  },
+  "Account": {
+    "signIn": "Entrar",
+    "menuLabel": "Cuenta de {name}",
+    "profile": "Mi cuenta",
+    "wallet": "Bolsillo",
+    "myWorks": "Mis obras",
+    "activity": "Actividad",
+    "notifications": "Avisos",
+    "newWork": "Nueva obra",
+    "review": "Revisión manual",
+    "settings": "Ajustes",
+    "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…"
+  },
+  "Balance": {
+    "held": " y {held} retenidas en pujas",
+    "title": "Saldo disponible: {balance} artacoins{held}. Abre tu bolsillo.",
+    "label": "Saldo: {balance} artacoins{held}. Abrir bolsillo",
+    "unit": "AC"
+  },
+  "Footer": {
+    "tagline": "Subastas de arte y antigüedades con auditoría de autenticidad. El reloj de cada sala es el del servidor.",
+    "catalog": "Catálogo y salas en vivo",
+    "myGallery": "Mi galería 3D",
+    "howItWorks": "Cómo funciona",
+    "wallet": "Bolsillo de artacoins",
+    "notifications": "Avisos",
+    "privacy": "Una obra privada no se muestra a terceros."
+  },
+  "Language": {
+    "label": "Idioma",
+    "switchTo": "Cambiar a {language}",
+    "settingsTitle": "Idioma",
+    "settingsHint": "La plataforma se muestra en este idioma en todos tus dispositivos. Las fichas de las obras se traducen automáticamente.",
+    "saveFailed": "No se pudo guardar el idioma en tu cuenta. Se aplicó solo en este navegador."
+  },
+  "Profile": {
+    "signInTitle": "Entra para ver tu cuenta",
+    "account": "Cuenta",
+    "roles": {
+      "USER": "Coleccionista",
+      "SELLER": "Vendedor",
+      "ADMIN": "Administración"
+    },
+    "descriptions": {
+      "profile": "Tu cuenta y sus secciones.",
+      "wallet": "Saldo de artacoins, recargas y lo retenido en salas.",
+      "myWorks": "Lo que publicaste con su estado, y lo que ganaste en subasta.",
+      "activity": "Lo que hacen las personas que sigues.",
+      "notifications": "Resultados de auditorías y cierres de subasta.",
+      "newWork": "Sube un proyecto propio para tu galería o, si vendes, una obra para el catálogo.",
+      "review": "Obras que esperan una decisión manual.",
+      "settings": "Tu nombre, tu imagen de perfil y el idioma."
+    }
+  },
+  "Settings": {
+    "signInTitle": "Entra para cambiar tus ajustes",
+    "eyebrow": "Tu cuenta",
+    "title": "Ajustes",
+    "description": "El nombre y la imagen se ven en la cabecera y en tu galería pública.",
+    "accountFallback": "Cuenta",
+    "preview": "Así te verán las demás personas.",
+    "nameLabel": "Nombre",
+    "avatarLabel": "Imagen de perfil",
+    "avatarHint": "Una dirección https. Si la dejas vacía, se usan tus iniciales.",
+    "avatarHttps": "La imagen debe ser una dirección https.",
+    "avatarComplete": "Escribe una dirección completa, por ejemplo https://…",
+    "save": "Guardar cambios",
+    "saving": "Guardando…",
+    "saved": "Tus ajustes quedaron guardados.",
+    "saveFailed": "No se pudieron guardar los ajustes."
+  }
+}

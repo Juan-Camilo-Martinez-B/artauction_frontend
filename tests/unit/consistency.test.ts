@@ -60,10 +60,12 @@ describe('avisos y actividad en palabras', () => {
     expect(describeActivity({ ...base, actorId: 'x', objectType: 'USER', objectId: 'u2' }, ME)).toMatchObject({ who: 'Alguien que sigues', href: '/galerias/u2' });
   });
 
-  it('muestra las fechas en tiempo relativo', () => {
+  it('muestra las fechas en tiempo relativo en el idioma activo', () => {
     const now = new Date('2026-11-02T12:00:00Z');
-    expect(formatRelative('2026-11-02T11:55:00Z', now)).toBe('hace 5 minutos');
-    expect(formatRelative('2026-11-02T14:00:00Z', now)).toBe('dentro de 2 horas');
+    expect(formatRelative('2026-11-02T11:55:00Z', 'es', now)).toBe('hace 5 minutos');
+    expect(formatRelative('2026-11-02T14:00:00Z', 'es', now)).toBe('dentro de 2 horas');
+    expect(formatRelative('2026-11-02T11:55:00Z', 'en', now)).toBe('5 minutes ago');
+    expect(formatRelative('2026-11-02T14:00:00Z', 'en', now)).toBe('in 2 hours');
   });
 });
 

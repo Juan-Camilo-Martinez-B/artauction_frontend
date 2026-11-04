@@ -10,8 +10,7 @@ import { ButtonLink } from '@/components/ui/button';
 import { Notice } from '@/components/ui/notice';
 import { auditSourceLabel, isPersonal, isReturned } from '@/lib/artwork/lot-review';
 import { formatArtacoins } from '@/lib/auction/policy';
-import { formatDateTime } from '@/lib/format';
-import { formatMoney } from '@/lib/money';
+import { useFormat } from '@/hooks/use-format';
 import type { Lot, LotModel } from '@/lib/api/types';
 
 // WebGL solo existe en el navegador: el visor se carga aparte y sin SSR.
@@ -28,6 +27,7 @@ export interface PurchaseInfo {
 }
 
 export function ArtworkExhibit({ lot, purchase = null }: { lot: Lot; purchase?: PurchaseInfo | null }) {
+  const formatter = useFormat();
   const image = lot.images?.find((item) => item.url)?.url ?? null;
   const [format, setFormat] = useState<ImageFormat | null>(null);
   const orientation = format?.orientation() ?? 'pending';
@@ -86,7 +86,7 @@ export function ArtworkExhibit({ lot, purchase = null }: { lot: Lot; purchase?: 
             {personal ? null : (
               <Fact
                 label="Banda sugerida"
-                value={`${formatMoney(lot.suggestedPriceMin)} – ${formatMoney(lot.suggestedPriceMax)}`}
+                value={`${formatter.money(lot.suggestedPriceMin)} – ${formatter.money(lot.suggestedPriceMax)}`}
               />
             )}
           </dl>
@@ -102,7 +102,7 @@ export function ArtworkExhibit({ lot, purchase = null }: { lot: Lot; purchase?: 
                 <span className="text-muted">
                   {lot.auction.status === 'ACTIVA'
                     ? `Va en ${formatArtacoins(lot.auction.currentPrice)}`
-                    : `Sale en ${formatArtacoins(lot.auction.currentPrice)}${lot.auction.startsAt ? ` · abre el ${formatDateTime(lot.auction.startsAt)}` : ''}`}
+                    : `Sale en ${formatArtacoins(lot.auction.currentPrice)}${lot.auction.startsAt ? ` · abre el ${formatter.dateTime(lot.auction.startsAt)}` : ''}`}
                 </span>
                 {lot.auction.buyNowPrice && (lot.auction.buyNowAvailable || lot.auction.status !== 'ACTIVA') ? (
                   <span className="block text-muted">
@@ -144,13 +144,14 @@ export function ArtworkExhibit({ lot, purchase = null }: { lot: Lot; purchase?: 
 
 /** Certificado de la compra: como se compro, cuando y, solo para su duena, por cuanto. */
 function PurchaseNotice({ purchase, wide }: { purchase: PurchaseInfo; wide: boolean }) {
+  const formatter = useFormat();
   const how = purchase.buyNow === true ? 'por compra inmediata' : purchase.buyNow === false ? 'en subasta' : 'en ArtAuction';
   return (
     <Notice tone="success" className={wide ? 'md:col-span-2' : ''}>
       <div>
         <span className="block font-medium">Ficha guardada de la compra</span>
         Comprada {how}
-        {purchase.acquiredAt ? ` el ${formatDateTime(purchase.acquiredAt)}` : ''}
+        {purchase.acquiredAt ? ` el ${formatter.dateTime(purchase.acquiredAt)}` : ''}
         {purchase.pricePaid ? ` por ${formatArtacoins(purchase.pricePaid)}` : ''}. Es la ficha de la obra tal como estaba al venderse.
       </div>
     </Notice>

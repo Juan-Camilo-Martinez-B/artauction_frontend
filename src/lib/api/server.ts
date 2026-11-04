@@ -1,9 +1,12 @@
+import { requestLocale } from '@/i18n/request';
 import { artApi, publicApiUrl } from './client';
 import type { CatalogPage, Category, GalleryItem, Lot } from './types';
 
 export async function getPublicLots(query = ''): Promise<{ catalog: CatalogPage; error: string | null }> {
   try {
     const response = await fetch(`${serverApiUrl()}/lots${query}`, {
+      // El idioma va en la cabecera: la cache de Next guarda una respuesta por idioma.
+      headers: await localeHeaders(),
       next: { revalidate: 60, tags: ['catalog'] },
     });
     if (!response.ok) {
@@ -31,7 +34,7 @@ export async function getCategories(): Promise<Category[]> {
 
 export async function getLot(id: string): Promise<Lot | null> {
   try {
-    const response = await fetch(`${serverApiUrl()}/lots/${id}`, { cache: 'no-store' });
+    const response = await fetch(`${serverApiUrl()}/lots/${id}`, { cache: 'no-store', headers: await localeHeaders() });
     if (!response.ok) {
       return null;
     }
@@ -54,6 +57,11 @@ export async function getPublicGallery(ownerId: string): Promise<GalleryItem[]> 
   } catch {
     return [];
   }
+}
+
+/** El gateway devuelve las fichas en el idioma de quien mira la pagina. */
+async function localeHeaders(): Promise<Record<string, string>> {
+  return { 'accept-language': await requestLocale() };
 }
 
 function serverApiUrl(): string {

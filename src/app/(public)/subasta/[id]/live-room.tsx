@@ -17,7 +17,7 @@ import type { Auction, WalletSnapshot } from '@/lib/api/types';
 import { buyNowOpen, buyNowThreshold } from '@/lib/auction/buy-now';
 import { canWithdraw, formatArtacoins } from '@/lib/auction/policy';
 import { bidderLabels, mergeBid, nextMinimumBid, quickBids, type RoomPhase } from '@/lib/auction/room';
-import { formatRelative } from '@/lib/format';
+import { useFormat } from '@/hooks/use-format';
 import { loginHref } from '@/lib/session/next-path';
 import { browserSession, type SessionSnapshot } from '@/lib/session/browser-session';
 import { useLiveAuction } from './use-live-auction';
@@ -30,6 +30,7 @@ const onlyDigits = (raw: string) => raw.replace(/\D+/g, '').slice(0, 9);
  * useLiveAuction.
  */
 export function LiveRoom({ auctionId }: { auctionId: string }) {
+  const format = useFormat();
   const notify = useToast();
   const { auction, lot, loadError, offsetMs, connected, wallet, session, phase, reload, updateAuction, refreshWallet } = useLiveAuction(auctionId);
   const [amount, setAmount] = useState('');
@@ -231,7 +232,7 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
                   </span>
                   <span className="tabular-nums">{formatArtacoins(bid.amount)}</span>
                   <time dateTime={bid.createdAt} className="w-24 text-right text-xs text-muted">
-                    {formatRelative(bid.createdAt, new Date(Date.now() + offsetMs))}
+                    {format.relative(bid.createdAt, new Date(Date.now() + offsetMs))}
                   </time>
                 </li>
               ))}

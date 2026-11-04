@@ -4,6 +4,8 @@ export interface AuthUser {
   role: string;
   displayName?: string;
   avatarUrl?: string | null;
+  /** Idioma de la interfaz guardado en la cuenta: es o en. */
+  locale?: string;
 }
 
 export interface TokenPair {

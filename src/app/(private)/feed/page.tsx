@@ -10,7 +10,7 @@ import { Notice } from '@/components/ui/notice';
 import { artApi } from '@/lib/api/client';
 import type { ActivityItem } from '@/lib/api/types';
 import { describeActivity } from '@/lib/describe-events';
-import { formatDateTime, formatRelative } from '@/lib/format';
+import { useFormat } from '@/hooks/use-format';
 import { browserSession, type AccountProfile } from '@/lib/session/browser-session';
 
 export default function FeedPage() {
@@ -18,6 +18,7 @@ export default function FeedPage() {
 }
 
 function Feed({ profile }: { profile: AccountProfile }) {
+  const format = useFormat();
   const [items, setItems] = useState<ActivityItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,8 +65,8 @@ function Feed({ profile }: { profile: AccountProfile }) {
                     described.text
                   )}
                 </p>
-                <time dateTime={item.createdAt} title={formatDateTime(item.createdAt)} className="shrink-0 text-xs text-muted">
-                  {formatRelative(item.createdAt)}
+                <time dateTime={item.createdAt} title={format.dateTime(item.createdAt)} className="shrink-0 text-xs text-muted">
+                  {format.relative(item.createdAt)}
                 </time>
               </li>
             );

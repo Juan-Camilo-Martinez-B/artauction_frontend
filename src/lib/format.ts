@@ -1,7 +1,24 @@
-// Fechas en un solo formato para todo el sitio (es-CO).
+import { INTL_LOCALE, type Locale } from '@/i18n/locales';
 
-const dateTime = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
-const relative = new Intl.RelativeTimeFormat('es-CO', { numeric: 'auto' });
+// Fechas y numeros en un solo formato por idioma para todo el sitio. Crear un
+// Intl.*Format es caro: se guarda uno por idioma y opciones.
+
+const cache = new Map<string, Intl.DateTimeFormat | Intl.RelativeTimeFormat | Intl.NumberFormat>();
+
+function cached<T extends Intl.DateTimeFormat | Intl.RelativeTimeFormat | Intl.NumberFormat>(key: string, create: () => T): T {
+  let formatter = cache.get(key) as T | undefined;
+  if (!formatter) {
+    formatter = create();
+    cache.set(key, formatter);
+  }
+  return formatter;
+}
+
+const dateTime = (locale: Locale) =>
+  cached(`dt:${locale}`, () => new Intl.DateTimeFormat(INTL_LOCALE[locale], { dateStyle: 'medium', timeStyle: 'short' }));
+const relative = (locale: Locale) => cached(`rel:${locale}`, () => new Intl.RelativeTimeFormat(INTL_LOCALE[locale], { numeric: 'auto' }));
+const integer = (locale: Locale) => cached(`int:${locale}`, () => new Intl.NumberFormat(INTL_LOCALE[locale], { maximumFractionDigits: 0 }));
+const decimal = (locale: Locale) => cached(`dec:${locale}`, () => new Intl.NumberFormat(INTL_LOCALE[locale], { maximumFractionDigits: 2 }));
 
 const STEPS: Array<[Intl.RelativeTimeFormatUnit, number]> = [
   ['second', 60],
@@ -13,23 +30,49 @@ const STEPS: Array<[Intl.RelativeTimeFormatUnit, number]> = [
   ['year', Number.POSITIVE_INFINITY],
 ];
 
-export function formatDateTime(iso: string | Date): string {
-  const date = typeof iso === 'string' ? new Date(iso) : iso;
-  return Number.isNaN(date.getTime()) ? '' : dateTime.format(date);
+function toDate(value: string | Date): Date | null {
+  const date = typeof value === 'string' ? new Date(value) : value;
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
-/** "hace 5 minutos", "en 2 horas", "ayer"... respecto de `now`. */
-export function formatRelative(iso: string | Date, now: Date = new Date()): string {
-  const date = typeof iso === 'string' ? new Date(iso) : iso;
-  if (Number.isNaN(date.getTime())) {
+export function formatDateTime(value: string | Date, locale: Locale): string {
+  const date = toDate(value);
+  return date ? dateTime(locale).format(date) : '';
+}
+
+/** "hace 5 minutos", "in 2 hours", "ayer"... respecto de `now`. */
+export function formatRelative(value: string | Date, locale: Locale, now: Date = new Date()): string {
+  const date = toDate(value);
+  if (!date) {
     return '';
   }
-  let value = (date.getTime() - now.getTime()) / 1000;
+  let amount = (date.getTime() - now.getTime()) / 1000;
   for (const [unit, size] of STEPS) {
-    if (Math.abs(value) < size) {
-      return relative.format(Math.round(value), unit);
+    if (Math.abs(amount) < size) {
+      return relative(locale).format(Math.round(amount), unit);
     }
-    value /= size;
+    amount /= size;
   }
-  return dateTime.format(date);
+  return dateTime(locale).format(date);
+}
+
+/** Entero con separador de miles del idioma: 1.234 en espanol, 1,234 en ingles. */
+export function formatInteger(value: number, locale: Locale): string {
+  return integer(locale).format(Math.round(value));
+}
+
+/** Numero con hasta dos decimales (medidas en centimetros, por ejemplo). */
+export function formatDecimal(value: number, locale: Locale): string {
+  return decimal(locale).format(value);
+}
+
+export function formatMoney(value: string | number | null | undefined, locale: Locale, currency = 'USD'): string {
+  const amount = typeof value === 'number' ? value : Number(value ?? '0');
+  if (!Number.isFinite(amount)) {
+    return '—';
+  }
+  return cached(
+    `cur:${locale}:${currency}`,
+    () => new Intl.NumberFormat(INTL_LOCALE[locale], { style: 'currency', currency, maximumFractionDigits: 2 }),
+  ).format(amount);
 }

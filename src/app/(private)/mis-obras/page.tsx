@@ -29,7 +29,7 @@ import {
   type WorkFilter,
 } from '@/lib/artwork/my-works';
 import { purchasedSheetHref } from '@/lib/artwork/sheet-href';
-import { formatDateTime } from '@/lib/format';
+import { useFormat } from '@/hooks/use-format';
 import { browserSession, type AccountProfile } from '@/lib/session/browser-session';
 import { canSell } from '@/lib/session/roles';
 import { canShowGalleryItem } from '@/lib/visibility';
@@ -295,6 +295,7 @@ function HangButton({ lotId, title, actions }: { lotId: string; title: string; a
 }
 
 function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
+  const format = useFormat();
   const status = sellerStatus(lot);
   const hasImage = Boolean(lot.images?.some((image) => image.url));
   const busy = actions.busy === lot.id;
@@ -318,7 +319,7 @@ function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
         {isReturned(lot) && lot.lastReview?.reason ? (
           <blockquote className="mt-3 rounded-field border-l-4 border-oxide bg-paper px-3 py-2 text-sm">
             <span className="block text-xs uppercase tracking-wide text-muted">
-              Motivo{lot.lastReview.createdAt ? ` · ${formatDateTime(lot.lastReview.createdAt)}` : ''}
+              Motivo{lot.lastReview.createdAt ? ` · ${format.dateTime(lot.lastReview.createdAt)}` : ''}
             </span>
             {lot.lastReview.reason}
           </blockquote>
@@ -373,6 +374,7 @@ function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
 }
 
 function WonRow({ item, actions }: { item: GalleryItem; actions: WorkActions }) {
+  const format = useFormat();
   return (
     <article className="rounded-panel border border-line bg-surface p-4 shadow-panel">
       <p className="text-xs font-medium uppercase tracking-[0.18em] text-oxide">Ganada en subasta</p>
@@ -388,7 +390,7 @@ function WonRow({ item, actions }: { item: GalleryItem; actions: WorkActions }) 
           {item.visibility === 'PUBLIC' ? <Eye aria-hidden="true" className="h-3.5 w-3.5" /> : <EyeOff aria-hidden="true" className="h-3.5 w-3.5" />}
           {item.visibility === 'PUBLIC' ? 'Pública en tu galería' : 'Solo tú la ves'}
         </span>
-        <time dateTime={item.acquiredAt}>{formatDateTime(item.acquiredAt)}</time>
+        <time dateTime={item.acquiredAt}>{format.dateTime(item.acquiredAt)}</time>
       </div>
       <div className="mt-3">
         <HangButton lotId={item.lotId} title={item.title} actions={actions} />

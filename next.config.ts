@@ -1,4 +1,8 @@
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+// Idioma sin prefijo en la URL: lo resuelve src/i18n/request.ts en cada render.
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const privateHeader = { key: 'Cache-Control', value: 'private, no-store' };
 
@@ -18,4 +22,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

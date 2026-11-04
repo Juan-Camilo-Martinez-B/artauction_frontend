@@ -2,6 +2,7 @@
 
 import { Bell, ClipboardCheck, LogOut, Newspaper, Palette, Settings, Upload, User, Wallet, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
 import { ButtonLink } from '@/components/ui/button';
@@ -9,23 +10,26 @@ import { loginHref } from '@/lib/session/next-path';
 import { browserSession, type SessionSnapshot } from '@/lib/session/browser-session';
 import { ProfileMark } from './profile-mark';
 
+/** Texto de cada seccion en el diccionario Account. */
+export type SectionLabel = 'profile' | 'wallet' | 'myWorks' | 'activity' | 'notifications' | 'newWork' | 'review' | 'settings';
+
 interface MenuEntry {
   href: string;
-  label: string;
+  label: SectionLabel;
   Icon: LucideIcon;
   roles?: readonly string[];
 }
 
 // Un solo lugar para las secciones de la cuenta: el menu y la pagina /perfil usan la misma lista.
 export const ACCOUNT_SECTIONS: readonly MenuEntry[] = [
-  { href: '/perfil', label: 'Mi cuenta', Icon: User },
-  { href: '/bolsillo', label: 'Bolsillo', Icon: Wallet },
-  { href: '/mis-obras', label: 'Mis obras', Icon: Palette },
-  { href: '/feed', label: 'Actividad', Icon: Newspaper },
-  { href: '/notificaciones', label: 'Avisos', Icon: Bell },
-  { href: '/publicar', label: 'Nueva obra', Icon: Upload },
-  { href: '/admin', label: 'Revisión manual', Icon: ClipboardCheck, roles: ['ADMIN'] },
-  { href: '/ajustes', label: 'Ajustes', Icon: Settings },
+  { href: '/perfil', label: 'profile', Icon: User },
+  { href: '/bolsillo', label: 'wallet', Icon: Wallet },
+  { href: '/mis-obras', label: 'myWorks', Icon: Palette },
+  { href: '/feed', label: 'activity', Icon: Newspaper },
+  { href: '/notificaciones', label: 'notifications', Icon: Bell },
+  { href: '/publicar', label: 'newWork', Icon: Upload },
+  { href: '/admin', label: 'review', Icon: ClipboardCheck, roles: ['ADMIN'] },
+  { href: '/ajustes', label: 'settings', Icon: Settings },
 ];
 
 export function sectionsFor(role: string): MenuEntry[] {
@@ -33,6 +37,7 @@ export function sectionsFor(role: string): MenuEntry[] {
 }
 
 export function AccountMenu() {
+  const t = useTranslations('Account');
   const router = useRouter();
   const pathname = usePathname();
   const menuId = useId();
@@ -80,7 +85,7 @@ export function AccountMenu() {
   if (snapshot.status === 'anonymous' || !snapshot.profile) {
     return (
       <ButtonLink href={loginHref(pathname)} size="sm">
-        Entrar
+        {t('signIn')}
       </ButtonLink>
     );
   }
@@ -104,7 +109,7 @@ export function AccountMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
-        aria-label={`Cuenta de ${profile.displayName}`}
+        aria-label={t('menuLabel', { name: profile.displayName })}
         onClick={() => { setOpen((current) => !current); }}
       >
         <ProfileMark name={profile.displayName} avatarUrl={profile.avatarUrl} />
@@ -125,7 +130,7 @@ export function AccountMenu() {
                 className={`flex items-center gap-3 rounded-field px-3 py-2 text-sm hover:bg-paper-deep ${pathname === href ? 'bg-paper-deep font-medium' : ''}`}
               >
                 <Icon aria-hidden="true" className="h-4 w-4 text-muted" />
-                {label}
+                {t(label)}
               </Link>
             ))}
           </div>
@@ -137,7 +142,7 @@ export function AccountMenu() {
             onClick={() => void signOut()}
           >
             <LogOut aria-hidden="true" className="h-4 w-4" />
-            {leaving ? 'Cerrando sesión…' : 'Cerrar sesión'}
+            {leaving ? t('signingOut') : t('signOut')}
           </button>
         </div>
       ) : null}

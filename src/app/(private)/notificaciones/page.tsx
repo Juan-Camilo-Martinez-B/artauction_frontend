@@ -10,7 +10,7 @@ import { Notice } from '@/components/ui/notice';
 import { artApi } from '@/lib/api/client';
 import type { NotificationItem } from '@/lib/api/types';
 import { describeNotification, type EventTone } from '@/lib/describe-events';
-import { formatDateTime, formatRelative } from '@/lib/format';
+import { useFormat } from '@/hooks/use-format';
 import { browserSession, type AccountProfile } from '@/lib/session/browser-session';
 
 const TONE_ICON: Record<EventTone, { Icon: typeof Info; className: string }> = {
@@ -24,6 +24,7 @@ export default function NotificationsPage() {
 }
 
 function Notifications({ profile }: { profile: AccountProfile }) {
+  const format = useFormat();
   const [items, setItems] = useState<NotificationItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,8 +69,8 @@ function Notifications({ profile }: { profile: AccountProfile }) {
                   <span className="block font-medium">{described.title}</span>
                   <span className="block text-sm text-muted">{described.body}</span>
                 </span>
-                <time dateTime={item.createdAt} title={formatDateTime(item.createdAt)} className="shrink-0 text-xs text-muted">
-                  {formatRelative(item.createdAt)}
+                <time dateTime={item.createdAt} title={format.dateTime(item.createdAt)} className="shrink-0 text-xs text-muted">
+                  {format.relative(item.createdAt)}
                 </time>
               </>
             );

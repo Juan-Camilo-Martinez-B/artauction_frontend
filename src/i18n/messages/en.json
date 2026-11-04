@@ -1,0 +1,89 @@
+{
+  "Meta": {
+    "title": "ArtAuction AI",
+    "description": "Art and antiques auctions with authenticity audits."
+  },
+  "Layout": {
+    "skipToContent": "Skip to content",
+    "mainNavigation": "Main"
+  },
+  "Nav": {
+    "catalog": "Catalog",
+    "myGallery": "My gallery",
+    "howItWorks": "How it works",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "Account": {
+    "signIn": "Sign in",
+    "menuLabel": "{name}'s account",
+    "profile": "My account",
+    "wallet": "Wallet",
+    "myWorks": "My works",
+    "activity": "Activity",
+    "notifications": "Notifications",
+    "newWork": "New work",
+    "review": "Manual review",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "signingOut": "Signing out…"
+  },
+  "Balance": {
+    "held": " and {held} held in bids",
+    "title": "Available balance: {balance} artacoins{held}. Open your wallet.",
+    "label": "Balance: {balance} artacoins{held}. Open wallet",
+    "unit": "AC"
+  },
+  "Footer": {
+    "tagline": "Art and antiques auctions with authenticity audits. Every room runs on the server's clock.",
+    "catalog": "Catalog and live rooms",
+    "myGallery": "My 3D gallery",
+    "howItWorks": "How it works",
+    "wallet": "Artacoin wallet",
+    "notifications": "Notifications",
+    "privacy": "A private work is never shown to others."
+  },
+  "Language": {
+    "label": "Language",
+    "switchTo": "Switch to {language}",
+    "settingsTitle": "Language",
+    "settingsHint": "The platform is shown in this language on all your devices. Artwork sheets are translated automatically.",
+    "saveFailed": "Your account could not store the language. It applies only in this browser."
+  },
+  "Profile": {
+    "signInTitle": "Sign in to see your account",
+    "account": "Account",
+    "roles": {
+      "USER": "Collector",
+      "SELLER": "Seller",
+      "ADMIN": "Administration"
+    },
+    "descriptions": {
+      "profile": "Your account and its sections.",
+      "wallet": "Artacoin balance, top-ups and what is held in rooms.",
+      "myWorks": "What you published and its status, and what you won at auction.",
+      "activity": "What the people you follow are doing.",
+      "notifications": "Audit results and auction closings.",
+      "newWork": "Upload a personal project for your gallery or, if you sell, a work for the catalog.",
+      "review": "Works waiting for a manual decision.",
+      "settings": "Your name, profile picture and language."
+    }
+  },
+  "Settings": {
+    "signInTitle": "Sign in to change your settings",
+    "eyebrow": "Your account",
+    "title": "Settings",
+    "description": "Your name and picture appear in the header and in your public gallery.",
+    "accountFallback": "Account",
+    "preview": "This is how others will see you.",
+    "nameLabel": "Name",
+    "avatarLabel": "Profile picture",
+    "avatarHint": "An https address. Leave it empty to use your initials.",
+    "avatarHttps": "The picture must be an https address.",
+    "avatarComplete": "Write a full address, for example https://…",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Your settings were saved.",
+    "saveFailed": "Your settings could not be saved."
+  }
+}

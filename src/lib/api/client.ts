@@ -1,3 +1,5 @@
+import { browserLocale } from '@/i18n/browser';
+import type { Locale } from '@/i18n/locales';
 import type {
   ActivityItem,
   AuctionView,
@@ -45,6 +47,10 @@ export async function api<T>(path: string, init: RequestInit & { token?: string 
   }
   if (init.token) {
     headers.set('authorization', `Bearer ${init.token}`);
+  }
+  // El gateway devuelve las fichas de las obras en este idioma.
+  if (!headers.has('accept-language')) {
+    headers.set('accept-language', browserLocale());
   }
   const response = await fetch(`${publicApiUrl()}${path}`, {
     ...init,
@@ -108,7 +114,8 @@ export type ResolveLotInput =
 
 export const artApi = {
   register(input: { email: string; password: string; displayName: string; role?: 'USER' | 'SELLER' }) {
-    return api<AuthUser>('/auth/register', { method: 'POST', body: JSON.stringify(input) });
+    // La cuenta nace en el idioma con que la persona ve la plataforma.
+    return api<AuthUser>('/auth/register', { method: 'POST', body: JSON.stringify({ ...input, locale: browserLocale() }) });
   },
   login(email: string, password: string) {
     return api<TokenPair>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
@@ -121,6 +128,9 @@ export const artApi = {
   },
   updateMe(token: string, input: { displayName: string; avatarUrl?: string }) {
     return api<AuthUser>('/auth/me', { method: 'PATCH', token, body: JSON.stringify(input) });
+  },
+  updatePreferences(token: string, locale: Locale) {
+    return api<AuthUser>('/auth/me/preferences', { method: 'PATCH', token, body: JSON.stringify({ locale }) });
   },
   lots(query = '') {
     return api<CatalogPage>(`/lots${query}`);

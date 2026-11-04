@@ -92,6 +92,16 @@ La sala personal (`/mi-galeria`) simula una galería real con React Three Fiber.
 - **Recorrido.** Se arrastra para mirar. WASD o flechas para caminar (Shift corre), Q/E para girar, o los botones en pantalla. Hay colisión con paredes y pedestales. Un clic en una obra lleva hasta ella y abre su ficha. Con `prefers-reduced-motion`, el salto es instantáneo.
 - **Montaje.** En **Editar montaje** se elige una obra para cambiarla de pared, moverla, subirla o escalarla. **Organizar automáticamente** reparte todo según las medidas reales. Ambiente y montaje son un borrador: **Guardar cambios** solo aparece si hay cambios, y avisa antes de cerrar la pestaña.
 
+## Idiomas
+
+La interfaz está en español e inglés con [next-intl](https://next-intl.dev), **sin prefijo en la URL**: `/catalogo` es la misma ruta en los dos idiomas.
+
+- **Qué idioma se ve.** `src/i18n/request.ts` lo decide en cada render. Primero la cookie `NEXT_LOCALE` (la elección de la persona o el idioma de su cuenta). Sin cookie, el idioma del navegador (`Accept-Language`). Si ninguno se ofrece, español. `<html lang>` sigue al idioma activo.
+- **Dónde se cambia.** Con los botones ES · EN del pie, o en **Ajustes → Idioma**, que lo guarda al instante en la cuenta (`PATCH /auth/me/preferences`). Al entrar manda el idioma de la cuenta (`LocaleSync`), así sigue a la persona en cualquier dispositivo. El registro crea la cuenta en el idioma con que la persona veía la plataforma.
+- **Diccionarios.** `src/i18n/messages/es.json` y `en.json`, por espacios de nombres (`Nav`, `Account`, `Settings`…). El español es la referencia: las claves están tipadas (`next-intl.d.ts`), una clave inexistente no compila, y una prueba exige que los dos idiomas tengan las mismas claves y los mismos marcadores (`{name}`).
+- **Fichas de las obras.** Las traduce el backend (Opus-MT). El frontend pide cada ficha en el idioma activo enviando `Accept-Language`, desde el navegador (`api()`) y desde el servidor (`server.ts`, con una entrada de caché por idioma).
+- **Números y fechas.** `src/lib/format.ts` y el hook `useFormat` formatean según el idioma: `es-CO` en español (12.345) y `en-US` en inglés (12,345).
+
 ## Convenciones
 
 - Commits en [Conventional Commits](https://www.conventionalcommits.org/): `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`, `build`.
