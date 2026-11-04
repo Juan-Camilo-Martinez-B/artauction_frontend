@@ -134,6 +134,7 @@ Reemplaza a «Mi colección» (`/galeria`), que listaba las mismas obras propias
 - **Nueva obra** (`/publicar`, para todas las cuentas) pregunta primero para qué es la obra: **Solo para mi galería** (proyecto propio, sin auditoría, no se vende) o **Publicar en el catálogo** (solo quien vende). Un proyecto propio pregunta además quién lo ve: solo su autor o también su galería pública.
 - La ficha de un proyecto propio dice **Proyecto propio, sin auditar** y no muestra score, banda de precio ni sala de subasta. La galería pública lo marca igual. Nunca aparece en el catálogo.
 - La sala 3D solo cuelga obras propias. Un proyecto propio y una obra ganada se cuelgan solos; lo publicado que aún no se vende se cuelga desde Mis obras. Al venderse, la obra sale de la sala del autor y entra en la del ganador. El antiguo botón «Añadir a mi galería», que colgaba cualquier obra del catálogo, ya no existe.
+- **Ficha guardada.** Una obra comprada ya no se publica en el catálogo; su ficha completa es la que guardó la galería del comprador, en `/galerias/<dueña>/obras/<obra>`, con cómo, cuándo y (solo para la dueña) por cuánto se compró. La abren la sala 3D, las ganadas de Mis obras y la galería pública (`src/lib/artwork/sheet-href.ts`).
 - Los roles que publican al catálogo están en `src/lib/session/roles.ts` y las reglas de la obra en `src/lib/artwork/lot-review.ts` y `my-works.ts`.
 
 ## Rutas
