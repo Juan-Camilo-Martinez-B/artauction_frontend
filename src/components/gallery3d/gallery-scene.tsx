@@ -5,7 +5,7 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, type RefObject } from 'react';
 import { ACESFilmicToneMapping } from 'three';
 import type { GalleryConfig, Lot } from '@/lib/api/types';
-import { artworkSize, footprintRadius, isObjectLot, roomOf, type Placement, type Room as RoomSize } from '@/lib/gallery/layout';
+import { artworkSize, canExhibit, footprintRadius, isObjectLot, roomOf, type Placement, type Room as RoomSize } from '@/lib/gallery/layout';
 import { kelvinToHex } from '@/lib/gallery/materials';
 import { FramedArtwork } from './framed-artwork';
 import { Room } from './room';
@@ -50,7 +50,10 @@ export function GalleryScene({
   // spotIntensity va de 0 a ~1.2 en la configuracion; en candelas, un foco de galeria ronda 20-60.
   const spot = 18 + config.lighting.spotIntensity * 40;
   const sized = useMemo(
-    () => artworks.map((artwork) => ({ ...artwork, size: artworkSize(artwork.lot), object: isObjectLot(artwork.lot) })),
+    () =>
+      artworks
+        .filter((artwork) => canExhibit(artwork.lot))
+        .map((artwork) => ({ ...artwork, size: artworkSize(artwork.lot), object: isObjectLot(artwork.lot) })),
     [artworks],
   );
   const obstacles = useMemo<Obstacle[]>(
@@ -104,7 +107,6 @@ export function GalleryScene({
                 {...common}
                 lit={objectLights <= MAX_OBJECT_LIGHTS}
                 pedestalColor={config.palette.pedestal}
-                support={config.materials.sculptureSupport}
               />
             );
           }

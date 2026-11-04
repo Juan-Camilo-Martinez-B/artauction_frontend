@@ -56,6 +56,14 @@ describe('tamaño real de las obras', () => {
     expect(artworkSize({ widthCm: '120', heightCm: '90', depthCm: null, representationKind: 'TWO_D' })).toEqual({ width: 1.2, height: 0.9, depth: 0.04 });
   });
 
+  it('una pieza que no cabe se reduce entera, sin deformarse', () => {
+    // Estatua de 3,6 m: se reduce a 2,6 m de alto y el ancho y el fondo en la misma proporcion.
+    const size = artworkSize({ widthCm: '90', heightCm: '360', depthCm: '72', representationKind: 'THREE_D' });
+    expect(size.height).toBeCloseTo(2.6);
+    expect(size.width / size.height).toBeCloseTo(90 / 360);
+    expect(size.depth / size.height).toBeCloseTo(72 / 360);
+  });
+
   it('usa medidas por defecto si faltan', () => {
     expect(artworkSize({ widthCm: null, heightCm: null, depthCm: null, representationKind: 'THREE_D' })).toEqual({ width: 0.35, height: 0.45, depth: 0.35 });
   });

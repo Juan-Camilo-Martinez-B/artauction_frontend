@@ -61,13 +61,27 @@ export function isObjectLot(lot: Pick<Lot, 'representationKind'>): boolean {
   return lot.representationKind === 'THREE_D';
 }
 
-/** Tamano real de la obra en metros, con limites para que quepa en cualquier sala. */
+/** Un objeto solo se expone en la sala con su modelo 3D real; una obra plana, siempre. */
+export function canExhibit(lot: Pick<Lot, 'representationKind' | 'model'>): boolean {
+  return !isObjectLot(lot) || Boolean(lot.model?.url);
+}
+
+/** Lo mas grande que entra en cualquier sala: ancho, alto y fondo en metros. */
+const MAX_SIZE: ArtworkSize = { width: 4, height: 2.6, depth: 3 };
+
+/**
+ * Tamano real de la obra en metros. Si no cabe en la sala se reduce entera, con
+ * el mismo factor en las tres medidas: limitar cada una por separado deformaba
+ * la pieza (una estatua alta quedaba ancha y achatada).
+ */
 export function artworkSize(lot: Pick<Lot, 'widthCm' | 'heightCm' | 'depthCm' | 'representationKind'>): ArtworkSize {
-  const fallback = isObjectLot(lot) ? DEFAULT_3D : DEFAULT_2D;
-  const width = Math.min(centimeters(lot.widthCm) ?? fallback.width, 4);
-  const height = Math.min(centimeters(lot.heightCm) ?? fallback.height, 2.6);
-  const depth = isObjectLot(lot) ? Math.min(centimeters(lot.depthCm) ?? width, 3) : DEFAULT_2D.depth;
-  return { width, height, depth };
+  const object = isObjectLot(lot);
+  const fallback = object ? DEFAULT_3D : DEFAULT_2D;
+  const width = centimeters(lot.widthCm) ?? fallback.width;
+  const height = centimeters(lot.heightCm) ?? fallback.height;
+  const depth = object ? (centimeters(lot.depthCm) ?? width) : DEFAULT_2D.depth;
+  const fit = Math.min(1, MAX_SIZE.width / width, MAX_SIZE.height / height, object ? MAX_SIZE.depth / depth : 1);
+  return { width: width * fit, height: height * fit, depth: object ? depth * fit : depth };
 }
 
 export function wallLength(side: WallSide, room: Room): number {

@@ -58,6 +58,16 @@ export interface LotReview {
   createdAt: string | null;
 }
 
+/** Modelo 3D (GLB) validado de una obra tridimensional. */
+export interface LotModel {
+  url: string | null;
+  bytes: number;
+  triangleCount: number;
+  vertexCount: number;
+  /** Caja que envuelve el modelo, en sus unidades (Blender exporta metros). */
+  size: { x: number; y: number; z: number };
+}
+
 export interface Lot {
   id: string;
   sellerId: string;
@@ -81,6 +91,7 @@ export interface Lot {
   auditSummaries?: AuditSummary[];
   categories?: LotCategoryLink[];
   lastReview?: LotReview | null;
+  model?: LotModel | null;
   auction?: {
     id: string;
     status: string;
@@ -234,7 +245,7 @@ export interface GalleryConfig {
 
 export interface WalletEntry {
   id: string;
-  kind: 'RECARGA' | 'RETENCION' | 'LIBERACION' | 'CANJE' | 'VENTA';
+  kind: 'RECARGA' | 'RETENCION' | 'LIBERACION' | 'CANJE' | 'VENTA' | 'REEMBOLSO' | 'ANULACION';
   coins: number;
   createdAt: string;
 }

@@ -37,10 +37,12 @@ const entryLabel: Record<WalletEntry['kind'], string> = {
   LIBERACION: 'Devolución de una sala',
   CANJE: 'Pago de una obra ganada',
   VENTA: 'Venta de una obra',
+  REEMBOLSO: 'Reembolso de una compra anulada',
+  ANULACION: 'Venta anulada',
 };
 
 // Movimientos que suman al saldo disponible; el resto lo descuentan.
-const CREDIT_KINDS = new Set<WalletEntry['kind']>(['RECARGA', 'LIBERACION', 'VENTA']);
+const CREDIT_KINDS = new Set<WalletEntry['kind']>(['RECARGA', 'LIBERACION', 'VENTA', 'REEMBOLSO']);
 
 const dateFormat = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 

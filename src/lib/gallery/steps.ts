@@ -190,7 +190,6 @@ export const STEPS = [
         prompt: '¿Cómo prefieres que se exhiban las esculturas y los objetos?',
         options: [
           ['pedestales', 'Pedestales individuales'],
-          ['vitrinas', 'Vitrinas'],
           ['plataformas', 'Plataformas bajas'],
           ['nichos', 'Nichos arquitectónicos'],
           ['suelo', 'Directamente sobre el suelo'],
