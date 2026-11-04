@@ -2,7 +2,7 @@
 
 import { Gavel, ShoppingBag, Undo2, Wifi, WifiOff } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState, type SubmitEvent } from 'react';
+import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { ArtworkImage } from '@/components/artwork-image';
 import { StatusPill } from '@/components/status-pill';
 import { Button, ButtonLink } from '@/components/ui/button';
@@ -11,32 +11,27 @@ import { EmptyState, LoadingState, Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { TextField } from '@/components/ui/text-field';
 import { useToast } from '@/components/ui/toast';
-import { useAuctionChannel } from '@/hooks/use-auction-channel';
 import { useRemaining } from '@/hooks/use-remaining';
-import { ApiError, artApi, publicWsUrl } from '@/lib/api/client';
-import type { Auction, Lot, WalletSnapshot } from '@/lib/api/types';
+import { ApiError, artApi } from '@/lib/api/client';
+import type { Auction, WalletSnapshot } from '@/lib/api/types';
 import { buyNowOpen, buyNowThreshold } from '@/lib/auction/buy-now';
 import { canWithdraw, formatArtacoins } from '@/lib/auction/policy';
-import { bidderLabels, mergeBid, nextMinimumBid, quickBids, roomPhase, type RoomPhase } from '@/lib/auction/room';
-import { clockOffset } from '@/lib/clock';
+import { bidderLabels, mergeBid, nextMinimumBid, quickBids, type RoomPhase } from '@/lib/auction/room';
 import { formatRelative } from '@/lib/format';
 import { loginHref } from '@/lib/session/next-path';
-import { walletBalance } from '@/lib/session/wallet-balance';
 import { browserSession, type SessionSnapshot } from '@/lib/session/browser-session';
-import type { AuctionInbound } from '@/lib/ws/events';
-
-/** Mientras la sala abre o cierra, se vuelve a pedir su estado cada tanto. */
-const TRANSITION_POLL_MS = 4000;
+import { useLiveAuction } from './use-live-auction';
 
 const onlyDigits = (raw: string) => raw.replace(/\D+/g, '').slice(0, 9);
 
+/**
+ * Sala de subasta: la pantalla y las acciones de quien la mira (pujar,
+ * retirarse, comprar ahora). El estado vivo de la sala lo mantiene
+ * useLiveAuction.
+ */
 export function LiveRoom({ auctionId }: { auctionId: string }) {
   const notify = useToast();
-  const [auction, setAuction] = useState<Auction | null>(null);
-  const [lot, setLot] = useState<Lot | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [offsetMs, setOffsetMs] = useState(0);
-  const [connected, setConnected] = useState(false);
+  const { auction, lot, loadError, offsetMs, connected, wallet, session, phase, reload, updateAuction, refreshWallet } = useLiveAuction(auctionId);
   const [amount, setAmount] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -46,105 +41,6 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
   // Una clave por intento de compra: si la respuesta se pierde y se reintenta,
   // el servidor reconoce la misma compra y no cobra dos veces.
   const buyKey = useRef<string | null>(null);
-  const [wallet, setWallet] = useState<WalletSnapshot | null>(null);
-  const [session, setSession] = useState<SessionSnapshot>(browserSession.current());
-
-  useEffect(() => browserSession.subscribe(setSession), []);
-
-  // Pulso de un segundo: la fase depende de la hora y debe cambiar sola (de "Abre en" a "Abriendo…").
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    const timer = window.setInterval(() => { setTick((tick) => tick + 1); }, 1000);
-    return () => { window.clearInterval(timer); };
-  }, []);
-
-  const applyEvent = useCallback(
-    (message: AuctionInbound) => {
-      if (message.type === 'status') {
-        setConnected(message.connected);
-      }
-      if (message.type === 'server-time') {
-        setOffsetMs(message.offsetMs);
-      }
-      if (message.type === 'bid-accepted') {
-        const event = message.event;
-        setAuction((current) =>
-          current
-            ? {
-                ...current,
-                currentPrice: event.amount,
-                endsAt: event.endsAt,
-                bids: mergeBid(current.bids ?? [], { id: event.bidId, bidderId: event.bidderId, amount: event.amount, createdAt: event.serverTime, active: true }),
-              }
-            : current,
-        );
-        if (event.extended) {
-          notify('Puja en el último momento: el cierre se alargó 30 segundos.', 'info');
-        }
-      }
-      if (message.type === 'auction-closed') {
-        const event = message.event;
-        setAuction((current) =>
-          current ? { ...current, status: 'CERRADA', currentPrice: event.amount, winnerId: event.winnerId, closedBy: event.closedBy ?? 'TIME', buyNowAvailable: false } : current,
-        );
-      }
-    },
-    [notify],
-  );
-  const { send } = useAuctionChannel(applyEvent);
-
-  const load = useCallback(async () => {
-    try {
-      const view = await artApi.auction(auctionId);
-      setAuction(view.auction);
-      setOffsetMs(clockOffset(view.serverTime));
-      return view.auction;
-    } catch {
-      setLoadError('Esta sala no existe o ya no está disponible.');
-      return null;
-    }
-  }, [auctionId]);
-
-  useEffect(() => {
-    void load().then((loaded) => {
-      if (loaded) {
-        void artApi.lot(loaded.lotId).then(setLot).catch(() => undefined);
-      }
-    });
-  }, [load]);
-
-  // Con sesion: se une al canal en vivo con su token y trae su bolsillo.
-  useEffect(() => {
-    if (session.status !== 'authenticated') {
-      return;
-    }
-    void browserSession.accessToken().then((token) => {
-      if (!token) {
-        return;
-      }
-      void artApi.wallet(token).then(setWallet).catch(() => undefined);
-      send({ version: 1, type: 'join', auctionId, token, wsUrl: publicWsUrl() });
-    });
-  }, [auctionId, send, session.status]);
-
-  const phase: RoomPhase | null = auction ? roomPhase(auction, Date.now() + offsetMs) : null;
-
-  // Al cerrar se trae la sala completa: el historial incluye la compra inmediata, si la hubo.
-  const status = auction?.status;
-  useEffect(() => {
-    if (status === 'CERRADA') {
-      void load();
-    }
-  }, [status, load]);
-
-  // La apertura y el cierre los hace el programador del servidor: se consulta hasta verlos.
-  useEffect(() => {
-    if (phase !== 'opening' && phase !== 'closing') {
-      return;
-    }
-    const timer = window.setInterval(() => void load(), TRANSITION_POLL_MS);
-    return () => { window.clearInterval(timer); };
-  }, [phase, load]);
 
   const minimum = auction ? nextMinimumBid(auction) : 0;
 
@@ -152,12 +48,6 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
   useEffect(() => {
     setAmount((current) => (Number(current) >= minimum ? current : String(minimum)));
   }, [minimum]);
-
-  async function refreshWallet(token: string) {
-    setWallet(await artApi.wallet(token).catch(() => null));
-    // El encabezado muestra el mismo saldo: se actualiza tras pujar, retirarse o comprar.
-    void walletBalance.refresh();
-  }
 
   async function onBid(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -173,16 +63,12 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
     setPending(true);
     try {
       const placed = await artApi.placeBid(token, auctionId, amount, crypto.randomUUID());
-      setAuction((current) =>
-        current
-          ? {
-              ...current,
-              currentPrice: placed.currentPrice,
-              endsAt: placed.endsAt,
-              bids: mergeBid(current.bids ?? [], { id: placed.bidId, bidderId: session.profile?.userId ?? '', amount: placed.amount, createdAt: new Date(Date.now() + offsetMs).toISOString(), active: true }),
-            }
-          : current,
-      );
+      updateAuction((current) => ({
+        ...current,
+        currentPrice: placed.currentPrice,
+        endsAt: placed.endsAt,
+        bids: mergeBid(current.bids ?? [], { id: placed.bidId, bidderId: session.profile?.userId ?? '', amount: placed.amount, createdAt: new Date(Date.now() + offsetMs).toISOString(), active: true }),
+      }));
       notify(placed.extended ? 'Oferta aceptada. El cierre se alargó 30 segundos.' : `Oferta aceptada: vas ganando con ${formatArtacoins(placed.amount)}.`, 'success');
       await refreshWallet(token);
     } catch (caught) {
@@ -202,7 +88,7 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
     try {
       const result = await artApi.withdrawBid(token, auctionId);
       notify(`Te retiraste. Volvieron ${formatArtacoins(result.released)} a tu bolsillo.`, 'success');
-      await load();
+      await reload();
       await refreshWallet(token);
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'No fue posible retirarse.');
@@ -226,15 +112,13 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
       const bought = await artApi.buyNow(token, auctionId, key);
       buyKey.current = null;
       setConfirmBuyNow(false);
-      setAuction((current) =>
-        current ? { ...current, status: 'CERRADA', currentPrice: bought.amount, winnerId: session.profile?.userId ?? null, closedBy: 'BUY_NOW', buyNowAvailable: false } : current,
-      );
+      updateAuction((current) => ({ ...current, status: 'CERRADA', currentPrice: bought.amount, winnerId: session.profile?.userId ?? null, closedBy: 'BUY_NOW', buyNowAvailable: false }));
       notify(`¡La compraste por ${formatArtacoins(bought.amount)}! Ya está en tu galería.`, 'success');
       await refreshWallet(token);
     } catch (caught) {
       setConfirmBuyNow(false);
       setError(caught instanceof ApiError ? caught.message : 'La compra no se completó. Intenta de nuevo.');
-      await load();
+      await reload();
     } finally {
       setBuying(false);
     }

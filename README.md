@@ -47,12 +47,14 @@ src/components/auctions  cartelera de salas en vivo y próximas (subastas rotati
 src/components       piezas de interfaz compartidas
 src/workers          imagen, subasta y catálogo
 src/lib/api          cliente HTTP de la API v1
-src/lib/forms        saneamiento de campos y validadores de cuenta
+src/lib/forms        saneamiento de campos, validadores de cuenta y la ficha de una obra (lot-draft: borrador, medidas y validación, sin React)
 src/lib/payments     marcas de tarjeta, máscaras y vencimiento
 src/lib/ws           tipos del catálogo de eventos
 src/hooks            filtro, imagen, canal de subasta y validación de formularios
-tests                pruebas de unidad y smoke e2e
+tests                pruebas de unidad, de componentes y smoke e2e
 ```
+
+Los hooks que sirven a una sola pantalla viven junto a ella. En `app/(private)/publicar`, `lot-form.tsx` solo arma la pantalla: el modelo 3D lo maneja `use-model-import.ts` y el guardado `use-lot-submission.ts`, que encadena alta, imagen, modelo, visibilidad, sala y envío a auditoría, y reutiliza la obra ya creada si se reintenta. En `app/(public)/subasta/[id]`, `use-live-auction.ts` mantiene la sala al día (carga, avisos del canal en vivo, consulta mientras abre o cierra, sesión y bolsillo) y `live-room.tsx` queda con la pantalla y las acciones de pujar, retirarse y comprar.
 
 ## Consistencia de la interfaz
 
