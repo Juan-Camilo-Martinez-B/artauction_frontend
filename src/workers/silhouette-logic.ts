@@ -40,6 +40,13 @@ export interface SilhouetteAnalysis {
 export const LATHE_MAX_ASYMMETRY = 0.14;
 const MIN_COVERAGE = 0.04;
 const MAX_COVERAGE = 0.92;
+/**
+ * Una pieza suelta se conserva si mide al menos esta fraccion de la mayor: asi
+ * entran las asas, la base o un brazo separados por fondo, y caen las motas.
+ */
+const MIN_PIECE_OF_LARGEST = 0.02;
+/** Ni la mayor pieza se descarta por chica: por debajo de esto es ruido de la foto. */
+const MIN_PIECE_OF_IMAGE = 0.0005;
 
 function colorAt(image: PixelImage, index: number): [number, number, number] {
   const offset = index * 4;
@@ -75,60 +82,74 @@ function distance(a: readonly number[], b: readonly number[]): number {
 }
 
 /**
- * Mascara del objeto (1 = objeto). El fondo es lo parecido al color del borde
- * y conectado con el borde; luego se queda la mayor pieza y se rellenan sus
- * huecos (sombras interiores de un jarron, por ejemplo).
+ * Mascara del objeto (1 = objeto). El fondo crece desde el borde de la foto
+ * mientras el color se parezca al del fondo y cambie poco de un pixel al
+ * siguiente: un marmol claro sobre fondo claro se parece al fondo, pero en su
+ * contorno hay un salto que detiene el crecimiento. Luego se conservan todas
+ * las piezas que no son motas y se rellenan sus huecos (sombras interiores de
+ * un jarron, por ejemplo).
  */
 export function objectMask(image: PixelImage): Uint8Array {
   const { width, height } = image;
   const total = width * height;
   const background = borderBackground(image);
   const tolerance = Math.max(26, background.spread * 3 + 12);
+  // Salto maximo entre vecinos del fondo: el degradado de una foto de estudio
+  // es suave; el contorno de la pieza, no.
+  const step = Math.max(10, background.spread * 2 + 6);
   const isBackground = new Uint8Array(total);
   const queue = new Int32Array(total);
   let head = 0;
   let tail = 0;
-  const visit = (index: number) => {
+  const visit = (index: number, from: number) => {
     if (isBackground[index] === 1) {
       return;
     }
-    if (distance(colorAt(image, index), background.color) <= tolerance) {
-      isBackground[index] = 1;
-      queue[tail] = index;
-      tail += 1;
+    const color = colorAt(image, index);
+    if (distance(color, background.color) > tolerance) {
+      return;
     }
+    if (from >= 0 && distance(color, colorAt(image, from)) > step) {
+      return;
+    }
+    isBackground[index] = 1;
+    queue[tail] = index;
+    tail += 1;
   };
   for (let x = 0; x < width; x += 1) {
-    visit(x);
-    visit((height - 1) * width + x);
+    visit(x, -1);
+    visit((height - 1) * width + x, -1);
   }
   for (let y = 0; y < height; y += 1) {
-    visit(y * width);
-    visit(y * width + width - 1);
+    visit(y * width, -1);
+    visit(y * width + width - 1, -1);
   }
   while (head < tail) {
     const index = queue[head] as number;
     head += 1;
     const x = index % width;
-    if (x > 0) visit(index - 1);
-    if (x < width - 1) visit(index + 1);
-    if (index >= width) visit(index - width);
-    if (index < total - width) visit(index + width);
+    if (x > 0) visit(index - 1, index);
+    if (x < width - 1) visit(index + 1, index);
+    if (index >= width) visit(index - width, index);
+    if (index < total - width) visit(index + width, index);
   }
   const mask = new Uint8Array(total);
   for (let index = 0; index < total; index += 1) {
     mask[index] = isBackground[index] === 1 ? 0 : 1;
   }
-  return fillHoles(largestComponent(mask, width, height), width, height);
+  return fillHoles(significantComponents(mask, width, height), width, height);
 }
 
-/** Deja solo la mayor region conectada del objeto (descarta motas y reflejos sueltos). */
-function largestComponent(mask: Uint8Array, width: number, height: number): Uint8Array {
+/**
+ * Conserva cada region del objeto que no sea una mota. Antes solo quedaba la
+ * mayor, y una pieza separada por fondo (un asa, la base, un brazo alzado)
+ * desaparecia: la obra se veia cortada.
+ */
+function significantComponents(mask: Uint8Array, width: number, height: number): Uint8Array {
   const total = width * height;
   const labels = new Int32Array(total);
   const queue = new Int32Array(total);
-  let best = 0;
-  let bestSize = 0;
+  const sizes: number[] = [0];
   let label = 0;
   for (let start = 0; start < total; start += 1) {
     if (mask[start] !== 1 || labels[start] !== 0) {
@@ -153,14 +174,14 @@ function largestComponent(mask: Uint8Array, width: number, height: number): Uint
         }
       }
     }
-    if (tail > bestSize) {
-      bestSize = tail;
-      best = label;
-    }
+    sizes.push(tail);
   }
+  const largest = Math.max(0, ...sizes);
+  const minimum = Math.max(largest * MIN_PIECE_OF_LARGEST, total * MIN_PIECE_OF_IMAGE);
   const result = new Uint8Array(total);
   for (let index = 0; index < total; index += 1) {
-    result[index] = labels[index] === best && best !== 0 ? 1 : 0;
+    const piece = labels[index] as number;
+    result[index] = piece !== 0 && (sizes[piece] ?? 0) >= minimum ? 1 : 0;
   }
   return result;
 }
@@ -243,6 +264,15 @@ export function analyzeSilhouette(mask: Uint8Array, width: number, height: numbe
   }
   const asymmetry = halfWidths > 0 ? deviation / (2 * halfWidths) : 1;
   return { mask, bounds, coverage, touchesEdge, axis, rows, asymmetry };
+}
+
+/**
+ * El analisis es fiable si el objeto ocupa una parte razonable de la foto. Si
+ * ocupa casi nada, la mascara se comio la pieza; si ocupa casi todo, no hubo
+ * fondo que separar. En ambos casos se muestra la foto completa, sin recortar.
+ */
+export function isReliableSilhouette(analysis: SilhouetteAnalysis): boolean {
+  return analysis.coverage >= MIN_COVERAGE && analysis.coverage <= MAX_COVERAGE;
 }
 
 /** Se puede tornear si es simetrica, ocupa una parte razonable de la foto y no esta recortada. */

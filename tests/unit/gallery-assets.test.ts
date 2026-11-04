@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { fitFrameToSize, frameStyle } from '@/lib/gallery/frames';
 import { parseProxiedImageUrl, textureSource } from '@/lib/gallery/image-source';
 import { kelvinToHex, shade, tintColor, wallMaterial } from '@/lib/gallery/materials';
-import { analyzeSilhouette, isLatheCandidate, latheProfile, objectMask, type PixelImage } from '@/workers/silhouette-logic';
+import { analyzeSilhouette, isLatheCandidate, isReliableSilhouette, latheProfile, objectMask, type PixelImage } from '@/workers/silhouette-logic';
 
 describe('proxy de imágenes', () => {
   it('solo acepta https del host permitido, sin credenciales ni puertos', () => {
@@ -118,6 +118,37 @@ describe('silueta de objetos', () => {
     const cropped = synthetic(64, 80, (x, y) => y > 30 && Math.abs(x - 32) < 12);
     expect(must(analyze(cropped)).touchesEdge).toBe(true);
     expect(isLatheCandidate(must(analyze(cropped)))).toBe(false);
+  });
+
+  it('conserva las piezas separadas por fondo: el asa y la base no se pierden', () => {
+    // Cuerpo, un asa suelta a la derecha y una base separada debajo.
+    const pieces = synthetic(80, 80, (x, y) => (x > 20 && x < 44 && y > 10 && y < 56) || (x > 50 && x < 58 && y > 20 && y < 40) || (x > 16 && x < 48 && y > 60 && y < 68));
+    const analysis = must(analyze(pieces));
+    expect(analysis.bounds).toMatchObject({ right: 57, bottom: 67 });
+  });
+
+  it('descarta las motas sueltas', () => {
+    const speck = synthetic(80, 80, (x, y) => (x > 20 && x < 50 && y > 10 && y < 60) || (x === 70 && y === 70));
+    expect(must(analyze(speck)).bounds.right).toBe(49);
+  });
+
+  it('un objeto claro sobre fondo claro no se funde con el fondo si su contorno marca un salto', () => {
+    // Marmol (225) sobre fondo (245): se parecen, pero el contorno es un salto de 20.
+    const data = new Uint8ClampedArray(60 * 60 * 4);
+    for (let y = 0; y < 60; y += 1) {
+      for (let x = 0; x < 60; x += 1) {
+        const value = x > 15 && x < 45 && y > 10 && y < 50 ? 225 : 245;
+        data.set([value, value, value, 255], (y * 60 + x) * 4);
+      }
+    }
+    const analysis = must(analyze({ width: 60, height: 60, data }));
+    expect(analysis.bounds).toMatchObject({ left: 16, right: 44, top: 11, bottom: 49 });
+  });
+
+  it('si la pieza ocupa casi nada de la foto, el analisis no es fiable y se muestra la foto completa', () => {
+    const tiny = synthetic(100, 100, (x, y) => x > 48 && x < 52 && y > 48 && y < 52);
+    expect(isReliableSilhouette(must(analyze(tiny)))).toBe(false);
+    expect(isReliableSilhouette(must(analyze(vase)))).toBe(true);
   });
 
   it('rellena los huecos interiores del objeto', () => {

@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-import { analyzeSilhouette, isLatheCandidate, latheProfile, objectMask } from './silhouette-logic';
+import { analyzeSilhouette, isLatheCandidate, isReliableSilhouette, latheProfile, objectMask } from './silhouette-logic';
 
 // Analiza la foto de un objeto fuera del hilo principal: mascara del fondo,
 // silueta, simetria y un recorte con transparencia para usar como textura.
@@ -69,8 +69,9 @@ async function analyze(request: AnalyzeRequest): Promise<SilhouetteResult> {
   const pixels = smallContext.getImageData(0, 0, width, height);
   const mask = objectMask({ width, height, data: pixels.data });
   const analysis = analyzeSilhouette(mask, width, height);
-  if (!analysis) {
-    throw new Error('No se encontró el objeto en la foto');
+  if (!analysis || !isReliableSilhouette(analysis)) {
+    // Mejor la foto completa que un recorte que deja fuera parte de la obra.
+    throw new Error('No se encontró el objeto en la foto con certeza');
   }
   const { bounds } = analysis;
   const boxWidth = bounds.right - bounds.left + 1;
