@@ -22,12 +22,20 @@ import type {
   WalletSnapshot,
 } from './types';
 
+/**
+ * Error de la API. `message` es el texto del servidor (en espanol); `code` es
+ * estable y es el que se traduce al idioma de quien mira (ver lib/api/error-text).
+ */
 export class ApiError extends Error {
   readonly status: number;
+  readonly code: string | null;
+  readonly params: Readonly<Record<string, string>>;
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, code: string | null = null, params: Readonly<Record<string, string>> = {}) {
     super(message);
     this.status = status;
+    this.code = code;
+    this.params = params;
   }
 }
 
@@ -57,7 +65,8 @@ export async function api<T>(path: string, init: RequestInit & { token?: string 
     headers,
   });
   if (!response.ok) {
-    throw new ApiError(await readError(response), response.status);
+    const { message, code, params } = await readError(response);
+    throw new ApiError(message, response.status, code, params);
   }
   if (response.status === 204) {
     return undefined as T;
@@ -65,23 +74,40 @@ export async function api<T>(path: string, init: RequestInit & { token?: string 
   return (await response.json()) as T;
 }
 
-async function readError(response: Response): Promise<string> {
+interface ErrorBody {
+  message: string;
+  code: string | null;
+  params: Record<string, string>;
+}
+
+const FALLBACK_MESSAGE = 'No se pudo completar la solicitud';
+
+/** Lee { message, code, params } del gateway; un cuerpo que no es JSON queda como mensaje. */
+async function readError(response: Response): Promise<ErrorBody> {
   const text = await response.text();
   try {
     const body: unknown = JSON.parse(text);
-    if (typeof body === 'object' && body !== null && 'message' in body) {
-      const message = body.message;
-      if (typeof message === 'string') {
-        return message;
-      }
-      if (Array.isArray(message)) {
-        return message.filter((item) => typeof item === 'string').join(' ');
-      }
+    if (typeof body !== 'object' || body === null) {
+      return { message: text || FALLBACK_MESSAGE, code: null, params: {} };
     }
+    const record = body as { message?: unknown; code?: unknown; params?: unknown };
+    const message =
+      typeof record.message === 'string'
+        ? record.message
+        : Array.isArray(record.message)
+          ? record.message.filter((item): item is string => typeof item === 'string').join(' ')
+          : text;
+    return { message: message || FALLBACK_MESSAGE, code: typeof record.code === 'string' ? record.code : null, params: stringParams(record.params) };
   } catch {
-    return text || 'No se pudo completar la solicitud';
+    return { message: text || FALLBACK_MESSAGE, code: null, params: {} };
   }
-  return text || 'No se pudo completar la solicitud';
+}
+
+function stringParams(raw: unknown): Record<string, string> {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
+    return {};
+  }
+  return Object.fromEntries(Object.entries(raw).filter((entry): entry is [string, string] => typeof entry[1] === 'string'));
 }
 
 /** Ficha de una obra, al crearla o al editarla en borrador o como proyecto propio. */

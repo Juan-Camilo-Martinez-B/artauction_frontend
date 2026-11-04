@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import english from '@/i18n/messages/en.json';
 import spanish from '@/i18n/messages/es.json';
 import { localeCookie, localeFromCookies, negotiateLocale } from '@/i18n/locales';
+import { errorText } from '@/lib/api/error-text';
 import { formatInteger } from '@/lib/format';
 
 type Tree = { [key: string]: string | Tree };
@@ -62,5 +63,34 @@ describe('idioma pedido', () => {
   it('los miles se separan segun el idioma', () => {
     expect(formatInteger(12345, 'es')).toBe('12.345');
     expect(formatInteger(12345, 'en')).toBe('12,345');
+  });
+});
+
+describe('texto de los errores del backend', () => {
+  const dictionary: Record<string, string> = {
+    INSUFFICIENT_FUNDS: 'Missing {missing}',
+    NOT_FOUND: 'Not found',
+    VALIDATION_FAILED: 'Check the data',
+  };
+  const t = Object.assign(
+    (key: string, values: Record<string, string> = {}) =>
+      (dictionary[key] ?? key).replace(/\{(\w+)\}/g, (_match, name: string) => values[name] ?? ''),
+    { has: (key: string) => key in dictionary },
+  );
+  const error = (code: string | null, message = 'Mensaje del servidor') => ({ code, message, params: { missing: '40' } });
+
+  it('un codigo especifico siempre sale del diccionario, con sus parametros', () => {
+    expect(errorText(error('INSUFFICIENT_FUNDS'), 'es', t, 'fallo')).toBe('Missing 40');
+    expect(errorText(error('VALIDATION_FAILED'), 'es', t, 'fallo')).toBe('Check the data');
+  });
+
+  it('con un codigo generico, en espanol vale el mensaje del servidor y en ingles el texto generico', () => {
+    expect(errorText(error('NOT_FOUND'), 'es', t, 'fallo')).toBe('Mensaje del servidor');
+    expect(errorText(error('NOT_FOUND'), 'en', t, 'fallo')).toBe('Not found');
+  });
+
+  it('sin codigo conocido o sin error, usa el texto de la accion', () => {
+    expect(errorText(error('ALGO_NUEVO'), 'en', t, 'Could not save')).toBe('Could not save');
+    expect(errorText(null, 'es', t, 'No se pudo guardar')).toBe('No se pudo guardar');
   });
 });

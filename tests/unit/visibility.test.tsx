@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { renderWithIntl } from '../intl';
 import { describe, expect, it } from 'vitest';
 import { ScoreRing } from '@/components/score-ring';
 import { canShowLot } from '@/lib/visibility';
@@ -10,7 +11,7 @@ describe('visibilidad y score', () => {
   });
 
   it('anuncia el puntaje de autenticidad', () => {
-    render(<ScoreRing score={82} verdict="APROBADO" />);
+    renderWithIntl(<ScoreRing score={82} verdict="APROBADO" />);
     expect(screen.getByRole('img', { name: /82/ })).toBeInTheDocument();
     expect(screen.getByText('Aprobada')).toBeInTheDocument();
   });

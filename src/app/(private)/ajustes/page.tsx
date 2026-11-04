@@ -10,8 +10,10 @@ import { PageHeader, Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { TextField } from '@/components/ui/text-field';
 import { useToast } from '@/components/ui/toast';
+import { useAccountErrors } from '@/hooks/use-account-errors';
+import { useErrorText } from '@/hooks/use-error-text';
 import { useFormValidation } from '@/hooks/use-form-validation';
-import { ApiError, artApi } from '@/lib/api/client';
+import { artApi } from '@/lib/api/client';
 import { displayNameError } from '@/lib/forms/validators';
 import { browserSession, toProfile, type AccountProfile } from '@/lib/session/browser-session';
 
@@ -38,13 +40,15 @@ function avatarProblem(value: string): AvatarProblem | undefined {
 function SettingsForm({ profile }: { profile: AccountProfile }) {
   const t = useTranslations('Settings');
   const notify = useToast();
+  const accountErrors = useAccountErrors();
+  const errorText = useErrorText();
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl ?? '');
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const avatar = avatarProblem(avatarUrl);
   const { touch, visibleError, attemptSubmit } = useFormValidation({
-    displayName: displayNameError(displayName),
+    ...accountErrors({ displayName: displayNameError(displayName) }),
     avatarUrl: avatar ? t(avatar) : undefined,
   });
   const dirty = displayName.trim() !== profile.displayName || avatarUrl.trim() !== (profile.avatarUrl ?? '');
@@ -65,7 +69,7 @@ function SettingsForm({ profile }: { profile: AccountProfile }) {
       browserSession.replace(toProfile(updated));
       notify(t('saved'), 'success');
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : t('saveFailed'));
+      setError(errorText(caught, t('saveFailed')));
     } finally {
       setPending(false);
     }

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 /** Encabezado comun de cada pagina: antetitulo, titulo, descripcion y acciones. */
@@ -52,11 +53,12 @@ export function EmptyState({
 }
 
 /** Indicador de carga en linea, anunciado a lectores de pantalla. */
-export function LoadingState({ label = 'Cargando…' }: { label?: string }) {
+export function LoadingState({ label }: { label?: string }) {
+  const t = useTranslations('Common');
   return (
     <p role="status" className="flex items-center gap-3 py-10 text-muted">
       <span aria-hidden="true" className="h-2 w-2 animate-pulse rounded-full bg-oxide" />
-      {label}
+      {label ?? t('loading')}
     </p>
   );
 }

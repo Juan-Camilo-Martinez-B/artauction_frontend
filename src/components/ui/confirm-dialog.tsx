@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { Button, type ButtonVariant } from './button';
 
@@ -12,7 +13,7 @@ export function ConfirmDialog({
   title,
   children,
   confirmLabel,
-  cancelLabel = 'Cancelar',
+  cancelLabel,
   tone = 'primary',
   confirmDisabled = false,
   confirmLoading = false,
@@ -31,6 +32,7 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations('Common');
   const dialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export function ConfirmDialog({
       {children ? <div className="mt-3 text-sm text-muted">{children}</div> : null}
       <div className="mt-6 flex justify-end gap-3">
         <Button variant="secondary" onClick={onCancel}>
-          {cancelLabel}
+          {cancelLabel ?? t('cancel')}
         </Button>
         <Button variant={tone} disabled={confirmDisabled} loading={confirmLoading} onClick={onConfirm}>
           {confirmLabel}

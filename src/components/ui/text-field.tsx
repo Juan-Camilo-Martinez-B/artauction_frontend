@@ -1,6 +1,7 @@
 'use client';
 
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useLayoutEffect, useRef, useState, type ChangeEvent, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { defaultSanitizeMode, sanitizeInput, transformWithCaret, type SanitizeMode } from '@/lib/forms/sanitize';
 
@@ -127,6 +128,7 @@ export function TextField({
 
 /** Campo de contrasena con boton para mostrar u ocultar lo escrito. */
 export function PasswordField(props: Omit<TextFieldProps, 'type' | 'trailing' | 'sanitize' | 'format'>) {
+  const t = useTranslations('Common');
   const [visible, setVisible] = useState(false);
   const Icon = visible ? EyeOff : Eye;
   return (
@@ -141,7 +143,7 @@ export function PasswordField(props: Omit<TextFieldProps, 'type' | 'trailing' | 
         <button
           type="button"
           onClick={() => { setVisible((current) => !current); }}
-          aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+          aria-label={visible ? t('hidePassword') : t('showPassword')}
           aria-pressed={visible}
           aria-controls={props.id}
           className="rounded-full p-2 text-muted hover:bg-paper-deep hover:text-ink"
