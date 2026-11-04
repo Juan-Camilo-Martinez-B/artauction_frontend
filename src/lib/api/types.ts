@@ -228,7 +228,7 @@ export interface SignedUpload {
 
 export interface GalleryConfig {
   schemaVersion: 1;
-  source: 'ai-local' | 'gemini' | 'manual' | 'random';
+  source: 'ai-local' | 'ai' | 'manual' | 'random';
   identity: { styleName: string; summary: string; artStyles: string[] };
   architecture: {
     spaceType: string;

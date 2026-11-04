@@ -113,7 +113,7 @@ Cuando la auditoría deja una obra en revisión manual, un administrador la resu
 
 - **Aprobar y publicar** con un rango de precio. Viene lleno con la sugerencia de la auditoría; si no la hay (decidió una regla o la auditoría no terminó), es obligatorio.
 - **Devolver al vendedor** con un motivo de 10 a 500 caracteres. La obra vuelve a borrador, el vendedor recibe un aviso que lleva a editarla, y en `/mis-obras` la ve como **Devuelta** con el motivo. La corrige en `/publicar/[id]`, también la imagen, y la reenvía.
-- **Re-auditar con IA**, solo si la decidió la evaluación local (`LOCAL`) o el respaldo (`FALLBACK`), por ejemplo cuando Gemini vuelve a tener cuota.
+- **Re-auditar con IA**, solo si la decidió la evaluación local (`LOCAL`) o el respaldo (`FALLBACK`), por ejemplo cuando la IA vuelve a tener cuota.
 
 La ficha de la obra dice quién la evaluó: la IA (con el modelo), la evaluación local sin IA, una regla o un administrador. La lógica está en `src/lib/artwork/lot-review.ts`.
 
