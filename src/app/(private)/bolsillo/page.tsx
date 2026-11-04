@@ -27,6 +27,7 @@ import {
   parseExpiry,
 } from '@/lib/payments/card';
 import { browserSession } from '@/lib/session/browser-session';
+import { walletBalance } from '@/lib/session/wallet-balance';
 
 const PACKS = [100, 250, 500, 1000];
 
@@ -121,6 +122,8 @@ function Wallet() {
       reset();
       notify(`Entraron ${formatArtacoins(result.credited)} con la tarjeta terminada en ${result.last4}.`, 'success');
       setState({ status: 'ready', wallet: await artApi.wallet(token) });
+      // El saldo del encabezado sube con la recarga.
+      void walletBalance.refresh();
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'La pasarela no completó el cobro. Intenta de nuevo.');
     } finally {

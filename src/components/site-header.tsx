@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AccountMenu } from './account/account-menu';
+import { BalanceBadge } from './account/balance-badge';
 import { MainNav } from './main-nav';
 
 export function SiteHeader() {
@@ -11,6 +12,7 @@ export function SiteHeader() {
         </Link>
         <div className="flex items-center gap-3 md:gap-6">
           <MainNav />
+          <BalanceBadge />
           <AccountMenu />
         </div>
       </nav>
