@@ -21,6 +21,7 @@ import { bidderLabels, mergeBid, nextMinimumBid, quickBids, roomPhase, type Room
 import { clockOffset } from '@/lib/clock';
 import { formatRelative } from '@/lib/format';
 import { loginHref } from '@/lib/session/next-path';
+import { walletBalance } from '@/lib/session/wallet-balance';
 import { browserSession, type SessionSnapshot } from '@/lib/session/browser-session';
 import type { AuctionInbound } from '@/lib/ws/events';
 
@@ -154,6 +155,8 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
 
   async function refreshWallet(token: string) {
     setWallet(await artApi.wallet(token).catch(() => null));
+    // El encabezado muestra el mismo saldo: se actualiza tras pujar, retirarse o comprar.
+    void walletBalance.refresh();
   }
 
   async function onBid(event: SubmitEvent<HTMLFormElement>) {
