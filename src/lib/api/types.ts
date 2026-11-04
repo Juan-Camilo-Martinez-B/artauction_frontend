@@ -89,6 +89,9 @@ export interface Lot {
     endsAt: string;
     saleDescription?: string | null;
     currency?: string;
+    /** Precio de compra inmediata y si todavia se ofrece. */
+    buyNowPrice?: string;
+    buyNowAvailable?: boolean;
   } | null;
 }
 
@@ -99,7 +102,12 @@ export interface Bid {
   createdAt: string;
   /** false si el postor se retiro o la sala se reprogramo. */
   active?: boolean;
+  /** La puja fue una compra inmediata. */
+  buyNow?: boolean;
 }
+
+/** Por que cerro una sala: al vencer el tiempo o por una compra inmediata. */
+export type CloseReason = 'TIME' | 'BUY_NOW';
 
 export interface Auction {
   id: string;
@@ -114,6 +122,16 @@ export interface Auction {
   winnerId: string | null;
   saleDescription?: string | null;
   bids?: Bid[];
+  buyNowPrice?: string;
+  buyNowAvailable?: boolean;
+  closedBy?: CloseReason | null;
+}
+
+export interface BoughtNow {
+  auctionId: string;
+  bidId: string;
+  amount: string;
+  idempotent: boolean;
 }
 
 /** Cartelera de salas activas y proximas, con la hora del servidor. */

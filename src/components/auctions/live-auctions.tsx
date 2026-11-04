@@ -140,6 +140,11 @@ function LiveCard({ lot, offsetMs, onElapsed }: { lot: LiveLot; offsetMs: number
             <dd className="font-medium tabular-nums">{elapsed ? (live ? 'Cerrando…' : 'Abriendo…') : label}</dd>
           </div>
         </dl>
+        {auction.buyNowPrice && (auction.buyNowAvailable || !live) ? (
+          <p className="mt-2 text-xs text-muted">
+            Compra inmediata: <span className="font-medium text-ink">{formatArtacoins(auction.buyNowPrice)}</span>
+          </p>
+        ) : null}
       </div>
     </Link>
   );

@@ -89,6 +89,12 @@ export function ArtworkExhibit({ lot }: { lot: Lot }) {
                     ? `Va en ${formatArtacoins(lot.auction.currentPrice)}`
                     : `Sale en ${formatArtacoins(lot.auction.currentPrice)}${lot.auction.startsAt ? ` · abre el ${formatDateTime(lot.auction.startsAt)}` : ''}`}
                 </span>
+                {lot.auction.buyNowPrice && (lot.auction.buyNowAvailable || lot.auction.status !== 'ACTIVA') ? (
+                  <span className="block text-muted">
+                    Compra inmediata: <span className="font-medium text-ink">{formatArtacoins(lot.auction.buyNowPrice)}</span>
+                    {lot.auction.status === 'ACTIVA' ? '' : ' al abrir la sala'}
+                  </span>
+                ) : null}
               </p>
               <ButtonLink href={`/subasta/${lot.auction.id}`} variant={lot.auction.status === 'ACTIVA' ? 'accent' : 'secondary'} icon={<Gavel aria-hidden="true" className="h-4 w-4" />}>
                 {lot.auction.status === 'ACTIVA' ? 'Entrar a la sala' : 'Ver la sala'}

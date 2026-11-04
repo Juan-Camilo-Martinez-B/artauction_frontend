@@ -27,6 +27,8 @@ export interface AuctionClosedEvent {
   lotId: string;
   winnerId: string | null;
   amount: string;
+  /** Campo nuevo y opcional: un gateway anterior no lo manda y se toma como TIME. */
+  closedBy?: 'TIME' | 'BUY_NOW';
   serverTime: string;
 }
 

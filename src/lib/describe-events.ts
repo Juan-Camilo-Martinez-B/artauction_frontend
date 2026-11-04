@@ -35,10 +35,24 @@ export function describeNotification(item: NotificationItem, userId: string): Ev
   }
   if (item.kind === 'AUCTION_CLOSED') {
     const amount = formatArtacoins(item.payload['amount']);
+    const buyNow = item.payload['closedBy'] === 'BUY_NOW';
     if (item.payload['winnerId'] === userId) {
-      return { title: '¡Ganaste la subasta!', body: `Pagaste ${amount}. La obra ya cuelga en tu galería.`, href: '/mi-galeria', tone: 'success' };
+      return buyNow
+        ? { title: 'Compraste ahora', body: `Pagaste ${amount} y la subasta terminó. La obra ya cuelga en tu galería.`, href: '/mi-galeria', tone: 'success' }
+        : { title: '¡Ganaste la subasta!', body: `Pagaste ${amount}. La obra ya cuelga en tu galería.`, href: '/mi-galeria', tone: 'success' };
     }
-    return { title: 'Vendiste una obra', body: `La subasta cerró en ${amount}. El pago, menos la comisión, ya está en tu bolsillo.`, href: lotHref, tone: 'success' };
+    return buyNow
+      ? { title: 'Vendiste por compra inmediata', body: `Alguien pagó ${amount} y cerró la subasta. El pago, menos la comisión, ya está en tu bolsillo.`, href: lotHref, tone: 'success' }
+      : { title: 'Vendiste una obra', body: `La subasta cerró en ${amount}. El pago, menos la comisión, ya está en tu bolsillo.`, href: lotHref, tone: 'success' };
+  }
+  if (item.kind === 'AUCTION_LOST') {
+    const buyNow = item.payload['closedBy'] === 'BUY_NOW';
+    return {
+      title: buyNow ? 'La obra se vendió por compra inmediata' : 'La subasta cerró con otro ganador',
+      body: 'Ya no compites por ella. Lo que tenías retenido volvió a tu bolsillo.',
+      href: lotHref,
+      tone: 'info',
+    };
   }
   return { title: 'Aviso', body: 'Hay novedades en tu cuenta.', href: null, tone: 'info' };
 }

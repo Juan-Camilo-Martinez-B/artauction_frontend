@@ -61,6 +61,7 @@ tests                pruebas de unidad y smoke e2e
 - **Navegación.** La cabecera marca la sección activa y tiene menú móvil. El menú de cuenta y `/perfil` comparten la lista de secciones (`ACCOUNT_SECTIONS`).
 - **Textos.** Avisos, actividad, estados y veredictos se muestran en palabras (`describe-events.ts`, `StatusPill`), y las fechas en un solo formato (`lib/format.ts`).
 - **Sala de subasta.** Muestra la obra, la oferta mínima siguiente, ofertas rápidas, el saldo con enlace a recargar, la cuenta regresiva de apertura o cierre, el historial con postores anónimos ("Tú", "Postor 1"…) y la confirmación antes de retirarse. Las reglas viven en `lib/auction/room.ts`.
+- **Compra inmediata.** Bajo el formulario de puja, **Comprar ahora por X** abre una confirmación con el precio, el saldo (más lo ya retenido en la sala) y el aviso de que la subasta termina; sin saldo suficiente ofrece recargar. Cada intento lleva una sola clave de idempotencia. Se ofrece con la sala abierta mientras el precio no llegue al 80 % del precio de compra (`lib/auction/buy-now.ts`, la misma regla del servidor, que la vuelve a comprobar). Al cerrar, la sala dice «Se vendió por compra inmediata» o «¡La compraste!», y el historial marca la compra. La cartelera y la ficha muestran el precio de compra mientras esté vigente.
 
 ## Galería 3D
 

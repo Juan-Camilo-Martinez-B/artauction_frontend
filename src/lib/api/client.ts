@@ -2,6 +2,7 @@ import type {
   ActivityItem,
   AuctionView,
   AuthUser,
+  BoughtNow,
   CatalogPage,
   Category,
   GalleryItem,
@@ -176,6 +177,10 @@ export const artApi = {
       token,
       body: JSON.stringify({ amount, idempotencyKey }),
     });
+  },
+  /** Compra inmediata. La clave hace que repetirla (doble clic, reintento) no cobre dos veces. */
+  buyNow(token: string, auctionId: string, idempotencyKey: string) {
+    return api<BoughtNow>(`/auctions/${auctionId}/buy-now`, { method: 'POST', token, body: JSON.stringify({ idempotencyKey }) });
   },
   withdrawBid(token: string, auctionId: string) {
     return api<{ auctionId: string; released: number; currentPrice: string }>(`/auctions/${auctionId}/withdraw`, {
