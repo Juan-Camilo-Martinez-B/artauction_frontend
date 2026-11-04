@@ -17,7 +17,7 @@ describe('ciclo de revision en la interfaz', () => {
   it('dice quien evaluo la obra sin confundir la evaluacion local con la IA', () => {
     const published = { status: 'PUBLICADA', lastReview: null };
     expect(auditSourceLabel({ modelName: 'local-rules' }, published)).toContain('sin IA');
-    expect(auditSourceLabel({ modelName: 'gemini-3.1-flash-lite' }, published)).toBe('Evaluada por la IA (gemini-3.1-flash-lite)');
+    expect(auditSourceLabel({ modelName: 'openai/gpt-oss-120b' }, published)).toBe('Evaluada por la IA (openai/gpt-oss-120b)');
     expect(auditSourceLabel({ modelName: 'fallback' }, published)).toBe('La auditoría automática no terminó');
     const approved = { status: 'PUBLICADA', lastReview: { decision: 'APPROVE' as const, reason: null, createdAt: null } };
     expect(auditSourceLabel({ modelName: 'local-rules' }, approved)).toBe('Aprobada por revisión manual de un administrador');

@@ -80,7 +80,7 @@ describe('mis obras', () => {
   it('un proyecto propio se edita siempre, se marca sin auditar y lo crea cualquier cuenta', () => {
     expect(isEditable(lot('own', 'PERSONAL'))).toBe(true);
     expect(isEditable(lot('p', 'PUBLICADA'))).toBe(false);
-    expect(auditSourceLabel({ modelName: 'gemini-x' }, lot('own', 'PERSONAL'))).toBe('Proyecto propio, sin auditar');
+    expect(auditSourceLabel({ modelName: 'modelo-x' }, lot('own', 'PERSONAL'))).toBe('Proyecto propio, sin auditar');
     expect(canSell('USER')).toBe(false);
     expect(canSell('SELLER')).toBe(true);
   });

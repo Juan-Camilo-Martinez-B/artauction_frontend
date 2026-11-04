@@ -29,7 +29,7 @@ const severityStyle: Record<ReviewFinding['severity'], { label: string; classNam
 const decidedByLabel: Record<string, string> = {
   RULES: 'Decidió una regla del sistema',
   AI: 'Evaluó la IA sobre el expediente',
-  LOCAL: 'Evaluación local, sin IA: Gemini no respondió',
+  LOCAL: 'Evaluación local, sin IA: el modelo de IA no respondió',
   FALLBACK: 'La auditoría automática no terminó',
 };
 
