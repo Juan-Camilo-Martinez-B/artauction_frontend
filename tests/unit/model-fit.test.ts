@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { canExhibit } from '@/lib/gallery/layout';
 import { fitModel } from '@/lib/gallery/model-fit';
-import { checkTriangles, companionKey, formatOf, isGlbHeader, pickModelFile } from '@/lib/gallery/model-files';
+import { checkTriangles, companionKey, formatOf, isGlbHeader, isUnreadableTexture, pickModelFile } from '@/lib/gallery/model-files';
 
 describe('fitModel', () => {
   it('escala sin deformar a la altura pedida y apoya la base en el suelo, centrada', () => {
@@ -52,6 +52,13 @@ describe('archivos del modelo 3D', () => {
     expect(pickModelFile([file('venus.fbx', 20 * 1024 * 1024), file('marmol.png', 11 * 1024 * 1024)])).toMatch(/30 MB/);
   });
 
+  it('acepta texturas que el navegador no lee, pero las marca para dejarlas fuera', () => {
+    // Asi vienen los FBX de Poly Haven: mapas de normales y metal en .exr.
+    expect(pickModelFile([file('vase.fbx'), file('vase_diff.jpg'), file('vase_nor.exr')])).toEqual({ main: 0, format: 'fbx' });
+    expect(isUnreadableTexture('textures/vase_nor_gl_1k.EXR')).toBe(true);
+    expect(isUnreadableTexture('vase_diff_1k.jpg')).toBe(false);
+  });
+
   it('revisa la firma de un GLB y los limites de triangulos', () => {
     expect(isGlbHeader(new TextEncoder().encode('glTF'))).toBe(true);
     expect(isGlbHeader(new TextEncoder().encode('PK\u0003\u0004'))).toBe(false);
@@ -73,5 +80,15 @@ describe('exhibicion en la sala', () => {
     expect(canExhibit({ representationKind: 'THREE_D', model: null })).toBe(false);
     expect(canExhibit({ representationKind: 'THREE_D', model })).toBe(true);
     expect(canExhibit({ representationKind: 'TWO_D', model: null })).toBe(true);
+  });
+});
+
+describe('materiales al convertir a GLB', () => {
+  it('pasa el brillo Phong a una rugosidad entre mate y casi pulido', async () => {
+    const { roughnessFromShininess } = await import('@/lib/gallery/model-import');
+    expect(roughnessFromShininess(0)).toBe(1);
+    expect(roughnessFromShininess(100)).toBeCloseTo(0.2);
+    expect(roughnessFromShininess(500)).toBeCloseTo(0.2);
+    expect(roughnessFromShininess(30)).toBeGreaterThan(0.5);
   });
 });

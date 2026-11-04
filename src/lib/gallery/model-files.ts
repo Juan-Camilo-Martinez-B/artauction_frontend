@@ -11,11 +11,21 @@ export type ModelFormat = 'glb' | 'gltf' | 'fbx' | 'obj';
 export const MODEL_LIMITS = { maxBytes: 30 * 1024 * 1024, minTriangles: 1_000, maxTriangles: 300_000 } as const;
 
 /** Extensiones de los archivos que acompanan al principal: materiales, buffers y texturas. */
-const COMPANION = /\.(mtl|bin|png|jpe?g|webp|ktx2|tga|bmp)$/i;
+const COMPANION = /\.(mtl|bin|png|jpe?g|webp|ktx2|tga|bmp|exr|hdr|tiff?|psd|dds)$/i;
+/**
+ * Texturas que el navegador no decodifica (alto rango o formatos de edicion).
+ * Se aceptan para no rechazar el modelo entero, pero se convierte sin ellas.
+ */
+const UNREADABLE_TEXTURE = /\.(exr|hdr|tiff?|psd|dds)$/i;
 const MAIN = /\.(glb|gltf|fbx|obj)$/i;
 
 /** Valor del atributo accept del campo de archivo. */
-export const MODEL_ACCEPT = '.glb,.gltf,.fbx,.obj,.mtl,.bin,.png,.jpg,.jpeg,.webp,.ktx2,.tga,.bmp';
+export const MODEL_ACCEPT = '.glb,.gltf,.fbx,.obj,.mtl,.bin,.png,.jpg,.jpeg,.webp,.ktx2,.tga,.bmp,.exr,.hdr,.tif,.tiff,.psd,.dds';
+
+/** Si el navegador no puede leer esta textura (ver UNREADABLE_TEXTURE). */
+export function isUnreadableTexture(name: string): boolean {
+  return UNREADABLE_TEXTURE.test(companionKey(name));
+}
 
 export interface ModelSelection {
   /** Indice del archivo principal en la lista elegida. */

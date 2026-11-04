@@ -125,7 +125,7 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
   const [created, setCreated] = useState<Lot | null>(null);
   const savedModel = lot?.model ?? null;
   // Modelo elegido, ya convertido a GLB, con sus triangulos y el formato original.
-  const [modelFile, setModelFile] = useState<{ file: File; triangles: number; source: string } | null>(null);
+  const [modelFile, setModelFile] = useState<{ file: File; triangles: number; source: string; skipped: string[] } | null>(null);
   const [modelPreview, setModelPreview] = useState<string | null>(null);
   const [modelBusy, setModelBusy] = useState(false);
   const [modelError, setModelError] = useState<string | null>(null);
@@ -448,6 +448,7 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
             preview={modelPreview ?? savedModel?.url ?? null}
             triangles={modelFile?.triangles ?? savedModel?.triangleCount ?? null}
             pendingName={modelFile ? `${modelFile.file.name}${modelFile.source === 'glb' ? '' : ` (convertido desde .${modelFile.source})`}` : null}
+            skipped={modelFile?.skipped ?? []}
             busy={modelBusy}
             error={modelError ?? visibleError('model') ?? null}
             title={draft.title || 'la obra'}
@@ -493,6 +494,7 @@ function ModelPanel({
   preview,
   triangles,
   pendingName,
+  skipped,
   busy,
   error,
   title,
@@ -501,6 +503,8 @@ function ModelPanel({
   preview: string | null;
   triangles: number | null;
   pendingName: string | null;
+  /** Texturas que no se pudieron incluir en el modelo convertido. */
+  skipped: readonly string[];
   busy: boolean;
   error: string | null;
   title: string;
@@ -525,6 +529,12 @@ function ModelPanel({
         <p className="mt-2 text-xs text-moss">
           {pendingName ? `${pendingName} · ` : 'Modelo verificado · '}
           {triangles.toLocaleString('es-CO')} triángulos{pendingName ? ' · se sube al guardar' : ''}
+        </p>
+      ) : null}
+      {!busy && skipped.length > 0 ? (
+        <p className="mt-1 text-xs text-muted">
+          Sin {skipped.join(', ')}: el navegador no lee ese formato de textura. Si la pieza se ve sin color o sin relieve, expórtala con
+          texturas .png o .jpg.
         </p>
       ) : null}
       <div className="mt-4 flex flex-wrap gap-2">
