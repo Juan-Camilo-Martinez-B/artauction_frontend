@@ -28,6 +28,8 @@ export interface ArtworkViewProps {
   lit: boolean;
   lightColor: string;
   lightIntensity: number;
+  /** Texto de la cartela sin artista: el idioma se resuelve fuera del Canvas. */
+  unattributed: string;
   onSelect: (id: string) => void;
 }
 
@@ -55,7 +57,7 @@ export function FramedArtwork(props: ArtworkViewProps) {
         </SceneBoundary>
         {style.glass ? <Glass size={size} style={style} /> : null}
       </group>
-      <Label lot={lot} x={(size.width + 2 * (style.width + style.mat)) / 2 + 0.22} y={LABEL_HEIGHT - placement.posY} scale={placement.scale} />
+      <Label lot={lot} unattributed={props.unattributed} x={(size.width + 2 * (style.width + style.mat)) / 2 + 0.22} y={LABEL_HEIGHT - placement.posY} scale={placement.scale} />
       {props.lit ? <ArtworkLight {...props} /> : null}
     </group>
   );
@@ -153,8 +155,8 @@ function Glass({ size, style }: { size: ArtworkSize; style: FrameStyle }) {
   );
 }
 
-function Label({ lot, x, y, scale }: { lot: Lot; x: number; y: number; scale: number }) {
-  const texture = useMemo(() => labelTexture(lot), [lot]);
+function Label({ lot, unattributed, x, y, scale }: { lot: Lot; unattributed: string; x: number; y: number; scale: number }) {
+  const texture = useMemo(() => labelTexture(lot, unattributed), [lot, unattributed]);
   useEffect(() => () => texture?.dispose(), [texture]);
   if (!texture) {
     return null;

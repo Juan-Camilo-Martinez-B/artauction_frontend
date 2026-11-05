@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowLeft, ArrowRight, Check, Shuffle, Sparkles, Star } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { RequireSession } from '@/components/session/require-session';
@@ -8,32 +9,33 @@ import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { PageHeader } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
+import { useErrorText } from '@/hooks/use-error-text';
 import { ApiError, artApi } from '@/lib/api/client';
 import { STEPS, emptyAnswers, stepComplete, toPreferences, type AnswerMap } from '@/lib/gallery/steps';
 import { browserSession } from '@/lib/session/browser-session';
 
-/** Etiqueta visible de una respuesta: el cuestionario guarda claves (clasico), no textos. */
-export function answerLabel(key: string, value: string): string {
-  for (const step of STEPS) {
-    for (const question of step.questions) {
-      if (question.key === key) {
-        const option = question.options.find(([optionValue]) => optionValue === value);
-        if (option) {
-          return option[1];
-        }
-      }
-    }
-  }
-  return value;
+/**
+ * Etiqueta visible de una respuesta: el cuestionario guarda claves (clasico),
+ * no textos. La clave se arma con la pregunta y el valor; una prueba exige que
+ * cada combinacion tenga texto en los dos idiomas.
+ */
+function useAnswerLabel(): (key: string, value: string) => string {
+  const t = useTranslations('GalleryWizard.questions') as unknown as { (key: string): string; has(key: string): boolean };
+  return (key, value) => {
+    const path = `${key}.options.${value}`;
+    return t.has(path) ? t(path) : value;
+  };
 }
 
 export function PersonalizaForm() {
-  return (
-    <RequireSession title="Entra para diseñar tu galería">{() => <Wizard />}</RequireSession>
-  );
+  const t = useTranslations('GalleryWizard');
+  return <RequireSession title={t('signInTitle')}>{() => <Wizard />}</RequireSession>;
 }
 
 function Wizard() {
+  const t = useTranslations('GalleryWizard');
+  const errorText = useErrorText();
+  const answerLabel = useAnswerLabel();
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<AnswerMap>(emptyAnswers);
@@ -75,7 +77,7 @@ function Wizard() {
         // La sala tiene cambios manuales: se pregunta antes de reemplazarlos.
         setConflict({ random });
       } else {
-        setError(caught instanceof ApiError ? caught.message : 'No se pudo diseñar la galería.');
+        setError(errorText(caught, t('designFailed')));
       }
       setPending(false);
     }
@@ -84,11 +86,11 @@ function Wizard() {
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
-        eyebrow="Asistente"
-        title="Diseña tu galería"
-        description="Responde unas preguntas y el asistente propone paredes, suelo, luz y recorrido para tu sala."
+        eyebrow={t('eyebrow')}
+        title={t('title')}
+        description={t('description')}
       />
-      <ol className="flex gap-2" aria-label={`Paso ${String(Math.min(step + 1, STEPS.length))} de ${String(STEPS.length)}`}>
+      <ol className="flex gap-2" aria-label={t('stepOf', { step: Math.min(step + 1, STEPS.length), total: STEPS.length })}>
         {STEPS.map((item, index) => (
           <li key={item.id} className={`h-1.5 flex-1 rounded-full ${index < step || reviewing ? 'bg-oxide' : index === step ? 'bg-ink' : 'bg-line'}`} />
         ))}
@@ -98,17 +100,17 @@ function Wizard() {
       ) : current ? (
         <div className="mt-8">
           <p className="text-sm text-muted">
-            Paso {step + 1} de {STEPS.length}
+            {t('stepOf', { step: step + 1, total: STEPS.length })}
           </p>
-          <h2 className="mt-1 font-serif text-3xl">{current.title}</h2>
+          <h2 className="mt-1 font-serif text-3xl">{t(`steps.${current.id}`)}</h2>
           {current.questions.map((question) => (
             <fieldset key={question.key} className="mt-6">
               <legend className="font-medium">
-                {question.prompt}
-                {question.multiple ? <span className="ml-2 text-sm font-normal text-muted">Puedes elegir varias.</span> : null}
+                {t(`questions.${question.key}.prompt`)}
+                {question.multiple ? <span className="ml-2 text-sm font-normal text-muted">{t('multiple')}</span> : null}
               </legend>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                {question.options.map(([value, label]) => {
+                {question.options.map((value: string) => {
                   const stored = answers[question.key];
                   const selected = question.multiple ? Array.isArray(stored) && stored.includes(value) : stored === value;
                   const favorite = question.key === 'artStyles' && answers['favoriteStyle'] === value;
@@ -122,11 +124,11 @@ function Wizard() {
                         selected ? 'border-ink bg-surface shadow-panel' : 'border-line bg-paper hover:border-line-strong'
                       }`}
                     >
-                      <span className="font-serif text-lg">{label}</span>
+                      <span className="font-serif text-lg">{answerLabel(question.key, value)}</span>
                       <span className="flex items-center gap-1.5">
                         {favorite ? (
                           <span className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-oxide">
-                            <Star aria-hidden="true" className="h-3.5 w-3.5" /> Preferido
+                            <Star aria-hidden="true" className="h-3.5 w-3.5" /> {t('favorite')}
                           </span>
                         ) : null}
                         {selected ? <Check aria-hidden="true" className="h-4 w-4 text-ink" /> : null}
@@ -137,7 +139,7 @@ function Wizard() {
               </div>
               {question.key === 'artStyles' && Array.isArray(answers['artStyles']) && answers['artStyles'].length > 1 ? (
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-                  <span className="text-muted">Tu preferido:</span>
+                  <span className="text-muted">{t('yourFavorite')}</span>
                   {answers['artStyles'].map((style) => (
                     <button
                       key={style}
@@ -161,15 +163,15 @@ function Wizard() {
                 checked={answers['contrastWithArt'] === true}
                 onChange={(event) => { setAnswers((previous) => ({ ...previous, contrastWithArt: event.target.checked })); }}
               />
-              Quiero que los colores del espacio contrasten con las obras
+              {t('contrast')}
             </label>
           ) : null}
           <div className="mt-8 flex justify-between border-t border-line pt-5">
             <Button variant="secondary" icon={<ArrowLeft aria-hidden="true" className="h-4 w-4" />} disabled={step === 0} onClick={() => { setStep((value) => value - 1); }}>
-              Anterior
+              {t('previous')}
             </Button>
             <Button disabled={!stepComplete(step, answers)} onClick={() => { setStep((value) => value + 1); }}>
-              {step === STEPS.length - 1 ? 'Ver resumen' : 'Siguiente'}
+              {step === STEPS.length - 1 ? t('seeSummary') : t('next')}
               <ArrowRight aria-hidden="true" className="h-4 w-4" />
             </Button>
           </div>
@@ -177,8 +179,8 @@ function Wizard() {
       ) : null}
       <ConfirmDialog
         open={conflict !== null}
-        title="¿Reemplazar tu sala?"
-        confirmLabel="Reemplazar"
+        title={t('replaceDialog.title')}
+        confirmLabel={t('replaceDialog.confirm')}
         tone="danger"
         onCancel={() => { setConflict(null); }}
         onConfirm={() => {
@@ -187,7 +189,7 @@ function Wizard() {
           void generate(random, true);
         }}
       >
-        Hiciste cambios a mano en tu sala. La propuesta nueva los reemplaza; las obras colgadas no cambian.
+        {t('replaceDialog.body')}
       </ConfirmDialog>
     </div>
   );
@@ -206,19 +208,23 @@ function Review({
   onBack: () => void;
   onGenerate: (random: boolean) => void;
 }) {
+  const t = useTranslations('GalleryWizard');
+  const answerLabel = useAnswerLabel();
+  const text = (key: string, value: AnswerMap[string] | undefined) => (typeof value === 'string' && value ? answerLabel(key, value) : '');
+  const list = (key: string, value: AnswerMap[string] | undefined) => (Array.isArray(value) ? value.map((item) => answerLabel(key, item)).join(', ') : '');
   const rows: Array<[string, string]> = [
-    ['Estilos', list('artStyles', answers['artStyles'])],
-    ['Paleta', text('paletteId', answers['paletteId'])],
-    ['Arquitectura', text('architecture', answers['architecture'])],
-    ['Distribución', text('layout', answers['layout'])],
-    ['Iluminación', text('light', answers['light'])],
-    ['Materiales', list('materials', answers['materials'])],
-    ['Recorrido', text('tour', answers['tour'])],
+    [t('review.styles'), list('artStyles', answers['artStyles'])],
+    [t('review.palette'), text('paletteId', answers['paletteId'])],
+    [t('review.architecture'), text('architecture', answers['architecture'])],
+    [t('review.layout'), text('layout', answers['layout'])],
+    [t('review.light'), text('light', answers['light'])],
+    [t('review.materials'), list('materials', answers['materials'])],
+    [t('review.tour'), text('tour', answers['tour'])],
   ];
   return (
     <div className="mt-8">
-      <h2 className="font-serif text-3xl">Resumen</h2>
-      <p className="mt-2 text-sm text-muted">El asistente usará estas respuestas para proponer tu sala. Nada se aplica hasta que la propuesta esté lista.</p>
+      <h2 className="font-serif text-3xl">{t('review.title')}</h2>
+      <p className="mt-2 text-sm text-muted">{t('review.hint')}</p>
       <dl className="mt-6 grid gap-3 sm:grid-cols-2">
         {rows.map(([label, value]) => (
           <div key={label} className="rounded-panel border border-line bg-surface p-4">
@@ -228,26 +234,19 @@ function Review({
         ))}
       </dl>
       {error ? <Notice tone="error" className="mt-4">{error}</Notice> : null}
-      {pending ? <Notice className="mt-4">Diseñando el espacio según tus preferencias…</Notice> : null}
+      {pending ? <Notice className="mt-4">{t('review.designing')}</Notice> : null}
       <div className="mt-6 flex flex-wrap gap-3 border-t border-line pt-5">
         <Button variant="secondary" icon={<ArrowLeft aria-hidden="true" className="h-4 w-4" />} disabled={pending} onClick={onBack}>
-          Volver a editar
+          {t('review.back')}
         </Button>
         <Button loading={pending} icon={<Sparkles aria-hidden="true" className="h-4 w-4" />} onClick={() => { onGenerate(false); }}>
-          Generar mi galería
+          {t('review.generate')}
         </Button>
         <Button variant="ghost" disabled={pending} icon={<Shuffle aria-hidden="true" className="h-4 w-4" />} onClick={() => { onGenerate(true); }}>
-          Sorpréndeme
+          {t('review.surprise')}
         </Button>
       </div>
     </div>
   );
 }
 
-function text(key: string, value: string | string[] | boolean | undefined): string {
-  return typeof value === 'string' && value ? answerLabel(key, value) : '';
-}
-
-function list(key: string, value: string | string[] | boolean | undefined): string {
-  return Array.isArray(value) ? value.map((item) => answerLabel(key, item)).join(', ') : '';
-}

@@ -30,13 +30,6 @@ export type WallSide = 'back' | 'left' | 'right' | 'front';
 /** Orden de recorrido: primero el fondo, luego los costados y al final la pared de entrada. */
 export const WALL_ORDER: readonly WallSide[] = ['back', 'left', 'right', 'front'];
 
-export const WALL_LABELS: Record<WallSide, string> = {
-  back: 'Fondo',
-  left: 'Izquierda',
-  right: 'Derecha',
-  front: 'Entrada',
-};
-
 /** Altura del centro de una obra mural: estandar de museo, a la altura de los ojos. */
 export const EYE_LEVEL = 1.55;
 /** Distancia libre entre una obra y la esquina. */

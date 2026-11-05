@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/components/ui/toast';
 import { useAuctionChannel } from '@/hooks/use-auction-channel';
@@ -25,6 +25,7 @@ const TRANSITION_POLL_MS = 4000;
  */
 export function useLiveAuction(auctionId: string) {
   const t = useTranslations('Room');
+  const locale = useLocale();
   const notify = useToast();
   const [auction, setAuction] = useState<Auction | null>(null);
   const [lot, setLot] = useState<Lot | null>(null);
@@ -96,7 +97,8 @@ export function useLiveAuction(auctionId: string) {
         void artApi.lot(loaded.lotId).then(setLot).catch(() => undefined);
       }
     });
-  }, [reload]);
+    // La ficha llega en el idioma activo: al cambiarlo se vuelve a pedir.
+  }, [reload, locale]);
 
   // Con sesion: se une al canal en vivo con su token y trae su bolsillo.
   useEffect(() => {

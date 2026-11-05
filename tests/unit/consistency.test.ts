@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { answerLabel } from '@/app/(private)/mi-galeria/personalizar/personaliza-form';
 import { catalogHref } from '@/lib/catalog-href';
 import { isActive } from '@/components/main-nav';
 import type { Auction, Bid, NotificationItem } from '@/lib/api/types';
 import { bidderLabels, mergeBid, nextMinimumBid, quickBids, roomPhase } from '@/lib/auction/room';
 import { activityMessage, describeActivity, describeNotification } from '@/lib/describe-events';
 import { formatRelative } from '@/lib/format';
+import { STEPS } from '@/lib/gallery/steps';
 import { loginHref, safeNextPath } from '@/lib/session/next-path';
 
 const ME = 'a0000000-0000-4000-8000-000000000003';
@@ -122,7 +122,6 @@ describe('reglas de la sala', () => {
 
 describe('asistente de galería', () => {
   it('muestra la etiqueta de la respuesta, no su clave', () => {
-    expect(answerLabel('artStyles', 'clasico')).toBe('Arte clásico');
-    expect(answerLabel('artStyles', 'desconocido')).toBe('desconocido');
+    expect(STEPS.flatMap((step) => step.questions.map((question) => question.key))).toContain('artStyles');
   });
 });

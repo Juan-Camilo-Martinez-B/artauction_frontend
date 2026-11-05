@@ -2,6 +2,7 @@
 
 import { ContactShadows, OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
+import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 import { GlbObject } from './glb-object';
 import { SceneBoundary } from './scene-boundary';
@@ -15,15 +16,16 @@ const VIEW_HEIGHT = 1;
  * no carga, muestra un aviso en lugar de romper la ficha.
  */
 export function ModelViewer({ url, title, className = '' }: { url: string; title: string; className?: string }) {
+  const t = useTranslations('Studio.viewer');
   return (
     <SceneBoundary
       fallback={
         <div className={`grid place-items-center px-6 text-center text-sm text-muted ${className}`}>
-          No se pudo cargar el modelo 3D. Prueba de nuevo más tarde.
+          {t('loadFailed')}
         </div>
       }
     >
-      <div className={`relative ${className}`} role="img" aria-label={`Modelo 3D de ${title}. Arrastra para girarlo.`}>
+      <div className={`relative ${className}`} role="img" aria-label={t('label', { title })}>
         <Canvas dpr={[1, 2]} camera={{ position: [1.5, 0.95, 1.5], fov: 40, near: 0.01, far: 50 }}>
           <color attach="background" args={['#efe7da']} />
           <hemisphereLight args={['#fff8ee', '#b9a58c', 0.9]} />

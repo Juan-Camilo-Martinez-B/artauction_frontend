@@ -1,6 +1,7 @@
 'use client';
 
 import { Footprints, LayoutGrid, Move3d, Sparkles } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArtworkCard } from '@/components/gallery3d/artwork-card';
@@ -15,7 +16,8 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { LoadingState, PageHeader, Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { useToast } from '@/components/ui/toast';
-import { ApiError, artApi } from '@/lib/api/client';
+import { useErrorText } from '@/hooks/use-error-text';
+import { artApi } from '@/lib/api/client';
 import type { GalleryConfig, PersonalGallery } from '@/lib/api/types';
 import { DEFAULT_GALLERY_CONFIG, sameConfig } from '@/lib/gallery/default-config';
 import { artworkSize, hangingPlan, hasOverlaps, isObjectLot, objectTop, roomOf, viewpointFor, type Placement } from '@/lib/gallery/layout';
@@ -24,8 +26,16 @@ import { browserSession } from '@/lib/session/browser-session';
 // La escena 3D solo existe en el navegador: se carga aparte para no pesar en el primer render.
 const GalleryScene = dynamic(() => import('@/components/gallery3d/gallery-scene').then((module) => module.GalleryScene), {
   ssr: false,
-  loading: () => <div className="flex h-full items-center justify-center text-sm text-paper/80">Preparando la sala…</div>,
+  loading: () => <SceneLoading />,
 });
+
+function SceneLoading() {
+  const t = useTranslations('Studio');
+  return <div className="flex h-full items-center justify-center text-sm text-paper/80">{t('preparing')}</div>;
+}
+
+/** Nombre con que gallery-service crea cada sala; es el nombre por omision, no uno elegido. */
+const DEFAULT_GALLERY_NAME = 'Mi galería';
 
 type LoadState = { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; gallery: PersonalGallery };
 
@@ -53,14 +63,18 @@ function usePrefersReducedMotion(): boolean {
 }
 
 export function GalleryStudio() {
+  const t = useTranslations('Studio');
   return (
-    <RequireSession title="Entra para ver tu galería" description="Tu sala 3D guarda las obras que ganas en subasta.">
+    <RequireSession title={t('signInTitle')} description={t('signInHint')}>
       {() => <Studio />}
     </RequireSession>
   );
 }
 
 function Studio() {
+  const t = useTranslations('Studio');
+  const locale = useLocale();
+  const errorText = useErrorText();
   const notify = useToast();
   const [state, setState] = useState<LoadState>({ status: 'loading' });
   const [configDraft, setConfigDraft] = useState<GalleryConfig | null>(null);
@@ -75,6 +89,7 @@ function Studio() {
   const viewport = useRef<HTMLDivElement>(null);
   const reducedMotion = usePrefersReducedMotion();
 
+  const loaded = useRef(false);
   const adopt = useCallback((gallery: PersonalGallery) => {
     setState({ status: 'ready', gallery });
     setConfigDraft(gallery.appliedConfig ?? DEFAULT_GALLERY_CONFIG);
@@ -87,12 +102,19 @@ function Studio() {
         return;
       }
       try {
-        adopt(await artApi.myGallery(token));
+        const next = await artApi.myGallery(token);
+        if (loaded.current) {
+          // Cambio el idioma: llegan las fichas traducidas y los cambios sin guardar se conservan.
+          setState({ status: 'ready', gallery: next });
+        } else {
+          loaded.current = true;
+          adopt(next);
+        }
       } catch (caught) {
-        setState({ status: 'error', message: caught instanceof ApiError ? caught.message : 'No se pudo abrir la galería.' });
+        setState({ status: 'error', message: errorText(caught, t('loadFailed')) });
       }
     });
-  }, [adopt]);
+  }, [adopt, errorText, t, locale]);
 
   const gallery = state.status === 'ready' ? state.gallery : null;
   const savedConfig = gallery?.appliedConfig ?? DEFAULT_GALLERY_CONFIG;
@@ -186,7 +208,7 @@ function Studio() {
       }
     }
     setPlacementDraft(next);
-    notify(next.size > 0 ? 'Propuesta de montaje lista. Guárdala si te gusta.' : 'La sala ya está ordenada.', 'info');
+    notify(next.size > 0 ? t('organized') : t('alreadyOrganized'), 'info');
   }
 
   function discard() {
@@ -214,9 +236,9 @@ function Studio() {
         }
       }
       adopt(latest);
-      notify('Cambios guardados.', 'success');
+      notify(t('saved'), 'success');
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'No se pudieron guardar los cambios.');
+      setError(errorText(caught, t('saveFailed')));
     } finally {
       setSaving(false);
     }
@@ -229,9 +251,9 @@ function Studio() {
     }
     try {
       adopt(await artApi.restoreGallery(token));
-      notify('Volviste a la propuesta del asistente.', 'success');
+      notify(t('restored'), 'success');
     } catch (caught) {
-      notify(caught instanceof ApiError ? caught.message : 'No se pudo restaurar la propuesta.', 'error');
+      notify(errorText(caught, t('restoreFailed')), 'error');
     }
   }
 
@@ -252,17 +274,17 @@ function Studio() {
       });
       setSelectedId(null);
       setFocusId(null);
-      notify(`${artwork.lot.title} salió de tu galería.`, 'success');
+      notify(t('removed', { title: artwork.lot.title }), 'success');
     } catch (caught) {
-      notify(caught instanceof ApiError ? caught.message : 'No se pudo retirar la obra.', 'error');
+      notify(errorText(caught, t('removeFailed')), 'error');
     }
   }
 
   if (state.status === 'loading') {
-    return <LoadingState label="Abriendo tu galería…" />;
+    return <LoadingState label={t('opening')} />;
   }
   if (state.status === 'error' || !gallery) {
-    return <Notice tone="error">{state.status === 'error' ? state.message : 'No se pudo abrir la galería.'}</Notice>;
+    return <Notice tone="error">{state.status === 'error' ? state.message : t('loadFailed')}</Notice>;
   }
 
   const focused = sceneArtworks.find((artwork) => artwork.id === focusId);
@@ -271,12 +293,12 @@ function Studio() {
   return (
     <>
       <PageHeader
-        eyebrow="Sala propia"
-        title={gallery.name}
-        description={config.identity.summary || 'Recorre tu sala, acércate a cada obra y ajusta el ambiente a tu gusto.'}
+        eyebrow={t('eyebrow')}
+        title={gallery.name === DEFAULT_GALLERY_NAME ? t('defaultName') : gallery.name}
+        description={config.identity.summary || t('description')}
         actions={
           <ButtonLink href="/mi-galeria/personalizar" variant="secondary" icon={<Sparkles aria-hidden="true" className="h-4 w-4" />}>
-            Diseñar con el asistente
+            {t('design')}
           </ButtonLink>
         }
       />
@@ -295,17 +317,17 @@ function Studio() {
         />
 
         <div className="pointer-events-none absolute inset-x-3 top-3 flex flex-wrap items-start justify-between gap-2">
-          <div role="radiogroup" aria-label="Modo de la sala" className="pointer-events-auto inline-flex rounded-full bg-surface/95 p-1 shadow-panel">
+          <div role="radiogroup" aria-label={t('modeLabel')} className="pointer-events-auto inline-flex rounded-full bg-surface/95 p-1 shadow-panel">
             <ModeButton active={mode === 'tour'} onClick={() => { changeMode('tour'); }} icon={<Footprints aria-hidden="true" className="h-4 w-4" />}>
-              Recorrer
+              {t('modeTour')}
             </ModeButton>
             <ModeButton active={mode === 'edit'} onClick={() => { changeMode('edit'); }} icon={<Move3d aria-hidden="true" className="h-4 w-4" />}>
-              Editar montaje
+              {t('modeEdit')}
             </ModeButton>
           </div>
           {mode === 'edit' && gallery.artworks.length > 0 ? (
             <Button variant="secondary" size="sm" className="pointer-events-auto shadow-panel" icon={<LayoutGrid aria-hidden="true" className="h-4 w-4" />} onClick={organize}>
-              Organizar automáticamente
+              {t('organize')}
             </Button>
           ) : null}
         </div>
@@ -313,16 +335,16 @@ function Studio() {
         {gallery.artworks.length === 0 ? (
           <div className="absolute inset-x-0 bottom-6 flex justify-center px-4">
             <div className="max-w-md rounded-panel bg-surface/95 p-5 text-center shadow-lift">
-              <p className="font-serif text-xl">Tu sala está vacía</p>
+              <p className="font-serif text-xl">{t('empty.title')}</p>
               <p className="mt-1 text-sm text-muted">
-                Tus proyectos propios y las obras que ganes en subasta se cuelgan aquí solos. Lo que publicaste y aún no se vende lo cuelgas desde Mis obras.
+                {t('empty.description')}
               </p>
               <div className="mt-3 flex flex-wrap justify-center gap-2">
                 <ButtonLink href="/publicar" size="sm">
-                  Subir un proyecto propio
+                  {t('empty.upload')}
                 </ButtonLink>
                 <ButtonLink href="/mis-obras" size="sm" variant="secondary">
-                  Mis obras
+                  {t('empty.myWorks')}
                 </ButtonLink>
               </div>
             </div>
@@ -333,14 +355,14 @@ function Studio() {
           <div className="absolute bottom-3 left-3 flex items-end gap-3">
             <TouchPad intent={intent} />
             <p className="hidden rounded-field bg-ink/70 px-3 py-2 text-xs text-paper md:block">
-              Arrastra para mirar · WASD o flechas para caminar · clic en una obra para acercarte
+              {t('tourHint')}
             </p>
           </div>
         ) : null}
 
         {mode === 'edit' && !selected && gallery.artworks.length > 0 ? (
           <p className="absolute bottom-3 left-3 rounded-field bg-ink/70 px-3 py-2 text-xs text-paper">
-            Elige una obra para moverla · arrastra para girar la vista
+            {t('editHint')}
           </p>
         ) : null}
 
@@ -363,17 +385,17 @@ function Studio() {
 
       {overlapping && mode === 'tour' ? (
         <Notice className="mt-4">
-          Hay obras superpuestas. Entra en <strong>Editar montaje</strong> y usa <strong>Organizar automáticamente</strong>.
+          {t.rich('overlap', { strong: (chunks) => <strong>{chunks}</strong> })}
         </Notice>
       ) : null}
 
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <Panel as="section">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="font-serif text-2xl">Ambiente</h2>
+            <h2 className="font-serif text-2xl">{t('ambience.title')}</h2>
             {gallery.suggestedConfig && !sameConfig(gallery.suggestedConfig, savedConfig) ? (
               <Button variant="ghost" onClick={() => void restore()}>
-                Volver a la propuesta del asistente
+                {t('restore')}
               </Button>
             ) : null}
           </div>
@@ -382,16 +404,16 @@ function Studio() {
           </div>
         </Panel>
         <Panel as="section">
-          <h2 className="font-serif text-2xl">Obras en la sala</h2>
+          <h2 className="font-serif text-2xl">{t('works.title')}</h2>
           {gallery.artworks.length === 0 ? (
-            <p className="mt-3 text-sm text-muted">Aún no hay obras.</p>
+            <p className="mt-3 text-sm text-muted">{t('works.empty')}</p>
           ) : (
             <ul className="mt-3 divide-y divide-line">
               {gallery.artworks.map((artwork) => (
                 <li key={artwork.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                   <span className="min-w-0">
                     <span className="block truncate font-medium">{artwork.lot.title}</span>
-                    <span className="text-xs text-muted">{isObjectLot(artwork.lot) ? 'Sobre pedestal' : 'En la pared'}</span>
+                    <span className="text-xs text-muted">{isObjectLot(artwork.lot) ? t('works.onPedestal') : t('works.onWall')}</span>
                   </span>
                   <Button
                     variant="ghost"
@@ -407,7 +429,7 @@ function Studio() {
                       }
                     }}
                   >
-                    {mode === 'tour' ? 'Ir a la obra' : 'Editar'}
+                    {mode === 'tour' ? t('works.goTo') : t('works.edit')}
                   </Button>
                 </li>
               ))}
@@ -419,20 +441,20 @@ function Studio() {
       {dirty ? (
         <div className="sticky bottom-4 z-30 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-panel border border-line bg-surface/95 px-5 py-3 shadow-lift backdrop-blur">
           <p className="text-sm">
-            <strong>Tienes cambios sin guardar</strong>
+            <strong>{t('unsaved.title')}</strong>
             <span className="text-muted">
               {' '}
-              {[configDirty ? 'ambiente' : null, placementDraft.size > 0 ? `${String(placementDraft.size)} obra${placementDraft.size === 1 ? '' : 's'} movida${placementDraft.size === 1 ? '' : 's'}` : null]
+              {[configDirty ? t('unsaved.ambience') : null, placementDraft.size > 0 ? t('unsaved.moved', { count: placementDraft.size }) : null]
                 .filter(Boolean)
-                .join(' y ')}
+                .join(t('unsaved.and'))}
             </span>
           </p>
           <div className="flex gap-2">
             <Button variant="secondary" onClick={discard} disabled={saving}>
-              Descartar
+              {t('unsaved.discard')}
             </Button>
             <Button onClick={() => void save()} loading={saving}>
-              Guardar cambios
+              {t('unsaved.save')}
             </Button>
           </div>
           {error ? <Notice tone="error" className="w-full">{error}</Notice> : null}
@@ -441,13 +463,13 @@ function Studio() {
 
       <ConfirmDialog
         open={removing !== null}
-        title="¿Retirar la obra de tu galería?"
-        confirmLabel="Retirar"
+        title={t('removeDialog.title')}
+        confirmLabel={t('removeDialog.confirm')}
         tone="danger"
         onConfirm={() => void confirmRemove()}
         onCancel={() => { setRemoving(null); }}
       >
-        {removing ? `${removing.lot.title} dejará de verse en tu sala. Podrás volver a colgarla desde su ficha.` : null}
+        {removing ? t('removeDialog.body', { title: removing.lot.title }) : null}
       </ConfirmDialog>
     </>
   );

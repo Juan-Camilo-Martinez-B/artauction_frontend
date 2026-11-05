@@ -12,20 +12,10 @@ export const DEFAULT_GALLERY_CONFIG: GalleryConfig = {
   navigation: { tour: 'libre', approach: 'ficha', motion: 'default' },
 };
 
-export const WALL_MATERIAL_OPTIONS: ReadonlyArray<{ value: GalleryConfig['materials']['wall']; label: string }> = [
-  { value: 'plaster', label: 'Yeso' },
-  { value: 'marble', label: 'Mármol' },
-  { value: 'concrete', label: 'Concreto' },
-  { value: 'wood', label: 'Madera' },
-  { value: 'metal', label: 'Metal' },
-];
+/** Materiales que se pueden elegir; el nombre esta en el diccionario Studio.ambience. */
+export const WALL_MATERIAL_OPTIONS = ['plaster', 'marble', 'concrete', 'wood', 'metal'] as const satisfies ReadonlyArray<GalleryConfig['materials']['wall']>;
 
-export const FLOOR_MATERIAL_OPTIONS: ReadonlyArray<{ value: GalleryConfig['materials']['floor']; label: string }> = [
-  { value: 'wood', label: 'Parqué' },
-  { value: 'stone', label: 'Piedra' },
-  { value: 'concrete', label: 'Concreto pulido' },
-  { value: 'marble', label: 'Mármol' },
-];
+export const FLOOR_MATERIAL_OPTIONS = ['wood', 'stone', 'concrete', 'marble'] as const satisfies ReadonlyArray<GalleryConfig['materials']['floor']>;
 
 /** Dos configuraciones son iguales si coinciden campo a campo (el orden de claves es estable). */
 export function sameConfig(left: GalleryConfig | null, right: GalleryConfig | null): boolean {

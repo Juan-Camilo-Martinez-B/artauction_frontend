@@ -872,5 +872,403 @@
       "moved": "{title} entró a la auditoría.",
       "moveFailed": "No se pudo pasar la obra al catálogo."
     }
+  },
+  "Studio": {
+    "defaultName": "Mi galería",
+    "signInTitle": "Entra para ver tu galería",
+    "signInHint": "Tu sala 3D guarda las obras que ganas en subasta.",
+    "preparing": "Preparando la sala…",
+    "opening": "Abriendo tu galería…",
+    "loadFailed": "No se pudo abrir la galería.",
+    "eyebrow": "Sala propia",
+    "description": "Recorre tu sala, acércate a cada obra y ajusta el ambiente a tu gusto.",
+    "design": "Diseñar con el asistente",
+    "modeLabel": "Modo de la sala",
+    "modeTour": "Recorrer",
+    "modeEdit": "Editar montaje",
+    "organize": "Organizar automáticamente",
+    "organized": "Propuesta de montaje lista. Guárdala si te gusta.",
+    "alreadyOrganized": "La sala ya está ordenada.",
+    "saved": "Cambios guardados.",
+    "saveFailed": "No se pudieron guardar los cambios.",
+    "restored": "Volviste a la propuesta del asistente.",
+    "restoreFailed": "No se pudo restaurar la propuesta.",
+    "restore": "Volver a la propuesta del asistente",
+    "removed": "{title} salió de tu galería.",
+    "removeFailed": "No se pudo retirar la obra.",
+    "tourHint": "Arrastra para mirar · WASD o flechas para caminar · clic en una obra para acercarte",
+    "editHint": "Elige una obra para moverla · arrastra para girar la vista",
+    "overlap": "Hay obras superpuestas. Entra en <strong>Editar montaje</strong> y usa <strong>Organizar automáticamente</strong>.",
+    "empty": {
+      "title": "Tu sala está vacía",
+      "description": "Tus proyectos propios y las obras que ganes en subasta se cuelgan aquí solos. Lo que publicaste y aún no se vende lo cuelgas desde Mis obras.",
+      "upload": "Subir un proyecto propio",
+      "myWorks": "Mis obras"
+    },
+    "works": {
+      "title": "Obras en la sala",
+      "empty": "Aún no hay obras.",
+      "onPedestal": "Sobre pedestal",
+      "onWall": "En la pared",
+      "goTo": "Ir a la obra",
+      "edit": "Editar"
+    },
+    "unsaved": {
+      "title": "Tienes cambios sin guardar",
+      "ambience": "ambiente",
+      "moved": "{count, plural, one {# obra movida} other {# obras movidas}}",
+      "and": " y ",
+      "discard": "Descartar",
+      "save": "Guardar cambios"
+    },
+    "removeDialog": {
+      "title": "¿Retirar la obra de tu galería?",
+      "confirm": "Retirar",
+      "body": "{title} dejará de verse en tu sala. Podrás volver a colgarla desde su ficha."
+    },
+    "ambience": {
+      "title": "Ambiente",
+      "walls": "Paredes",
+      "wallMaterial": "Material de las paredes",
+      "wallColor": "Color de las paredes",
+      "wallOptions": {
+        "plaster": "Yeso",
+        "marble": "Mármol",
+        "concrete": "Concreto",
+        "wood": "Madera",
+        "metal": "Metal"
+      },
+      "floor": "Suelo",
+      "floorMaterial": "Material del suelo",
+      "floorColor": "Tono del suelo",
+      "floorOptions": {
+        "wood": "Parqué",
+        "stone": "Piedra",
+        "concrete": "Concreto pulido",
+        "marble": "Mármol"
+      },
+      "light": "Luz",
+      "ambient": "Luz general",
+      "spot": "Focos sobre las obras",
+      "warmth": "Calidez (cálida a fría)"
+    },
+    "card": {
+      "label": "Ficha de {title}",
+      "eyebrow": "En la sala",
+      "unattributedArtist": "Artista sin atribuir",
+      "materials": "Materiales",
+      "measures": "Medidas",
+      "back": "Seguir el recorrido",
+      "fullSheet": "Ver ficha completa"
+    },
+    "pad": {
+      "label": "Caminar por la sala",
+      "forward": "Avanzar",
+      "turnLeft": "Girar a la izquierda",
+      "backward": "Retroceder",
+      "turnRight": "Girar a la derecha"
+    },
+    "placement": {
+      "label": "Montaje de {title}",
+      "eyebrow": "Montaje",
+      "close": "Cerrar el panel de montaje",
+      "scale": "Escala",
+      "remove": "Retirar de la galería",
+      "wall": "Pared",
+      "walls": {
+        "back": "Fondo",
+        "left": "Izquierda",
+        "right": "Derecha",
+        "front": "Entrada"
+      },
+      "position": "Posición en la pared",
+      "center": "Centro",
+      "toLeft": "{meters} m a la izquierda",
+      "toRight": "{meters} m a la derecha",
+      "centerHeight": "Altura del centro",
+      "leftRight": "De izquierda a derecha",
+      "backFront": "Del fondo a la entrada",
+      "rotation": "Giro"
+    },
+    "viewer": {
+      "loadFailed": "No se pudo cargar el modelo 3D. Prueba de nuevo más tarde.",
+      "label": "Modelo 3D de {title}. Arrastra para girarlo."
+    }
+  },
+  "Admin": {
+    "signInTitle": "Entra con una cuenta administradora",
+    "eyebrow": "Administración",
+    "title": "Revisión manual",
+    "description": "Obras que la auditoría no pudo aprobar sola, con los hallazgos y las evidencias que usó.",
+    "loading": "Cargando la cola…",
+    "loadFailed": "No se pudo cargar la cola de revisión.",
+    "resolveFailed": "No se pudo resolver la obra.",
+    "empty": {
+      "title": "No hay obras esperando revisión",
+      "description": "Cuando la auditoría deje una obra en revisión manual, aparecerá aquí."
+    },
+    "severity": {
+      "CRITICAL": "Crítico",
+      "WARNING": "Advertencia",
+      "INFO": "Nota"
+    },
+    "evidence": "Evidencias ({count})",
+    "decidedBy": {
+      "RULES": "Decidió una regla del sistema",
+      "AI": "Evaluó la IA sobre el expediente",
+      "LOCAL": "Evaluación local, sin IA: el modelo de IA no respondió",
+      "FALLBACK": "La auditoría automática no terminó",
+      "legacy": "Auditoría anterior al expediente de evidencias"
+    },
+    "resolved": {
+      "APROBADO": "{title} quedó publicada.",
+      "BORRADOR": "{title} volvió al vendedor con tu motivo.",
+      "REAUDITAR": "{title} volvió a la cola de auditoría."
+    },
+    "noAuthor": "Autoría sin declarar",
+    "score": "score",
+    "noFindings": "La auditoría no dejó hallazgos.",
+    "noDossier": "El expediente de auditoría no está disponible ahora. Puedes resolver igual.",
+    "price": {
+      "legend": "Rango de precio al publicar (artacoins)",
+      "min": "Mínimo",
+      "max": "Máximo",
+      "required": "Esta obra no tiene precio sugerido: fija el rango para aprobarla.",
+      "both": "Indica el precio mínimo y el máximo.",
+      "range": "El rango va de 1 a {max} artacoins.",
+      "order": "El máximo no puede ser menor que el mínimo.",
+      "hintRequired": "La auditoría no estimó precio: es obligatorio para aprobar.",
+      "hintSuggested": "Viene de la auditoría; puedes ajustarlo antes de aprobar."
+    },
+    "approve": "Aprobar y publicar",
+    "returnToSeller": "Devolver al vendedor",
+    "reaudit": "Re-auditar con IA",
+    "returnDialog": {
+      "title": "Devolver la obra al vendedor",
+      "confirm": "Devolver con este motivo",
+      "body": "La obra vuelve a borrador. El vendedor recibe un aviso con el motivo y puede corregirla y reenviarla.",
+      "reason": "Motivo",
+      "hint": "{length}/{max} · al menos {min} caracteres. Di qué debe corregir."
+    }
+  },
+  "GalleryWizard": {
+    "metaTitle": "Personaliza tu galería",
+    "signInTitle": "Entra para diseñar tu galería",
+    "designFailed": "No se pudo diseñar la galería.",
+    "eyebrow": "Asistente",
+    "title": "Diseña tu galería",
+    "description": "Responde unas preguntas y el asistente propone paredes, suelo, luz y recorrido para tu sala.",
+    "stepOf": "Paso {step} de {total}",
+    "multiple": "Puedes elegir varias.",
+    "favorite": "Preferido",
+    "yourFavorite": "Tu preferido:",
+    "contrast": "Quiero que los colores del espacio contrasten con las obras",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "seeSummary": "Ver resumen",
+    "replaceDialog": {
+      "title": "¿Reemplazar tu sala?",
+      "confirm": "Reemplazar",
+      "body": "Hiciste cambios a mano en tu sala. La propuesta nueva los reemplaza; las obras colgadas no cambian."
+    },
+    "review": {
+      "title": "Resumen",
+      "hint": "El asistente usará estas respuestas para proponer tu sala. Nada se aplica hasta que la propuesta esté lista.",
+      "styles": "Estilos",
+      "palette": "Paleta",
+      "architecture": "Arquitectura",
+      "layout": "Distribución",
+      "light": "Iluminación",
+      "materials": "Materiales",
+      "tour": "Recorrido",
+      "designing": "Diseñando el espacio según tus preferencias…",
+      "back": "Volver a editar",
+      "generate": "Generar mi galería",
+      "surprise": "Sorpréndeme"
+    },
+    "steps": {
+      "identidad": "Identidad artística",
+      "color": "Preferencias cromáticas",
+      "arquitectura": "Arquitectura y distribución",
+      "luz": "Iluminación y atmósfera",
+      "materiales": "Materiales y detalles",
+      "experiencia": "Experiencia personal"
+    },
+    "questions": {
+      "artStyles": {
+        "prompt": "¿Qué estilos artísticos te gustan más?",
+        "options": {
+          "clasico": "Arte clásico",
+          "renacimiento": "Renacimiento",
+          "barroco": "Barroco",
+          "romanticismo": "Romanticismo",
+          "impresionismo": "Impresionismo",
+          "postimpresionismo": "Postimpresionismo",
+          "moderno": "Arte moderno",
+          "contemporaneo": "Arte contemporáneo",
+          "minimalismo": "Minimalismo",
+          "abstracto": "Arte abstracto",
+          "surrealismo": "Surrealismo",
+          "digital": "Arte digital",
+          "combinacion": "Una combinación de estilos"
+        }
+      },
+      "atmosphere": {
+        "prompt": "¿Qué tipo de ambiente artístico te gustaría sentir al entrar en tu galería?",
+        "options": {
+          "elegante": "Elegante y clásico",
+          "sereno": "Sereno y contemplativo",
+          "minimalista": "Moderno y minimalista",
+          "vanguardista": "Experimental y vanguardista",
+          "calido": "Cálido y acogedor",
+          "dramatico": "Dramático y sofisticado",
+          "futurista": "Futurista y tecnológico",
+          "eclectico": "Ecléctico y creativo"
+        }
+      },
+      "colorFamily": {
+        "prompt": "¿Qué tipo de colores prefieres para tu galería?",
+        "options": {
+          "claros": "Tonos claros",
+          "oscuros": "Tonos oscuros",
+          "calidos": "Tonos cálidos",
+          "frios": "Tonos fríos",
+          "neutros": "Tonos neutros",
+          "intensos": "Colores intensos y contrastados",
+          "equilibrada": "Una combinación equilibrada"
+        }
+      },
+      "paletteId": {
+        "prompt": "¿Qué combinación de colores te resulta más atractiva?",
+        "options": {
+          "marfil": "Marfil, arena y madera",
+          "piedra": "Blanco, gris y piedra",
+          "grafito": "Negro, carbón y grafito",
+          "terracota": "Beige, terracota y marrón",
+          "oliva": "Verde oliva, crema y madera",
+          "azul": "Azul profundo, gris y blanco",
+          "borgona": "Borgoña, carbón y dorado",
+          "personalizada": "Una paleta personalizada"
+        }
+      },
+      "architecture": {
+        "prompt": "¿Cómo imaginas el espacio donde expondrás tus obras?",
+        "options": {
+          "minimal": "Galería minimalista de paredes lisas",
+          "museo-clasico": "Museo clásico con molduras",
+          "loft": "Loft industrial",
+          "hormigon": "Hormigón y piedra",
+          "madera": "Espacio cálido con madera",
+          "futurista": "Galería futurista",
+          "experimental": "Formas arquitectónicas originales"
+        }
+      },
+      "layout": {
+        "prompt": "¿Qué tipo de distribución prefieres?",
+        "options": {
+          "pocas": "Pocas obras destacadas",
+          "equilibrada": "Muchas obras equilibradas",
+          "abiertos": "Grandes espacios abiertos",
+          "habitaciones": "Habitaciones conectadas",
+          "intimas": "Zonas íntimas",
+          "esculturas": "Un centro para esculturas",
+          "combinacion": "Abierto y contemplativo"
+        }
+      },
+      "sculptureRole": {
+        "prompt": "¿Qué importancia quieres dar a las esculturas y los objetos tridimensionales?",
+        "options": {
+          "protagonistas": "Serán protagonistas",
+          "igual": "La misma que las pinturas",
+          "complementarias": "Elementos complementarios",
+          "murales": "Prefiero obras murales"
+        }
+      },
+      "light": {
+        "prompt": "¿Cómo prefieres que esté iluminada tu galería?",
+        "options": {
+          "natural": "Luz natural abundante",
+          "calida": "Iluminación cálida e íntima",
+          "neutra": "Luz neutra de museo",
+          "blanca": "Iluminación blanca y moderna",
+          "dramatica": "Dramática, con sombras",
+          "focos": "Focos dirigidos a cada obra",
+          "indirecta": "Luz ambiental indirecta",
+          "combinada": "General y focos"
+        }
+      },
+      "lightMood": {
+        "prompt": "¿Qué ambiente debe transmitir la iluminación?",
+        "options": {
+          "serenidad": "Serenidad",
+          "energia": "Energía y creatividad",
+          "misterio": "Misterio",
+          "elegancia": "Elegancia",
+          "calidez": "Calidez",
+          "fidelidad": "Neutralidad para ver el color real"
+        }
+      },
+      "intensity": {
+        "prompt": "¿Qué intensidad de iluminación prefieres?",
+        "options": {
+          "baja": "Baja",
+          "media": "Media",
+          "alta": "Alta"
+        }
+      },
+      "materials": {
+        "prompt": "¿Qué materiales te gustaría encontrar en tu galería?",
+        "options": {
+          "madera": "Madera natural",
+          "marmol": "Mármol o piedra",
+          "hormigon": "Hormigón pulido",
+          "yeso": "Yeso y superficies lisas",
+          "metal": "Metal",
+          "cristal": "Cristal",
+          "artesanal": "Texturas artesanales",
+          "combinacion": "Una combinación"
+        }
+      },
+      "sculptureDisplay": {
+        "prompt": "¿Cómo prefieres que se exhiban las esculturas y los objetos?",
+        "options": {
+          "pedestales": "Pedestales individuales",
+          "plataformas": "Plataformas bajas",
+          "nichos": "Nichos arquitectónicos",
+          "suelo": "Directamente sobre el suelo",
+          "combinacion": "Una combinación de soportes"
+        }
+      },
+      "tour": {
+        "prompt": "¿Cómo te gustaría recorrer tu galería?",
+        "options": {
+          "libre": "Exploración libre",
+          "guiado": "Recorrido guiado",
+          "habitaciones": "Habitaciones conectadas",
+          "abiertos": "Espacios abiertos",
+          "tematicas": "Zonas por estilos",
+          "cronologico": "Recorrido cronológico"
+        }
+      },
+      "approach": {
+        "prompt": "¿Qué prefieres que ocurra cuando te acercas a una obra?",
+        "options": {
+          "ficha": "Una ficha discreta",
+          "detallada": "Una ficha detallada",
+          "camara": "Acercar la cámara",
+          "relacionadas": "Información y obras relacionadas"
+        }
+      },
+      "accessibility": {
+        "prompt": "¿Tienes alguna preferencia para facilitar la navegación?",
+        "options": {
+          "lento": "Movimiento lento y suave",
+          "reducir": "Reducir movimientos de cámara",
+          "sencillos": "Controles sencillos",
+          "contraste": "Mayor contraste",
+          "ninguna": "Ninguna preferencia adicional"
+        }
+      }
+    }
   }
 }

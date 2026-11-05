@@ -1,44 +1,46 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 import type { GalleryConfig } from '@/lib/api/types';
 import { FLOOR_MATERIAL_OPTIONS, WALL_MATERIAL_OPTIONS } from '@/lib/gallery/default-config';
 
 /** Ambiente de la sala: materiales, colores y luz. Edita el borrador de la configuracion. */
 export function AmbiencePanel({ config, onChange }: { config: GalleryConfig; onChange: (next: GalleryConfig) => void }) {
+  const t = useTranslations('Studio.ambience');
   const ids = { wallMaterial: useId(), floorMaterial: useId(), wall: useId(), floor: useId(), ambient: useId(), spot: useId(), warmth: useId() };
   const update = (patch: (current: GalleryConfig) => GalleryConfig) => { onChange({ ...patch(config), source: 'manual' }); };
 
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       <fieldset className="space-y-3">
-        <legend className="mb-1 text-sm font-medium">Paredes</legend>
+        <legend className="mb-1 text-sm font-medium">{t('walls')}</legend>
         <MaterialSelect
           id={ids.wallMaterial}
-          label="Material de las paredes"
+          label={t('wallMaterial')}
           value={config.materials.wall}
-          options={WALL_MATERIAL_OPTIONS}
+          options={WALL_MATERIAL_OPTIONS.map((value) => ({ value, label: t(`wallOptions.${value}`) }))}
           onChange={(wall) => { update((current) => ({ ...current, materials: { ...current.materials, wall } })); }}
         />
-        <ColorInput id={ids.wall} label="Color de las paredes" value={config.palette.wall} onChange={(wall) => { update((current) => ({ ...current, palette: { ...current.palette, wall } })); }} />
+        <ColorInput id={ids.wall} label={t('wallColor')} value={config.palette.wall} onChange={(wall) => { update((current) => ({ ...current, palette: { ...current.palette, wall } })); }} />
       </fieldset>
       <fieldset className="space-y-3">
-        <legend className="mb-1 text-sm font-medium">Suelo</legend>
+        <legend className="mb-1 text-sm font-medium">{t('floor')}</legend>
         <MaterialSelect
           id={ids.floorMaterial}
-          label="Material del suelo"
+          label={t('floorMaterial')}
           value={config.materials.floor}
-          options={FLOOR_MATERIAL_OPTIONS}
+          options={FLOOR_MATERIAL_OPTIONS.map((value) => ({ value, label: t(`floorOptions.${value}`) }))}
           onChange={(floor) => { update((current) => ({ ...current, materials: { ...current.materials, floor } })); }}
         />
-        <ColorInput id={ids.floor} label="Tono del suelo" value={config.palette.floor} onChange={(floor) => { update((current) => ({ ...current, palette: { ...current.palette, floor } })); }} />
+        <ColorInput id={ids.floor} label={t('floorColor')} value={config.palette.floor} onChange={(floor) => { update((current) => ({ ...current, palette: { ...current.palette, floor } })); }} />
       </fieldset>
       <fieldset className="space-y-3 sm:col-span-2">
-        <legend className="mb-1 text-sm font-medium">Luz</legend>
+        <legend className="mb-1 text-sm font-medium">{t('light')}</legend>
         <div className="grid gap-4 sm:grid-cols-3">
-          <Range id={ids.ambient} label="Luz general" value={config.lighting.ambientIntensity} min={0.15} max={1.2} step={0.05} onChange={(ambientIntensity) => { update((current) => ({ ...current, lighting: { ...current.lighting, ambientIntensity } })); }} />
-          <Range id={ids.spot} label="Focos sobre las obras" value={config.lighting.spotIntensity} min={0} max={1.2} step={0.05} onChange={(spotIntensity) => { update((current) => ({ ...current, lighting: { ...current.lighting, spotIntensity } })); }} />
-          <Range id={ids.warmth} label="Calidez (cálida a fría)" value={config.lighting.colorTemperature} min={2700} max={6500} step={100} onChange={(colorTemperature) => { update((current) => ({ ...current, lighting: { ...current.lighting, colorTemperature } })); }} />
+          <Range id={ids.ambient} label={t('ambient')} value={config.lighting.ambientIntensity} min={0.15} max={1.2} step={0.05} onChange={(ambientIntensity) => { update((current) => ({ ...current, lighting: { ...current.lighting, ambientIntensity } })); }} />
+          <Range id={ids.spot} label={t('spot')} value={config.lighting.spotIntensity} min={0} max={1.2} step={0.05} onChange={(spotIntensity) => { update((current) => ({ ...current, lighting: { ...current.lighting, spotIntensity } })); }} />
+          <Range id={ids.warmth} label={t('warmth')} value={config.lighting.colorTemperature} min={2700} max={6500} step={100} onChange={(colorTemperature) => { update((current) => ({ ...current, lighting: { ...current.lighting, colorTemperature } })); }} />
         </div>
       </fieldset>
     </div>

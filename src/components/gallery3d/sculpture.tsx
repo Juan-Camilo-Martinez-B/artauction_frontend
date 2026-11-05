@@ -55,14 +55,14 @@ export function Sculpture(props: ArtworkViewProps & { pedestalColor: string }) {
           </mesh>
         ) : null}
       </group>
-      <PedestalLabel lot={lot} footprint={footprint} baseHeight={baseHeight} />
+      <PedestalLabel lot={lot} unattributed={props.unattributed} footprint={footprint} baseHeight={baseHeight} />
       {props.lit ? <ObjectLight top={baseHeight + size.height} {...props} /> : null}
     </group>
   );
 }
 
-function PedestalLabel({ lot, footprint, baseHeight }: { lot: ArtworkViewProps['lot']; footprint: number; baseHeight: number }) {
-  const texture = useMemo(() => labelTexture(lot), [lot]);
+function PedestalLabel({ lot, unattributed, footprint, baseHeight }: { lot: ArtworkViewProps['lot']; unattributed: string; footprint: number; baseHeight: number }) {
+  const texture = useMemo(() => labelTexture(lot, unattributed), [lot, unattributed]);
   useEffect(() => () => texture?.dispose(), [texture]);
   if (!texture) {
     return null;

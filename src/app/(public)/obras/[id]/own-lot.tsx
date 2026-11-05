@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { ButtonLink } from '@/components/ui/button';
 import { EmptyState, LoadingState } from '@/components/ui/layout';
@@ -11,6 +11,7 @@ import { ArtworkExhibit } from './artwork-exhibit';
 
 export function OwnLot({ id }: { id: string }) {
   const t = useTranslations('Artwork.unavailable');
+  const locale = useLocale();
   const [lot, setLot] = useState<Lot | null>(null);
   const [missing, setMissing] = useState(false);
 
@@ -26,7 +27,7 @@ export function OwnLot({ id }: { id: string }) {
         setMissing(true);
       }
     });
-  }, [id]);
+  }, [id, locale]);
 
   if (lot) {
     return <ArtworkExhibit lot={lot} />;

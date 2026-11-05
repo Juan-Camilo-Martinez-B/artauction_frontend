@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowDown, ArrowUp, RotateCcw, RotateCw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { ButtonHTMLAttributes, RefObject, PointerEvent, ReactNode } from 'react';
 import type { MoveIntent } from './tour-controls';
 
@@ -9,6 +10,7 @@ import type { MoveIntent } from './tour-controls';
  * mantiene pulsado un boton, la intencion de movimiento queda activa.
  */
 export function TouchPad({ intent }: { intent: RefObject<MoveIntent> }) {
+  const t = useTranslations('Studio.pad');
   const hold = (patch: Partial<MoveIntent>) => ({
     onPointerDown: (event: PointerEvent<HTMLButtonElement>) => {
       event.currentTarget.setPointerCapture(event.pointerId);
@@ -18,19 +20,19 @@ export function TouchPad({ intent }: { intent: RefObject<MoveIntent> }) {
     onPointerCancel: () => { Object.assign(intent.current, { forward: 0, turn: 0 }); },
   });
   return (
-    <div className="grid grid-cols-3 gap-1.5" role="group" aria-label="Caminar por la sala">
+    <div className="grid grid-cols-3 gap-1.5" role="group" aria-label={t('label')}>
       <span />
-      <PadButton label="Avanzar" {...hold({ forward: 1 })}>
+      <PadButton label={t('forward')} {...hold({ forward: 1 })}>
         <ArrowUp aria-hidden="true" className="h-4 w-4" />
       </PadButton>
       <span />
-      <PadButton label="Girar a la izquierda" {...hold({ turn: 1 })}>
+      <PadButton label={t('turnLeft')} {...hold({ turn: 1 })}>
         <RotateCcw aria-hidden="true" className="h-4 w-4" />
       </PadButton>
-      <PadButton label="Retroceder" {...hold({ forward: -1 })}>
+      <PadButton label={t('backward')} {...hold({ forward: -1 })}>
         <ArrowDown aria-hidden="true" className="h-4 w-4" />
       </PadButton>
-      <PadButton label="Girar a la derecha" {...hold({ turn: -1 })}>
+      <PadButton label={t('turnRight')} {...hold({ turn: -1 })}>
         <RotateCw aria-hidden="true" className="h-4 w-4" />
       </PadButton>
     </div>

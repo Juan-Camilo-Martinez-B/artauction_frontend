@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArtworkImage } from '@/components/artwork-image';
 import { ButtonLink } from '@/components/ui/button';
@@ -24,6 +24,7 @@ type State = { status: 'loading' } | { status: 'error' } | { status: 'ready'; it
  */
 export function LiveAuctions({ limit = 8, showCatalogLink = false }: { limit?: number; showCatalogLink?: boolean }) {
   const t = useTranslations('LiveAuctions');
+  const locale = useLocale();
   const [state, setState] = useState<State>({ status: 'loading' });
   const pending = useRef(false);
 
@@ -41,7 +42,8 @@ export function LiveAuctions({ limit = 8, showCatalogLink = false }: { limit?: n
     } finally {
       pending.current = false;
     }
-  }, [limit]);
+    // Las fichas llegan en el idioma activo: al cambiarlo se vuelven a pedir.
+  }, [limit, locale]);
 
   useEffect(() => {
     void refresh();

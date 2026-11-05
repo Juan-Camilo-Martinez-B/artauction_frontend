@@ -4,6 +4,7 @@ import spanish from '@/i18n/messages/es.json';
 import { localeCookie, localeFromCookies, negotiateLocale } from '@/i18n/locales';
 import { errorText } from '@/lib/api/error-text';
 import { formatInteger } from '@/lib/format';
+import { STEPS } from '@/lib/gallery/steps';
 
 type Tree = { [key: string]: string | Tree };
 
@@ -40,6 +41,26 @@ describe('diccionarios', () => {
     for (const [key, text] of es) {
       expect({ key, placeholders: placeholders(en.get(key) ?? '') }).toEqual({ key, placeholders: placeholders(text) });
       expect({ key, empty: text.trim() === '' || (en.get(key) ?? '').trim() === '' }).toEqual({ key, empty: false });
+    }
+  });
+});
+
+describe('cuestionario de la galeria', () => {
+  it('cada paso, pregunta y opcion tiene texto en los dos idiomas', () => {
+    for (const dictionary of [spanish, english]) {
+      const wizard = dictionary.GalleryWizard as unknown as {
+        steps: Record<string, string>;
+        questions: Record<string, { prompt: string; options: Record<string, string> }>;
+      };
+      for (const step of STEPS) {
+        expect(wizard.steps[step.id]).toBeTruthy();
+        for (const question of step.questions) {
+          expect(wizard.questions[question.key]?.prompt).toBeTruthy();
+          for (const option of question.options) {
+            expect({ option, text: Boolean(wizard.questions[question.key]?.options[option]) }).toEqual({ option, text: true });
+          }
+        }
+      }
     }
   });
 });

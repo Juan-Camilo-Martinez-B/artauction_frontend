@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { ButtonLink } from '@/components/ui/button';
 import { EmptyState, LoadingState } from '@/components/ui/layout';
@@ -13,6 +13,7 @@ type Loaded = { kind: 'loading' } | { kind: 'ready'; sheet: PurchasedSheet } | {
 
 export function PurchasedSheetView({ ownerId, lotId }: { ownerId: string; lotId: string }) {
   const t = useTranslations('Artwork.unavailableSheet');
+  const locale = useLocale();
   const [state, setState] = useState<Loaded>({ kind: 'loading' });
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export function PurchasedSheetView({ ownerId, lotId }: { ownerId: string; lotId:
         setState({ kind: 'missing' });
       }
     });
-  }, [ownerId, lotId]);
+  }, [ownerId, lotId, locale]);
 
   if (state.kind === 'loading') {
     return <LoadingState label={t('opening')} />;
