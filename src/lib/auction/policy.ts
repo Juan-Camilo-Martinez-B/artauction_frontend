@@ -68,10 +68,3 @@ export function amountTakenMessage(cents: number): string {
   return `La oferta de ${publishedAmount(cents)} ya fue publicada por otro usuario.`;
 }
 
-export function formatArtacoins(value: string | number | null | undefined): string {
-  const amount = typeof value === 'number' ? value : Number(value ?? '0');
-  if (!Number.isFinite(amount)) {
-    return '—';
-  }
-  return `${new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(Math.round(amount))} artacoins`;
-}

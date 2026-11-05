@@ -24,14 +24,4 @@ export class ImageFormat {
     return 'square';
   }
 
-  label(): string {
-    const orientation = this.orientation();
-    if (orientation === 'landscape') {
-      return 'Formato horizontal';
-    }
-    if (orientation === 'portrait') {
-      return 'Formato vertical';
-    }
-    return 'Formato cuadrado';
-  }
 }

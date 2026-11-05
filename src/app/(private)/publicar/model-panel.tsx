@@ -1,15 +1,22 @@
 'use client';
 
 import { Box } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { Panel } from '@/components/ui/layout';
-import { MODEL_ACCEPT } from '@/lib/gallery/model-files';
+import { useFormat } from '@/hooks/use-format';
+import { MODEL_ACCEPT, MODEL_LIMITS } from '@/lib/gallery/model-files';
 
 // El visor usa WebGL: se carga solo en el navegador y aparte del formulario.
 const ModelViewer = dynamic(() => import('@/components/gallery3d/model-viewer').then((module) => module.ModelViewer), {
   ssr: false,
-  loading: () => <div className="grid h-full place-items-center text-sm text-muted">Preparando la vista previa…</div>,
+  loading: () => <ViewerLoading />,
 });
+
+function ViewerLoading() {
+  const t = useTranslations('Publish.model');
+  return <div className="grid h-full place-items-center text-sm text-muted">{t('preparing')}</div>;
+}
 
 /**
  * Modelo 3D de un objeto, obligatorio: la sala y la ficha lo muestran completo
@@ -36,37 +43,36 @@ export function ModelPanel({
   title: string;
   onFiles: (files: File[]) => void;
 }) {
+  const t = useTranslations('Publish.model');
+  const format = useFormat();
   return (
     <Panel as="section">
-      <h2 className="font-serif text-2xl">Modelo 3D</h2>
+      <h2 className="font-serif text-2xl">{t('title')}</h2>
       <p className="mt-2 text-sm text-muted">
-        Obligatorio en esculturas y objetos: la sala 3D los expone con su volumen real y a la altura que declaraste. Sirve un .glb o .gltf
-        (Blender: Archivo › Exportar › glTF 2.0), un .fbx o un .obj, como los de Sketchfab o la Asset Store de Unity. Si el .obj o el .gltf
-        traen materiales (.mtl), buffers (.bin) o texturas aparte, elígelos todos a la vez. Un .blend no se abre en la web: expórtalo.
-        Entre 1.000 y 300.000 triángulos y hasta 30 MB.
+        {t('help', { min: format.integer(MODEL_LIMITS.minTriangles), max: format.integer(MODEL_LIMITS.maxTriangles) })}
       </p>
       {preview ? (
         <div className="mt-4 overflow-hidden rounded-field border border-line bg-paper-deep">
           <ModelViewer url={preview} title={title} className="h-64 w-full" />
         </div>
       ) : null}
-      {busy ? <p className="mt-2 text-xs text-muted" role="status">Abriendo y revisando el modelo…</p> : null}
+      {busy ? <p className="mt-2 text-xs text-muted" role="status">{t('checking')}</p> : null}
       {!busy && triangles !== null ? (
         <p className="mt-2 text-xs text-moss">
-          {pendingName ? `${pendingName} · ` : 'Modelo verificado · '}
-          {triangles.toLocaleString('es-CO')} triángulos{pendingName ? ' · se sube al guardar' : ''}
+          {pendingName ? `${pendingName} · ` : `${t('verified')} · `}
+          {t('triangles', { triangles: format.integer(triangles) })}
+          {pendingName ? ` · ${t('uploadsOnSave')}` : ''}
         </p>
       ) : null}
       {!busy && skipped.length > 0 ? (
         <p className="mt-1 text-xs text-muted">
-          Sin {skipped.join(', ')}: el navegador no lee ese formato de textura. Si la pieza se ve sin color o sin relieve, expórtala con
-          texturas .png o .jpg.
+          {t('skipped', { files: skipped.join(', ') })}
         </p>
       ) : null}
       <div className="mt-4 flex flex-wrap gap-2">
         <label htmlFor="model" className="inline-flex cursor-pointer items-center gap-2 rounded-field border border-line-strong px-3 py-2 text-sm hover:border-ink">
           <Box aria-hidden="true" className="h-4 w-4" />
-          {preview ? 'Cambiar modelo' : 'Elegir modelo 3D'}
+          {preview ? t('change') : t('choose')}
           <input
             id="model"
             type="file"

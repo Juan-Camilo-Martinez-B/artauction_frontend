@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   artworkSize,
+  fitSizeToImage,
   EYE_LEVEL,
   hangingPlan,
   hasOverlaps,
@@ -54,6 +55,25 @@ describe('geometría de las paredes', () => {
 describe('tamaño real de las obras', () => {
   it('usa los centímetros declarados', () => {
     expect(artworkSize({ widthCm: '120', heightCm: '90', depthCm: null, representationKind: 'TWO_D' })).toEqual({ width: 1.2, height: 0.9, depth: 0.04 });
+  });
+
+  it('una obra mural pequena se amplia entera hasta verse desde la sala', () => {
+    const card = artworkSize({ widthCm: '3.5', heightCm: '7', depthCm: null, representationKind: 'TWO_D' });
+    expect(card.height).toBeCloseTo(0.8);
+    expect(card.width).toBeCloseTo(0.4);
+  });
+
+  it('un objeto pequeno conserva su tamano: solo se amplian las obras murales', () => {
+    expect(artworkSize({ widthCm: '10', heightCm: '20', depthCm: '10', representationKind: 'THREE_D' })).toEqual({ width: 0.1, height: 0.2, depth: 0.1 });
+  });
+
+  it('el marco sigue la proporcion real de la imagen y conserva el lado mayor', () => {
+    const declared = { width: 0.8, height: 0.8, depth: 0.04 };
+    expect(fitSizeToImage(declared, 400, 800)).toEqual({ width: 0.4, height: 0.8, depth: 0.04 });
+    expect(fitSizeToImage(declared, 800, 400)).toEqual({ width: 0.8, height: 0.4, depth: 0.04 });
+    expect(fitSizeToImage(declared, 0, 400)).toBe(declared);
+    // Una imagen muy alta no se sale del alto que cabe en la sala.
+    expect(fitSizeToImage({ width: 3.6, height: 2, depth: 0.04 }, 500, 1000).height).toBeCloseTo(2.6);
   });
 
   it('una pieza que no cabe se reduce entera, sin deformarse', () => {

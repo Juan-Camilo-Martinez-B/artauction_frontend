@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { use, useEffect, useState } from 'react';
 import { RequireSession } from '@/components/session/require-session';
 import { ButtonLink } from '@/components/ui/button';
@@ -13,8 +14,9 @@ import { LotForm } from '../lot-form';
 
 export default function EditLotPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const t = useTranslations('Publish.editPage');
   return (
-    <RequireSession title="Entra para editar tu obra">
+    <RequireSession title={t('signInTitle')}>
       {(profile) => <EditLot id={id} userId={profile.userId} sells={canSell(profile.role)} />}
     </RequireSession>
   );
@@ -23,6 +25,7 @@ export default function EditLotPage({ params }: { params: Promise<{ id: string }
 type Loaded = { kind: 'loading' } | { kind: 'ready'; lot: Lot } | { kind: 'locked'; lot: Lot } | { kind: 'missing' };
 
 function EditLot({ id, userId, sells }: { id: string; userId: string; sells: boolean }) {
+  const t = useTranslations('Publish.editPage');
   const [state, setState] = useState<Loaded>({ kind: 'loading' });
 
   useEffect(() => {
@@ -47,36 +50,32 @@ function EditLot({ id, userId, sells }: { id: string; userId: string; sells: boo
   }, [id, userId]);
 
   if (state.kind === 'loading') {
-    return <LoadingState label="Abriendo la ficha…" />;
+    return <LoadingState label={t('opening')} />;
   }
   if (state.kind === 'missing') {
     return (
       <EmptyState
-        title="No encontramos esta obra entre las tuyas"
-        description="Solo quien publicó una obra puede editarla."
-        action={<ButtonLink href="/mis-obras" variant="secondary">Ir a mis obras</ButtonLink>}
+        title={t('missing.title')}
+        description={t('missing.description')}
+        action={<ButtonLink href="/mis-obras" variant="secondary">{t('missing.action')}</ButtonLink>}
       />
     );
   }
   if (state.kind === 'locked') {
     return (
       <EmptyState
-        title="Esta obra ya no se puede editar"
-        description="Solo se editan los proyectos propios y las obras en borrador, por ejemplo las que un administrador devolvió. Una obra en auditoría o publicada conserva su ficha."
-        action={<ButtonLink href={`/obras/${state.lot.id}`} variant="secondary">Ver la ficha</ButtonLink>}
+        title={t('locked.title')}
+        description={t('locked.description')}
+        action={<ButtonLink href={`/obras/${state.lot.id}`} variant="secondary">{t('locked.action')}</ButtonLink>}
       />
     );
   }
   return (
     <>
       <PageHeader
-        eyebrow="Mis obras"
-        title={`Editar «${state.lot.title}»`}
-        description={
-          state.lot.status === 'PERSONAL'
-            ? 'Cambia la ficha, la imagen o quién la ve. Un proyecto propio no pasa por auditoría.'
-            : 'Corrige la ficha o cambia la imagen. Al reenviarla, la auditoría la revisa de nuevo.'
-        }
+        eyebrow={t('eyebrow')}
+        title={t('title', { title: state.lot.original?.title ?? state.lot.title })}
+        description={state.lot.status === 'PERSONAL' ? t('descriptionOwn') : t('descriptionCatalog')}
       />
       <LotForm lot={state.lot} canSell={sells} />
     </>

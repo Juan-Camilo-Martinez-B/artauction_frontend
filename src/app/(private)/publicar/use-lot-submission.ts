@@ -1,8 +1,10 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { ApiError, artApi } from '@/lib/api/client';
+import { useErrorText } from '@/hooks/use-error-text';
+import { artApi } from '@/lib/api/client';
 import type { Lot } from '@/lib/api/types';
 import { inputFrom, type Destination, type Draft, type Visibility } from '@/lib/forms/lot-draft';
 import type { ImportedModel } from '@/lib/gallery/model-import';
@@ -30,11 +32,18 @@ export interface SubmissionRequest {
   intent: Intent;
 }
 
+/** Fallo la subida directa al bucket de un archivo de la obra. */
+class UploadFailed extends Error {
+  constructor(readonly asset: 'image' | 'model') {
+    super(`upload failed: ${asset}`);
+  }
+}
+
 async function uploadImage(token: string, lotId: string, image: { blob: Blob; hash: string }) {
   const signed = await artApi.signUpload(token, lotId, 'image/jpeg', 0);
   const uploaded = await fetch(signed.uploadUrl, { method: 'PUT', body: image.blob });
   if (!uploaded.ok) {
-    throw new Error('No se pudo guardar la imagen.');
+    throw new UploadFailed('image');
   }
   // La posicion 0 reemplaza la imagen anterior de la obra.
   await artApi.registerImage(token, lotId, { objectKey: signed.objectKey, position: 0, perceptualHash: image.hash });
@@ -44,7 +53,7 @@ async function uploadModel(token: string, lotId: string, model: ImportedModel) {
   const signed = await artApi.signModelUpload(token, lotId);
   const uploaded = await fetch(signed.uploadUrl, { method: 'PUT', headers: { 'content-type': 'model/gltf-binary' }, body: model.file });
   if (!uploaded.ok) {
-    throw new Error('No se pudo guardar el modelo 3D.');
+    throw new UploadFailed('model');
   }
   // Registrar reemplaza el modelo anterior de la obra; el catalogo lo valida y lo mide.
   await artApi.registerModel(token, lotId, signed.objectKey);
@@ -57,6 +66,8 @@ async function uploadModel(token: string, lotId: string, model: ImportedModel) {
  * el reintento la reutiliza en vez de duplicarla.
  */
 export function useLotSubmission() {
+  const t = useTranslations('Publish.saveErrors');
+  const errorText = useErrorText();
   const router = useRouter();
   const [stage, setStage] = useState<Stage>('idle');
   const [created, setCreated] = useState<Lot | null>(null);
@@ -113,7 +124,7 @@ export function useLotSubmission() {
       }
       router.push('/mis-obras');
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : caught instanceof Error ? caught.message : 'No se pudo guardar la obra.');
+      setError(caught instanceof UploadFailed ? t(caught.asset) : errorText(caught, t('generic')));
       setStage('idle');
     }
   }

@@ -25,11 +25,10 @@ describe('compra inmediata', () => {
       createdAt: '2026-11-03T12:00:00Z',
       readAt: null,
     });
-    expect(describeNotification(notice('AUCTION_CLOSED', 'BUY_NOW'), 'buyer').title).toBe('Compraste ahora');
-    expect(describeNotification(notice('AUCTION_CLOSED', 'BUY_NOW'), 'seller').title).toBe('Vendiste por compra inmediata');
-    expect(describeNotification(notice('AUCTION_CLOSED', 'TIME'), 'buyer').title).toBe('¡Ganaste la subasta!');
+    expect(describeNotification(notice('AUCTION_CLOSED', 'BUY_NOW'), 'buyer').message).toEqual({ kind: 'boughtNow', amount: '1800.00' });
+    expect(describeNotification(notice('AUCTION_CLOSED', 'BUY_NOW'), 'seller').message.kind).toBe('soldBuyNow');
+    expect(describeNotification(notice('AUCTION_CLOSED', 'TIME'), 'buyer').message.kind).toBe('wonAuction');
     const lost = describeNotification(notice('AUCTION_LOST', 'BUY_NOW'), 'bidder');
-    expect(lost).toMatchObject({ title: 'La obra se vendió por compra inmediata', href: '/obras/l1', tone: 'info' });
-    expect(lost.body).toContain('volvió a tu bolsillo');
+    expect(lost).toEqual({ message: { kind: 'lostBuyNow' }, href: '/obras/l1', tone: 'info' });
   });
 });

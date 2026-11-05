@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '@/components/ui/toast';
 import { useAuctionChannel } from '@/hooks/use-auction-channel';
@@ -23,10 +24,12 @@ const TRANSITION_POLL_MS = 4000;
  * pantalla, que actualiza la sala con updateAuction.
  */
 export function useLiveAuction(auctionId: string) {
+  const t = useTranslations('Room');
+  const locale = useLocale();
   const notify = useToast();
   const [auction, setAuction] = useState<Auction | null>(null);
   const [lot, setLot] = useState<Lot | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [offsetMs, setOffsetMs] = useState(0);
   const [connected, setConnected] = useState(false);
   const [wallet, setWallet] = useState<WalletSnapshot | null>(null);
@@ -62,7 +65,7 @@ export function useLiveAuction(auctionId: string) {
             : current,
         );
         if (event.extended) {
-          notify('Puja en el último momento: el cierre se alargó 30 segundos.', 'info');
+          notify(t('extendedByOther'), 'info');
         }
       }
       if (message.type === 'auction-closed') {
@@ -72,7 +75,7 @@ export function useLiveAuction(auctionId: string) {
         );
       }
     },
-    [notify],
+    [notify, t],
   );
   const { send } = useAuctionChannel(applyEvent);
 
@@ -83,7 +86,7 @@ export function useLiveAuction(auctionId: string) {
       setOffsetMs(clockOffset(view.serverTime));
       return view.auction;
     } catch {
-      setLoadError('Esta sala no existe o ya no está disponible.');
+      setLoadError(true);
       return null;
     }
   }, [auctionId]);
@@ -94,7 +97,8 @@ export function useLiveAuction(auctionId: string) {
         void artApi.lot(loaded.lotId).then(setLot).catch(() => undefined);
       }
     });
-  }, [reload]);
+    // La ficha llega en el idioma activo: al cambiarlo se vuelve a pedir.
+  }, [reload, locale]);
 
   // Con sesion: se une al canal en vivo con su token y trae su bolsillo.
   useEffect(() => {

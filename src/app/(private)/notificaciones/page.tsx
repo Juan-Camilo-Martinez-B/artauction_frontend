@@ -2,6 +2,7 @@
 
 import { Bell, CircleAlert, CircleCheck, Info } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { RequireSession } from '@/components/session/require-session';
 import { ButtonLink } from '@/components/ui/button';
@@ -10,7 +11,8 @@ import { Notice } from '@/components/ui/notice';
 import { artApi } from '@/lib/api/client';
 import type { NotificationItem } from '@/lib/api/types';
 import { describeNotification, type EventTone } from '@/lib/describe-events';
-import { formatDateTime, formatRelative } from '@/lib/format';
+import { useEventText } from '@/hooks/use-event-text';
+import { useFormat } from '@/hooks/use-format';
 import { browserSession, type AccountProfile } from '@/lib/session/browser-session';
 
 const TONE_ICON: Record<EventTone, { Icon: typeof Info; className: string }> = {
@@ -20,12 +22,16 @@ const TONE_ICON: Record<EventTone, { Icon: typeof Info; className: string }> = {
 };
 
 export default function NotificationsPage() {
-  return <RequireSession title="Entra para ver tus avisos">{(profile) => <Notifications profile={profile} />}</RequireSession>;
+  const t = useTranslations('Notifications');
+  return <RequireSession title={t('signInTitle')}>{(profile) => <Notifications profile={profile} />}</RequireSession>;
 }
 
 function Notifications({ profile }: { profile: AccountProfile }) {
+  const t = useTranslations('Notifications');
+  const eventText = useEventText();
+  const format = useFormat();
   const [items, setItems] = useState<NotificationItem[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     void browserSession.accessToken().then(async (token) => {
@@ -36,22 +42,22 @@ function Notifications({ profile }: { profile: AccountProfile }) {
         const rows = await artApi.notifications(token);
         setItems([...rows].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
       } catch {
-        setError('No se pudieron cargar los avisos.');
+        setFailed(true);
       }
     });
   }, []);
 
   return (
     <>
-      <PageHeader eyebrow="Tu cuenta" title="Avisos" description="Resultados de tus auditorías y de las subastas en las que participaste." />
-      {error ? <Notice tone="error">{error}</Notice> : null}
-      {!items && !error ? <LoadingState label="Cargando avisos…" /> : null}
+      <PageHeader eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
+      {failed ? <Notice tone="error">{t('loadFailed')}</Notice> : null}
+      {!items && !failed ? <LoadingState label={t('loading')} /> : null}
       {items?.length === 0 ? (
         <EmptyState
           icon={<Bell aria-hidden="true" className="h-6 w-6" />}
-          title="Sin avisos por ahora"
-          description="Cuando termine una auditoría o cierre una subasta en la que participes, lo verás aquí."
-          action={<ButtonLink href="/catalogo" variant="secondary">Ver salas en vivo</ButtonLink>}
+          title={t('empty.title')}
+          description={t('empty.description')}
+          action={<ButtonLink href="/catalogo" variant="secondary">{t('empty.action')}</ButtonLink>}
         />
       ) : null}
       {items && items.length > 0 ? (
@@ -59,17 +65,18 @@ function Notifications({ profile }: { profile: AccountProfile }) {
           {items.map((item) => {
             const described = describeNotification(item, profile.userId);
             const { Icon, className } = TONE_ICON[described.tone];
+            const text = eventText.notification(described.message);
             const body = (
               <>
                 <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${className}`}>
                   <Icon aria-hidden="true" className="h-5 w-5" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block font-medium">{described.title}</span>
-                  <span className="block text-sm text-muted">{described.body}</span>
+                  <span className="block font-medium">{text.title}</span>
+                  <span className="block text-sm text-muted">{text.body}</span>
                 </span>
-                <time dateTime={item.createdAt} title={formatDateTime(item.createdAt)} className="shrink-0 text-xs text-muted">
-                  {formatRelative(item.createdAt)}
+                <time dateTime={item.createdAt} title={format.dateTime(item.createdAt)} className="shrink-0 text-xs text-muted">
+                  {format.relative(item.createdAt)}
                 </time>
               </>
             );

@@ -1,6 +1,7 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, type SubmitEvent } from 'react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { catalogHref } from '@/lib/catalog-href';
  * se aplica al elegirlo. Cambiar un filtro vuelve a la primera pagina.
  */
 export function CatalogSearch({ query, representation, category }: { query: string; representation: string; category: string }) {
+  const t = useTranslations('Catalog.search');
   const router = useRouter();
   const [text, setText] = useState(query);
 
@@ -28,9 +30,9 @@ export function CatalogSearch({ query, representation, category }: { query: stri
     <form role="search" onSubmit={onSubmit} className="mb-6 grid items-end gap-3 md:grid-cols-[1fr_13rem_auto]">
       <TextField
         id="catalog-query"
-        label="Buscar obra, artista o material"
+        label={t('label')}
         type="search"
-        placeholder="Retrato, óleo, Vásquez…"
+        placeholder={t('placeholder')}
         maxLength={120}
         value={text}
         onValueChange={setText}
@@ -38,7 +40,7 @@ export function CatalogSearch({ query, representation, category }: { query: stri
           text ? (
             <button
               type="button"
-              aria-label="Borrar la búsqueda"
+              aria-label={t('clear')}
               className="rounded-full p-2 text-muted hover:bg-paper-deep hover:text-ink"
               onClick={() => {
                 setText('');
@@ -50,13 +52,13 @@ export function CatalogSearch({ query, representation, category }: { query: stri
           ) : null
         }
       />
-      <SelectField id="catalog-representation" label="Formato" value={representation} onChange={(event) => { go({ representation: event.target.value }); }}>
-        <option value="">Todos</option>
-        <option value="TWO_D">Obras planas</option>
-        <option value="THREE_D">Objetos</option>
+      <SelectField id="catalog-representation" label={t('format')} value={representation} onChange={(event) => { go({ representation: event.target.value }); }}>
+        <option value="">{t('all')}</option>
+        <option value="TWO_D">{t('flat')}</option>
+        <option value="THREE_D">{t('objects')}</option>
       </SelectField>
       <Button type="submit" icon={<Search aria-hidden="true" className="h-4 w-4" />}>
-        Buscar
+        {t('submit')}
       </Button>
     </form>
   );

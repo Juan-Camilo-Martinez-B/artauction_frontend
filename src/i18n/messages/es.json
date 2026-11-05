@@ -1,0 +1,1276 @@
+{
+  "Meta": {
+    "title": "ArtAuction AI",
+    "description": "Subastas de arte y antigüedades con auditoría de autenticidad."
+  },
+  "Layout": {
+    "skipToContent": "Saltar al contenido",
+    "mainNavigation": "Principal"
+  },
+  "Nav": {
+    "catalog": "Catálogo",
+    "myGallery": "Mi galería",
+    "howItWorks": "Cómo funciona",
+    "openMenu": "Abrir el menú",
+    "closeMenu": "Cerrar el menú"
+  },
+  "Account": {
+    "signIn": "Entrar",
+    "menuLabel": "Cuenta de {name}",
+    "profile": "Mi cuenta",
+    "wallet": "Bolsillo",
+    "myWorks": "Mis obras",
+    "activity": "Actividad",
+    "notifications": "Avisos",
+    "newWork": "Nueva obra",
+    "review": "Revisión manual",
+    "settings": "Ajustes",
+    "signOut": "Cerrar sesión",
+    "signingOut": "Cerrando sesión…"
+  },
+  "Balance": {
+    "held": " y {held} retenidas en pujas",
+    "title": "Saldo disponible: {balance} artacoins{held}. Abre tu bolsillo.",
+    "label": "Saldo: {balance} artacoins{held}. Abrir bolsillo",
+    "unit": "AC"
+  },
+  "Footer": {
+    "tagline": "Subastas de arte y antigüedades con auditoría de autenticidad. El reloj de cada sala es el del servidor.",
+    "catalog": "Catálogo y salas en vivo",
+    "myGallery": "Mi galería 3D",
+    "howItWorks": "Cómo funciona",
+    "wallet": "Bolsillo de artacoins",
+    "notifications": "Avisos",
+    "privacy": "Una obra privada no se muestra a terceros."
+  },
+  "Language": {
+    "label": "Idioma",
+    "switchTo": "Cambiar a {language}",
+    "settingsTitle": "Idioma",
+    "settingsHint": "La plataforma se muestra en este idioma en todos tus dispositivos. Las fichas de las obras se traducen automáticamente.",
+    "saveFailed": "No se pudo guardar el idioma en tu cuenta. Se aplicó solo en este navegador."
+  },
+  "Profile": {
+    "signInTitle": "Entra para ver tu cuenta",
+    "account": "Cuenta",
+    "roles": {
+      "USER": "Coleccionista",
+      "SELLER": "Vendedor",
+      "ADMIN": "Administración"
+    },
+    "descriptions": {
+      "profile": "Tu cuenta y sus secciones.",
+      "wallet": "Saldo de artacoins, recargas y lo retenido en salas.",
+      "myWorks": "Lo que publicaste con su estado, y lo que ganaste en subasta.",
+      "activity": "Lo que hacen las personas que sigues.",
+      "notifications": "Resultados de auditorías y cierres de subasta.",
+      "newWork": "Sube un proyecto propio para tu galería o, si vendes, una obra para el catálogo.",
+      "review": "Obras que esperan una decisión manual.",
+      "settings": "Tu nombre, tu imagen de perfil y el idioma."
+    }
+  },
+  "Settings": {
+    "signInTitle": "Entra para cambiar tus ajustes",
+    "eyebrow": "Tu cuenta",
+    "title": "Ajustes",
+    "description": "El nombre y la imagen se ven en la cabecera y en tu galería pública.",
+    "accountFallback": "Cuenta",
+    "preview": "Así te verán las demás personas.",
+    "nameLabel": "Nombre",
+    "avatarLabel": "Imagen de perfil",
+    "avatarHint": "Una dirección https. Si la dejas vacía, se usan tus iniciales.",
+    "avatarHttps": "La imagen debe ser una dirección https.",
+    "avatarComplete": "Escribe una dirección completa, por ejemplo https://…",
+    "save": "Guardar cambios",
+    "saving": "Guardando…",
+    "saved": "Tus ajustes quedaron guardados.",
+    "saveFailed": "No se pudieron guardar los ajustes."
+  },
+  "Errors": {
+    "EMAIL_TAKEN": "Ese correo ya tiene una cuenta. Entra con él o usa otro.",
+    "INVALID_CREDENTIALS": "El correo o la contraseña no coinciden.",
+    "SESSION_INVALID": "Tu sesión terminó. Vuelve a entrar.",
+    "ROLE_NOT_ALLOWED": "Ese rol no se puede elegir al registrarse.",
+    "ACCOUNT_NOT_FOUND": "La cuenta no existe.",
+    "USER_NOT_FOUND": "No encontramos a esa persona.",
+    "LOT_NOT_FOUND": "No encontramos esa obra.",
+    "LOT_CHANGED": "La obra cambió mientras la editabas. Intenta de nuevo.",
+    "LOT_NOT_EDITABLE": "Solo se puede cambiar una obra en borrador o un proyecto propio. Si un administrador te la devuelve, podrás editarla.",
+    "LOT_VISIBILITY_FIXED": "Solo un proyecto propio se muestra u oculta a mano. La visibilidad de una obra del catálogo la decide la auditoría.",
+    "MODEL_ONLY_THREE_D": "Solo una obra tridimensional (escultura u objeto) lleva modelo 3D.",
+    "MODEL_REQUIRED": "Una obra tridimensional necesita su modelo 3D (.glb, .gltf, .fbx u .obj) antes de mostrarse.",
+    "MODEL_REMOVE_PUBLIC": "Tu obra es pública: sube otro modelo para reemplazarlo u ocúltala antes de quitarlo.",
+    "SELLER_ONLY": "Solo una cuenta de vendedor puede hacer esto.",
+    "ADMIN_ONLY": "Solo un administrador puede hacer esto.",
+    "AUCTION_NOT_FOUND": "No encontramos esa subasta.",
+    "AUCTION_NOT_ACTIVE": "La subasta no está activa.",
+    "AUCTION_CLOSED": "La subasta ya cerró.",
+    "AUCTION_ALREADY_EXISTS": "Esa obra ya tiene una subasta abierta o cerrada.",
+    "LOT_NOT_READY_FOR_AUCTION": "La obra todavía no está lista para subastarse.",
+    "BID_BELOW_INCREMENT": "La puja no alcanza el incremento mínimo.",
+    "BID_TAKEN": "La oferta de {amount} ya la publicó otra persona.",
+    "BID_ALREADY_PLACED": "Ya publicaste la oferta de {amount}.",
+    "OWN_LOT_BID": "No puedes pujar por tu propia obra.",
+    "OWN_LOT_PURCHASE": "No puedes comprar tu propia obra.",
+    "WITHDRAW_LOCKED": "No puedes retirarte durante los últimos 4 minutos de la subasta.",
+    "BUY_NOW_EXCEEDED": "La compra inmediata ya no está disponible: las pujas llegaron al 80 % de su precio.",
+    "BUY_NOW_ROOM_CLOSED": "La compra inmediata solo está disponible con la sala abierta.",
+    "IDEMPOTENCY_KEY_REUSED": "Esa operación ya se envió con otros datos. Recarga la página e intenta de nuevo.",
+    "INSUFFICIENT_FUNDS": "No tienes artacoins suficientes. Faltan {missing} en el bolsillo.",
+    "PAYMENT_REJECTED": "La pasarela rechazó la tarjeta: revisa que no esté vencida y que el número y el código estén completos.",
+    "TOP_UP_OUT_OF_RANGE": "Se cargan entre {min} y {max} artacoins enteras.",
+    "WALLET_UNAVAILABLE": "El bolsillo no responde. Intenta de nuevo.",
+    "GALLERY_NOT_FOUND": "Todavía no tienes galería.",
+    "GALLERY_MANUAL_CHANGES": "Hay cambios manuales. Confirma si quieres reemplazar la sala actual.",
+    "ARTWORK_NOT_OWNED": "Solo puedes colgar obras tuyas: tus proyectos, lo que publicaste sin vender y lo que ganaste.",
+    "ARTWORK_NEEDS_MODEL": "Esta obra tridimensional no tiene modelo 3D: súbelo para exponerla en tu sala.",
+    "ARTWORK_NOT_IN_GALLERY": "La obra no está en tu galería.",
+    "SHEET_NOT_FOUND": "No encontramos esa ficha.",
+    "AI_NOT_CONFIGURED": "El diseño con IA no está disponible ahora.",
+    "AI_UNAVAILABLE": "La IA no respondió. Intenta de nuevo en un momento.",
+    "TRANSLATION_DISABLED": "La traducción automática está desactivada.",
+    "INVALID_ARGUMENT": "Hay un dato que no es válido.",
+    "NOT_FOUND": "No encontramos lo que buscas.",
+    "CONFLICT": "Algo cambió mientras tanto. Recarga e intenta de nuevo.",
+    "PERMISSION_DENIED": "No tienes permiso para hacer esto.",
+    "UNAUTHENTICATED": "Tu sesión terminó. Vuelve a entrar.",
+    "FAILED_PRECONDITION": "Ahora no se puede hacer esto.",
+    "UNAVAILABLE": "El servicio no responde. Intenta de nuevo en un momento.",
+    "TIMEOUT": "El servicio tardó demasiado. Intenta de nuevo.",
+    "RATE_LIMITED": "Demasiados intentos seguidos. Espera unos segundos.",
+    "VALIDATION_FAILED": "Revisa los datos: hay campos incompletos o con un formato no válido.",
+    "INVALID_JSON": "La solicitud llegó dañada. Intenta de nuevo.",
+    "PAYLOAD_TOO_LARGE": "Lo que enviaste es demasiado grande.",
+    "INTERNAL": "Algo falló de nuestro lado. Intenta de nuevo."
+  },
+  "Auth": {
+    "loginEyebrow": "Tu cuenta",
+    "loginTitle": "Entrar",
+    "loggingIn": "Entrando…",
+    "loginFailed": "No se pudo entrar. Intenta de nuevo.",
+    "noAccount": "¿Aún no tienes cuenta?",
+    "haveAccount": "¿Ya tienes cuenta?",
+    "registerEyebrow": "Nueva cuenta",
+    "createAccount": "Crear cuenta",
+    "creatingAccount": "Creando cuenta…",
+    "registerFailed": "No se pudo crear la cuenta. Intenta de nuevo.",
+    "name": "Nombre",
+    "email": "Correo",
+    "password": "Contraseña",
+    "passwordHint": "Mínimo {min} caracteres, sin espacios.",
+    "sellerTitle": "Quiero publicar obras",
+    "sellerHint": "Tu cuenta podrá enviar obras a auditoría y subastarlas."
+  },
+  "Validation": {
+    "emailRequired": "Escribe tu correo.",
+    "emailInvalid": "Revisa el correo: debe tener la forma nombre@dominio.com.",
+    "passwordRequired": "Escribe tu contraseña.",
+    "passwordShort": "La contraseña debe tener al menos {minPassword} caracteres.",
+    "passwordLong": "La contraseña es demasiado larga.",
+    "nameLength": "El nombre debe tener entre 2 y 80 caracteres."
+  },
+  "Common": {
+    "loading": "Cargando…",
+    "cancel": "Cancelar",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "closeNotice": "Cerrar aviso"
+  },
+  "Session": {
+    "checking": "Comprobando tu sesión…",
+    "signInTitle": "Entra para continuar",
+    "signInHint": "Esta sección es de tu cuenta. Entra y vuelves aquí mismo.",
+    "signIn": "Entrar",
+    "createAccount": "Crear cuenta",
+    "wrongRole": "Esta sección no es para tu cuenta",
+    "sellerOnly": "Solo una cuenta de vendedor puede publicar obras.",
+    "adminOnly": "Solo una cuenta administradora puede entrar aquí.",
+    "toCatalog": "Ir al catálogo"
+  },
+  "Status": {
+    "BORRADOR": "Borrador",
+    "DEVUELTA": "Devuelta",
+    "PERSONAL": "Proyecto propio",
+    "PENDIENTE_AUDITORIA": "En auditoría",
+    "APROBADO": "Aprobada",
+    "PUBLICADA": "Publicada",
+    "REVISION_MANUAL": "Revisión manual",
+    "EN_SUBASTA": "En subasta",
+    "VENDIDA": "Vendida",
+    "CERRADO": "Cerrada",
+    "ACTIVA": "Sala abierta",
+    "PROGRAMADA": "Programada",
+    "CERRADA": "Cerrada"
+  },
+  "Score": {
+    "title": "Autenticidad",
+    "score": "Puntaje de autenticidad {score}",
+    "noScore": "Puntaje de autenticidad sin dato",
+    "noVerdict": "Todavía sin veredicto"
+  },
+  "Home": {
+    "eyebrow": "Sala de arte",
+    "title": "La obra entra cuando el material y el siglo coinciden.",
+    "lead": "Subastas de arte y antigüedades con auditoría de autenticidad. El precio solo sube, el cierre se alarga si alguien puja en el último instante y lo que ganas se exhibe en tu propia sala.",
+    "toCatalog": "Ver el catálogo",
+    "howItWorks": "Cómo funciona",
+    "steps": {
+      "audit": {
+        "title": "Auditamos",
+        "text": "Cada obra pasa una auditoría de autenticidad: material, época e imagen deben coincidir."
+      },
+      "auction": {
+        "title": "Subastamos",
+        "text": "Salas en vivo con el reloj del servidor. Una puja en el último instante alarga el cierre."
+      },
+      "exhibit": {
+        "title": "Exhibes",
+        "text": "La obra que ganas cuelga en tu galería 3D, que puedes recorrer y montar a tu gusto."
+      }
+    }
+  },
+  "Categories": {
+    "arte-digital": "Arte digital",
+    "ceramica": "Cerámica y jarrones",
+    "escultura": "Escultura",
+    "fotografia": "Fotografía",
+    "objetos-artisticos": "Objetos artísticos",
+    "otras": "Otras",
+    "pinturas": "Pinturas"
+  },
+  "Catalog": {
+    "eyebrow": "Exposición",
+    "title": "Catálogo",
+    "description": "Pinturas, fotografías y objetos con auditoría de autenticidad. Cada pocos minutos una obra sale a subasta.",
+    "errors": {
+      "unavailable": "El catálogo no está disponible.",
+      "offline": "No hay conexión con la sala."
+    },
+    "categories": "Categorías",
+    "allCatalog": "Todo el catálogo",
+    "empty": {
+      "title": "No hay obras con ese criterio",
+      "description": "Prueba otra categoría, otro formato o una búsqueda más corta.",
+      "action": "Ver todo el catálogo"
+    },
+    "featured": "Obra destacada",
+    "unattributedArtist": "Artista sin atribuir",
+    "unattributed": "Sin atribuir",
+    "noCategory": "Sin categoría",
+    "total": "{total, plural, one {# obra} other {# obras}} en esta selección.",
+    "object": "Objeto",
+    "wallWork": "Obra mural",
+    "search": {
+      "label": "Buscar obra, artista o material",
+      "placeholder": "Retrato, óleo, Vásquez…",
+      "clear": "Borrar la búsqueda",
+      "format": "Formato",
+      "all": "Todos",
+      "flat": "Obras planas",
+      "objects": "Objetos",
+      "submit": "Buscar"
+    },
+    "pager": {
+      "label": "Páginas del catálogo",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Página {page} de {pages}"
+    }
+  },
+  "LiveAuctions": {
+    "eyebrow": "Sala abierta",
+    "title": "En vivo y próximas",
+    "description": "Cada pocos minutos abre una sala nueva con una obra del catálogo.",
+    "toCatalog": "Ver todo el catálogo",
+    "unavailable": "La cartelera no está disponible en este momento.",
+    "empty": "Estamos preparando la próxima sala. Vuelve en unos minutos.",
+    "live": "En vivo",
+    "upcoming": "Próxima",
+    "unattributedArtist": "Artista sin atribuir",
+    "currentPrice": "Precio actual",
+    "openingPrice": "Salida",
+    "closesIn": "Cierra en",
+    "opensIn": "Abre en",
+    "closing": "Cerrando…",
+    "opening": "Abriendo…",
+    "buyNow": "Compra inmediata:"
+  },
+  "HowItWorks": {
+    "metaTitle": "Cómo funciona",
+    "eyebrow": "Guía",
+    "title": "Cómo funciona la sala",
+    "description": "De la auditoría a tu galería: todo lo que pasa con una obra en ArtAuction.",
+    "toLive": "Ver salas en vivo",
+    "createAccount": "Crear cuenta",
+    "sections": {
+      "audit": {
+        "title": "Auditoría de autenticidad",
+        "p1": "Cada obra publicada pasa por una auditoría: reglas que detectan anacronismos (por ejemplo, acrílico antes de 1950) o imágenes repetidas, y un modelo que evalúa la ficha completa.",
+        "p2": "Si todo cuadra, la obra se publica con un puntaje de autenticidad y un precio sugerido. Si algo no encaja, queda en revisión manual y la decide una persona."
+      },
+      "rooms": {
+        "title": "Salas de subasta",
+        "p1": "Siempre hay algunas salas abiertas o por abrir: cada pocos minutos una obra del catálogo sale a subasta y la sala dura entre 15 y 30 minutos.",
+        "p2": "El precio solo sube. Si alguien puja en los últimos 30 segundos, el cierre se alarga otros 30. Puedes retirar tu oferta hasta 4 minutos antes del cierre.",
+        "p3": "La cuenta regresiva usa el reloj del servidor, así que todas las personas ven el mismo tiempo."
+      },
+      "wallet": {
+        "title": "Artacoins y bolsillo",
+        "p1": "Las pujas se pagan en artacoins. Se recargan en el bolsillo con un cobro simulado: sirve cualquier tarjeta que no esté vencida.",
+        "p2": "Al ofertar solo se retiene la diferencia con tu oferta anterior. Si pierdes, lo retenido vuelve; si ganas, se cobra, y quien vende recibe el precio menos el 10 % de comisión."
+      },
+      "gallery": {
+        "title": "Tu galería 3D",
+        "p1": "Las obras que ganas cuelgan en tu sala 3D. Puedes recorrerla a pie, acercarte a cada obra y montarla a tu gusto: paredes, suelo, luz y la posición de cada pieza.",
+        "p2": "Las obras públicas también se ven en tu galería pública, y otras personas pueden seguirte."
+      }
+    }
+  },
+  "Artwork": {
+    "work": "Obra",
+    "sheetTitle": "Ficha de la obra",
+    "preparingModel": "Preparando el modelo 3D…",
+    "noCategory": "Sin categoría",
+    "threeD": "Objeto tridimensional",
+    "twoD": "Obra bidimensional",
+    "unclassified": "Formato sin clasificar",
+    "format": {
+      "landscape": "Formato horizontal",
+      "portrait": "Formato vertical",
+      "square": "Formato cuadrado"
+    },
+    "returned": "Un administrador devolvió esta obra",
+    "editAndResend": "Editar y reenviar",
+    "notAudited": "Sin auditar",
+    "unattributed": "Sin atribuir",
+    "unknownYear": "año desconocido",
+    "facts": {
+      "materials": "Materiales",
+      "presentation": "Presentación",
+      "measures": "Medidas",
+      "noMeasures": "Sin medidas en la ficha",
+      "provenance": "Procedencia",
+      "noProvenance": "Sin procedencia en la ficha",
+      "priceBand": "Banda sugerida"
+    },
+    "personalTitle": "Proyecto propio, sin auditar",
+    "personalText": "Su autor la subió para su galería personal. No pasó por la auditoría de autenticidad y no está a la venta.",
+    "audit": {
+      "critical": "La auditoría encontró una inconsistencia crítica.",
+      "clean": "La auditoría no encontró inconsistencias críticas.",
+      "soldWith": "Score de autenticidad con el que se vendió la obra.",
+      "pending": "El reporte de autenticidad aparece cuando termina la auditoría."
+    },
+    "source": {
+      "personal": "Proyecto propio, sin auditar",
+      "manualApproval": "Aprobada por revisión manual de un administrador",
+      "localRules": "Evaluación local (sin IA): la IA no estaba disponible",
+      "systemRule": "Decidió una regla del sistema",
+      "unfinished": "La auditoría automática no terminó",
+      "ai": "Evaluada por la IA ({model})"
+    },
+    "translation": {
+      "automatic": "Traducido automáticamente",
+      "original": "Texto original",
+      "showOriginal": "Ver original",
+      "showTranslation": "Ver traducción"
+    },
+    "auction": {
+      "openNow": "Sala abierta ahora",
+      "scheduled": "Subasta programada",
+      "currentPrice": "Va en {price}",
+      "openingPrice": "Sale en {price}",
+      "openingAt": "Sale en {price} · abre el {date}",
+      "buyNow": "Compra inmediata:",
+      "buyNowWhenOpen": "al abrir la sala",
+      "enterRoom": "Entrar a la sala",
+      "seeRoom": "Ver la sala"
+    },
+    "purchase": {
+      "title": "Ficha guardada de la compra",
+      "byBuyNow": "por compra inmediata",
+      "atAuction": "en subasta",
+      "onArtAuction": "en ArtAuction",
+      "bought": "Comprada {how}",
+      "on": "el {date}",
+      "for": "por {price}",
+      "snapshot": "Es la ficha de la obra tal como estaba al venderse."
+    },
+    "view": "Vista de la obra",
+    "photo": "Foto",
+    "model": "Modelo 3D",
+    "noImage": "Esta obra todavía no tiene una imagen publicada.",
+    "verifiedModel": "Modelo 3D verificado · {triangles} triángulos",
+    "unavailable": {
+      "title": "Esta obra no está disponible",
+      "description": "Puede que sea privada, que se haya vendido o que el enlace esté mal.",
+      "action": "Volver al catálogo",
+      "opening": "Abriendo la ficha…"
+    },
+    "unavailableSheet": {
+      "title": "Esta ficha no está disponible",
+      "description": "Puede que la obra sea privada en esta galería o que el enlace esté mal.",
+      "action": "Ver la galería",
+      "opening": "Abriendo la ficha…"
+    }
+  },
+  "PublicGallery": {
+    "metaTitle": "Galería",
+    "eyebrow": "Colección",
+    "title": "Galería pública",
+    "description": "Las obras públicas de esta colección: lo que su dueño ganó, publicó o creó para su galería. Síguela para ver en tu feed lo que gana.",
+    "empty": {
+      "title": "Todavía no hay obras públicas",
+      "description": "Cuando esta persona gane o publique obras públicas, se verán aquí."
+    },
+    "sources": {
+      "GANADA": "Ganada en subasta",
+      "PROPIA": "De su autoría",
+      "PROYECTO": "Proyecto propio, sin auditar",
+      "other": "En la colección"
+    },
+    "unattributedArtist": "Artista sin atribuir",
+    "follow": {
+      "signIn": "Entrar para seguir",
+      "own": "Es tu galería: ir a la sala 3D",
+      "done": "Ahora sigues esta galería. Su actividad aparecerá en tu feed.",
+      "failed": "No se pudo seguir esta galería.",
+      "following": "Siguiendo",
+      "follow": "Seguir galería"
+    }
+  },
+  "Room": {
+    "metaTitle": "Sala de subasta",
+    "eyebrow": "Sala de subasta",
+    "fallbackTitle": "La puja",
+    "unattributedArtist": "Artista sin atribuir",
+    "workAlt": "Obra en subasta",
+    "seeSheet": "Ver la ficha y el reporte de autenticidad",
+    "preparing": "Preparando la sala…",
+    "unavailable": {
+      "title": "Sala no disponible",
+      "description": "Esta sala no existe o ya no está disponible.",
+      "action": "Ver salas en vivo"
+    },
+    "live": "En vivo",
+    "connecting": "Conectando…",
+    "highestBid": "Oferta más alta",
+    "openingPrice": "Precio de salida",
+    "leaderYou": "La lleva tu oferta",
+    "leader": "La lleva {bidder}",
+    "you": "Tú",
+    "bidder": "Postor {number}",
+    "withdraw": "Retirar mi oferta",
+    "history": "Historial de pujas",
+    "noBids": "Aún no hay pujas. La primera oferta abre en {amount}.",
+    "buyNowTag": "Compra inmediata",
+    "minimumBid": "La oferta mínima es {amount}.",
+    "bidExtended": "Oferta aceptada. El cierre se alargó 30 segundos.",
+    "bidAccepted": "Oferta aceptada: vas ganando con {amount}.",
+    "bidFailed": "La oferta no entró. Intenta de nuevo.",
+    "withdrawn": "Te retiraste. Volvieron {amount} a tu bolsillo.",
+    "withdrawFailed": "No fue posible retirarse.",
+    "bought": "¡La compraste por {amount}! Ya está en tu galería.",
+    "buyFailed": "La compra no se completó. Intenta de nuevo.",
+    "extendedByOther": "Puja en el último momento: el cierre se alargó 30 segundos.",
+    "available": "Disponible: {amount}",
+    "heldHere": "más {amount} ya retenidas en esta sala",
+    "topUp": "Recargar",
+    "withdrawDialog": {
+      "title": "¿Retirar tu oferta?",
+      "confirm": "Retirarme",
+      "body": "Las artacoins retenidas vuelven a tu bolsillo y dejas de competir por esta obra. Solo se puede hasta 4 minutos antes del cierre."
+    },
+    "buyDialog": {
+      "title": "¿Comprar ahora?",
+      "confirm": "Comprar por {price}",
+      "body": "Pagas <strong>{price}</strong>, te llevas la obra y la subasta termina para todos. Quienes pujaron recuperan lo retenido."
+    },
+    "clock": {
+      "unsold": "Cerró sin ventas: se programará otra fecha.",
+      "youBought": "¡La compraste! Ya está en tu galería.",
+      "soldBuyNow": "Se vendió por compra inmediata.",
+      "youWon": "¡Ganaste esta obra! Ya está en tu galería.",
+      "closedWithWinner": "Cerró con un ganador.",
+      "opening": "Abriendo la sala…",
+      "closing": "Cerrando la sala…",
+      "opensIn": "Abre en",
+      "closesIn": "Cierra en"
+    },
+    "bid": {
+      "wantToBid": "¿Quieres pujar?",
+      "signInHint": "Entra con tu cuenta y recarga artacoins en el bolsillo.",
+      "signIn": "Entrar para pujar",
+      "ownWork": "Es tu obra: puedes seguir la sala, pero no ofertar en ella.",
+      "notYet": "Podrás ofertar cuando la sala abra.",
+      "noMore": "La sala ya no recibe ofertas.",
+      "amountLabel": "Tu oferta en artacoins",
+      "minimum": "Mínimo {amount}.",
+      "quick": "Ofertas rápidas",
+      "available": "Disponible: {amount}.",
+      "topUp": "Recargar",
+      "onlyIncrease": "Solo se retiene lo que sube tu oferta.",
+      "submit": "Ofertar",
+      "submitAmount": "Ofertar {amount}"
+    },
+    "buyNow": {
+      "whenOpen": "Compra inmediata al abrir la sala: {price}.",
+      "exceeded": "La compra inmediata ya no está disponible: las pujas llegaron a {threshold}, el 80 % de {price}.",
+      "price": "Compra inmediata: {price}.",
+      "pitch": "¿No quieres esperar? Llévatela ahora y la subasta termina.",
+      "action": "Comprar ahora por {price}"
+    }
+  },
+  "Wallet": {
+    "signInTitle": "Entra para ver tu bolsillo",
+    "loadFailed": "No se pudo abrir el bolsillo.",
+    "payFailed": "La pasarela no completó el cobro. Intenta de nuevo.",
+    "credited": "Entraron {amount} con la tarjeta terminada en {last4}.",
+    "opening": "Abriendo tu bolsillo…",
+    "eyebrow": "Artacoins",
+    "title": "Bolsillo",
+    "description": "Las artacoins son la moneda de la sala. El cobro es simulado: sirve cualquier tarjeta inventada que no esté vencida.",
+    "topUp": "Recargar",
+    "pack": "Paquete",
+    "notStored": "No se guarda el número ni el código.",
+    "charging": "Cobrando…",
+    "pay": "Pagar {amount}",
+    "available": "Disponible",
+    "held": "Retenido en salas",
+    "entriesTitle": "Movimientos",
+    "noEntries": "Aún no hay movimientos. Tu primera recarga aparecerá aquí.",
+    "entries": {
+      "RECARGA": "Recarga",
+      "RETENCION": "Retenido en una sala",
+      "LIBERACION": "Devolución de una sala",
+      "CANJE": "Pago de una obra ganada",
+      "VENTA": "Venta de una obra",
+      "REEMBOLSO": "Reembolso de una compra anulada",
+      "ANULACION": "Venta anulada"
+    }
+  },
+  "Card": {
+    "genericBrand": "Tarjeta",
+    "namePlaceholder": "NOMBRE EN LA TARJETA",
+    "expiryPlaceholder": "MM/AA",
+    "nameLabel": "Nombre en la tarjeta",
+    "numberLabel": "Número de la tarjeta",
+    "numberHint": "Visa, Mastercard, American Express o Diners Club.",
+    "expiryLabel": "Vencimiento",
+    "cvvLabel": "Código de seguridad",
+    "cvvHintFront": "{digits} dígitos, al frente.",
+    "cvvHintBack": "{digits} dígitos, al respaldo.",
+    "numberRequired": "Escribe el número de la tarjeta.",
+    "numberLength": "Una tarjeta {brand} tiene {digits} dígitos.",
+    "expiryRequired": "Escribe el vencimiento.",
+    "expiryFormat": "Escribe el vencimiento como MM/AA.",
+    "expiryMonth": "El mes debe estar entre 01 y 12.",
+    "expired": "La tarjeta está vencida.",
+    "expiryYear": "Revisa el año de vencimiento.",
+    "cvvLength": "El código de seguridad tiene {digits} dígitos.",
+    "nameRequired": "Escribe el nombre como aparece en la tarjeta."
+  },
+  "Events": {
+    "auditApproved": {
+      "title": "Tu obra pasó la auditoría",
+      "body": "Ya está publicada en el catálogo y recibirá su sala de subasta."
+    },
+    "auditManual": {
+      "title": "Tu obra quedó en revisión manual",
+      "body": "La auditoría encontró algo que debe mirar una persona. Te avisaremos al resolverla."
+    },
+    "auditDone": {
+      "title": "Terminó la auditoría de tu obra",
+      "result": "Resultado: {verdict}.",
+      "noResult": "Revisa la ficha para ver el resultado."
+    },
+    "lotReturned": {
+      "title": "{title} volvió a borrador",
+      "genericTitle": "Tu obra volvió a borrador",
+      "reason": "Motivo: {reason} Corrígela y reenvíala a auditoría.",
+      "noReason": "Un administrador la devolvió. Corrígela y reenvíala a auditoría."
+    },
+    "boughtNow": {
+      "title": "Compraste ahora",
+      "body": "Pagaste {amount} y la subasta terminó. La obra ya cuelga en tu galería."
+    },
+    "wonAuction": {
+      "title": "¡Ganaste la subasta!",
+      "body": "Pagaste {amount}. La obra ya cuelga en tu galería."
+    },
+    "soldBuyNow": {
+      "title": "Vendiste por compra inmediata",
+      "body": "Alguien pagó {amount} y cerró la subasta. El pago, menos la comisión, ya está en tu bolsillo."
+    },
+    "sold": {
+      "title": "Vendiste una obra",
+      "body": "La subasta cerró en {amount}. El pago, menos la comisión, ya está en tu bolsillo."
+    },
+    "lostBuyNow": {
+      "title": "La obra se vendió por compra inmediata",
+      "body": "Ya no compites por ella. Lo que tenías retenido volvió a tu bolsillo."
+    },
+    "lost": {
+      "title": "La subasta cerró con otro ganador",
+      "body": "Ya no compites por ella. Lo que tenías retenido volvió a tu bolsillo."
+    },
+    "generic": {
+      "title": "Aviso",
+      "body": "Hay novedades en tu cuenta."
+    },
+    "activity": {
+      "followed": "Siguió a {name}",
+      "boughtNow": "Compró {name} al instante",
+      "won": "Ganó {name}"
+    }
+  },
+  "Feed": {
+    "signInTitle": "Entra para ver la actividad",
+    "eyebrow": "Comunidad",
+    "title": "Actividad",
+    "description": "Lo que pasa con tus obras y con las galerías que sigues.",
+    "loadFailed": "No se pudo cargar la actividad.",
+    "loading": "Cargando actividad…",
+    "empty": {
+      "title": "Aún no hay actividad",
+      "description": "Gana una subasta o sigue la galería de otra persona y su actividad aparecerá aquí.",
+      "action": "Explorar el catálogo"
+    },
+    "you": "Tú",
+    "followed": "Alguien que sigues"
+  },
+  "Notifications": {
+    "signInTitle": "Entra para ver tus avisos",
+    "eyebrow": "Tu cuenta",
+    "title": "Avisos",
+    "description": "Resultados de tus auditorías y de las subastas en las que participaste.",
+    "loadFailed": "No se pudieron cargar los avisos.",
+    "loading": "Cargando avisos…",
+    "empty": {
+      "title": "Sin avisos por ahora",
+      "description": "Cuando termine una auditoría o cierre una subasta en la que participes, lo verás aquí.",
+      "action": "Ver salas en vivo"
+    }
+  },
+  "Publish": {
+    "categoriesFailed": "No se pudieron cargar las categorías.",
+    "imageFailed": "No se pudo preparar la imagen. Prueba con un JPG o PNG.",
+    "returnReason": "Motivo de la devolución:",
+    "titleFallback": "la obra",
+    "destination": {
+      "title": "¿Para qué es esta obra?",
+      "label": "Destino de la obra",
+      "personalTitle": "Solo para mi galería",
+      "personalText": "Un proyecto propio: se cuelga en tu sala 3D sin auditoría. No se vende.",
+      "catalogTitle": "Publicar en el catálogo",
+      "catalogText": "Pasa por la auditoría y, si la aprueba, recibe su sala de subasta.",
+      "sellerOnly": "Solo para cuentas de vendedor."
+    },
+    "visibility": {
+      "title": "¿Quién la ve?",
+      "label": "Visibilidad del proyecto",
+      "privateTitle": "Solo yo",
+      "privateText": "En tu sala 3D y en Mis obras.",
+      "publicTitle": "Pública en mi galería",
+      "publicText": "Aparece en tu galería pública como «Proyecto propio, sin auditar». Nunca en el catálogo."
+    },
+    "sections": {
+      "work": "La obra",
+      "materials": "Materiales y medidas",
+      "image": "Imagen"
+    },
+    "fields": {
+      "title": "Título",
+      "description": "Descripción",
+      "artist": "Artista",
+      "artistHint": "Déjalo vacío si no se conoce.",
+      "year": "Año",
+      "materials": "Materiales",
+      "materialsPlaceholder": "Óleo sobre lienzo",
+      "category": "Categoría",
+      "format": "Formato",
+      "formatFlat": "Obra plana (pintura, dibujo, foto)",
+      "formatObject": "Objeto (escultura, cerámica)",
+      "width": "Ancho (cm)",
+      "height": "Alto (cm)",
+      "depth": "Profundidad (cm)",
+      "provenance": "Procedencia",
+      "provenanceHint": "Colecciones o ventas anteriores, si las conoces."
+    },
+    "image": {
+      "previewAlt": "Vista previa de la obra",
+      "preparing": "Preparando la imagen…",
+      "choose": "Elige una foto de la obra",
+      "hint": "Al menos 800 px. Se redimensiona en tu navegador antes de enviarse.",
+      "change": "Toca la imagen para cambiarla."
+    },
+    "submit": {
+      "saveChanges": "Guardar cambios",
+      "saveToGallery": "Guardar en mi galería",
+      "saveAndResend": "Guardar y reenviar a auditoría",
+      "send": "Enviar a auditoría",
+      "saving": "Guardando la ficha…",
+      "uploading": "Subiendo la imagen…",
+      "modeling": "Revisando el modelo 3D…",
+      "submitting": "Enviando a auditoría…",
+      "saveOnly": "Guardar sin enviar"
+    },
+    "problems": {
+      "titleShort": "El título necesita al menos 3 caracteres.",
+      "descriptionShort": "Describe la obra con al menos 10 caracteres.",
+      "materialsRequired": "Indica los materiales.",
+      "yearRange": "El año debe estar entre 1 y {max}.",
+      "widthRequired": "Escribe el ancho.",
+      "widthRange": "El ancho debe estar entre 0,1 y 2000 cm.",
+      "heightRequired": "Escribe el alto.",
+      "heightRange": "El alto debe estar entre 0,1 y 2000 cm.",
+      "depthRequired": "Escribe la profundidad.",
+      "depthRange": "La profundidad debe estar entre 0,1 y 2000 cm.",
+      "provenanceShort": "La procedencia necesita al menos 3 caracteres.",
+      "imageRequired": "Elige la imagen de la obra.",
+      "modelRequired": "Sube el modelo 3D de la obra."
+    },
+    "saveErrors": {
+      "image": "No se pudo guardar la imagen.",
+      "model": "No se pudo guardar el modelo 3D.",
+      "generic": "No se pudo guardar la obra."
+    },
+    "model": {
+      "title": "Modelo 3D",
+      "preparing": "Preparando la vista previa…",
+      "help": "Obligatorio en esculturas y objetos: la sala 3D los expone con su volumen real y a la altura que declaraste. Sirve un .glb o .gltf (Blender: Archivo › Exportar › glTF 2.0), un .fbx o un .obj, como los de Sketchfab o la Asset Store de Unity. Si el .obj o el .gltf traen materiales (.mtl), buffers (.bin) o texturas aparte, elígelos todos a la vez. Un .blend no se abre en la web: expórtalo. Entre {min} y {max} triángulos y hasta 30 MB.",
+      "checking": "Abriendo y revisando el modelo…",
+      "verified": "Modelo verificado",
+      "triangles": "{triangles} triángulos",
+      "uploadsOnSave": "se sube al guardar",
+      "skipped": "Sin {files}: el navegador no lee ese formato de textura. Si la pieza se ve sin color o sin relieve, expórtala con texturas .png o .jpg.",
+      "change": "Cambiar modelo",
+      "choose": "Elegir modelo 3D",
+      "converted": "{name} (convertido desde .{source})"
+    },
+    "modelErrors": {
+      "unknown": "No se pudo abrir el modelo 3D.",
+      "noMain": "Elige el modelo: un archivo .glb, .gltf, .fbx u .obj (un .blend no se abre en la web: expórtalo desde Blender).",
+      "manyMains": "Elige un solo modelo a la vez; junto a él solo van sus materiales (.mtl), buffers (.bin) y texturas.",
+      "stray": "«{name}» no es parte de un modelo 3D.",
+      "tooLarge": "El modelo y sus texturas superan los 30 MB. Redúcelo con el modificador Decimate de Blender o usa texturas más pequeñas.",
+      "choose": "Elige el modelo.",
+      "badGlb": "El archivo no es un GLB válido: le falta la cabecera glTF.",
+      "convertFailed": "No se pudo convertir el modelo a GLB.",
+      "convertedTooLarge": "Convertido a GLB, el modelo supera los 30 MB. Redúcelo con Decimate en Blender o usa texturas más pequeñas.",
+      "tooFewTriangles": "El modelo tiene {triangles} triángulos: muy poco detalle. El mínimo es {min}.",
+      "tooManyTriangles": "El modelo tiene {triangles} triángulos: la sala se volvería lenta. El máximo es {max}; redúcelo con Decimate en Blender.",
+      "openFailed": "No se pudo abrir el modelo .{format}. Revisa que estén todos sus archivos (materiales y texturas) o expórtalo como .glb."
+    },
+    "newPage": {
+      "signInTitle": "Entra para subir una obra",
+      "eyebrow": "Nueva obra",
+      "titleSeller": "Subir una obra",
+      "titleOwn": "Subir un proyecto propio",
+      "descriptionSeller": "Guárdala solo para tu galería o publícala en el catálogo. En el catálogo, la auditoría revisa que materiales, fecha e imagen sean coherentes antes de darle una sala de subasta.",
+      "descriptionOwn": "Tus propias obras se cuelgan en tu sala 3D sin pasar por auditoría. Tú decides si se ven en tu galería pública."
+    },
+    "editPage": {
+      "signInTitle": "Entra para editar tu obra",
+      "opening": "Abriendo la ficha…",
+      "missing": {
+        "title": "No encontramos esta obra entre las tuyas",
+        "description": "Solo quien publicó una obra puede editarla.",
+        "action": "Ir a mis obras"
+      },
+      "locked": {
+        "title": "Esta obra ya no se puede editar",
+        "description": "Solo se editan los proyectos propios y las obras en borrador, por ejemplo las que un administrador devolvió. Una obra en auditoría o publicada conserva su ficha.",
+        "action": "Ver la ficha"
+      },
+      "eyebrow": "Mis obras",
+      "title": "Editar «{title}»",
+      "descriptionOwn": "Cambia la ficha, la imagen o quién la ve. Un proyecto propio no pasa por auditoría.",
+      "descriptionCatalog": "Corrige la ficha o cambia la imagen. Al reenviarla, la auditoría la revisa de nuevo."
+    }
+  },
+  "MyWorks": {
+    "signInTitle": "Entra para ver tus obras",
+    "loading": "Cargando tus obras…",
+    "loadFailed": "No se pudieron cargar todas tus obras.",
+    "eyebrow": "Tu cuenta",
+    "title": "Mis obras",
+    "descriptionSeller": "Tus proyectos propios, lo que publicaste en el catálogo con su estado, y lo que ganaste. Las devueltas se pueden corregir y reenviar.",
+    "descriptionBuyer": "Tus proyectos propios y las obras que ganaste en subasta.",
+    "newWork": "Nueva obra",
+    "room": "Sala 3D",
+    "publicGallery": "Galería pública",
+    "empty": {
+      "title": "Todavía no tienes obras",
+      "description": "Sube un proyecto propio para tu sala 3D o gana una subasta: aquí verás cada obra y su estado.",
+      "action": "Subir la primera"
+    },
+    "emptyFilter": {
+      "title": "No hay obras con esta etiqueta",
+      "action": "Ver todas"
+    },
+    "filterLabel": "Filtrar por estado",
+    "groups": {
+      "published": "Creadas por mí",
+      "acquired": "Adquiridas"
+    },
+    "filters": {
+      "todas": "Todas",
+      "devueltas": "Devueltas",
+      "proyectos": "Proyectos propios",
+      "borrador": "Borrador",
+      "auditoria": "En auditoría",
+      "revision": "Revisión manual",
+      "publicada": "Publicada",
+      "subasta": "En subasta",
+      "vendida": "Vendida",
+      "cerrada": "Cerrada sin venta",
+      "ganadas": "Ganadas en subasta"
+    },
+    "hints": {
+      "DEVUELTA": "Un administrador la devolvió. Corrígela y reenvíala a auditoría.",
+      "PERSONAL": "Proyecto propio: solo para tu galería, sin auditoría.",
+      "BORRADOR": "Aún no se ha enviado a auditoría.",
+      "PENDIENTE_AUDITORIA": "La auditoría la está revisando.",
+      "REVISION_MANUAL": "Un administrador la revisará pronto.",
+      "APROBADO": "Está en el catálogo.",
+      "PUBLICADA": "Está en el catálogo.",
+      "EN_SUBASTA": "Tiene una sala de subasta.",
+      "VENDIDA": "Se vendió en subasta: ahora es de quien la ganó.",
+      "CERRADO": "La subasta cerró sin venta."
+    },
+    "seenPublic": "Se ve en tu galería pública.",
+    "seenPrivate": "Solo la ves tú.",
+    "reason": "Motivo",
+    "edit": "Editar",
+    "needImageSend": "Agrega una imagen antes de enviarla",
+    "needImageMove": "Agrega una imagen antes de pasarla al catálogo",
+    "resubmit": "Reenviar sin cambios",
+    "sendToAudit": "Enviar a auditoría",
+    "makePrivate": "Hacer privada",
+    "makePublic": "Hacer pública",
+    "moveToCatalog": "Pasar al catálogo",
+    "hang": "Colgar en mi sala",
+    "unhang": "Quitar de mi sala",
+    "unattributedArtist": "Artista sin atribuir",
+    "publicInGallery": "Pública en tu galería",
+    "onlyYou": "Solo tú la ves",
+    "moveDialog": {
+      "title": "Pasar al catálogo",
+      "confirm": "Enviar a auditoría",
+      "body": "La auditoría revisa la obra y, si la aprueba, la publica con su sala de subasta. Mientras tanto se oculta de tu galería pública y ya no la podrás editar."
+    },
+    "actions": {
+      "resubmitted": "{title} volvió a auditoría.",
+      "resubmitFailed": "No se pudo enviar la obra a auditoría.",
+      "nowPublic": "{title} ya se ve en tu galería pública.",
+      "nowPrivate": "{title} ahora solo la ves tú.",
+      "visibilityFailed": "No se pudo cambiar quién ve la obra.",
+      "hung": "{title} quedó colgada en tu sala.",
+      "unhung": "{title} salió de tu sala.",
+      "hangFailed": "No se pudo colgar la obra.",
+      "unhangFailed": "No se pudo quitar la obra de la sala.",
+      "moved": "{title} entró a la auditoría.",
+      "moveFailed": "No se pudo pasar la obra al catálogo."
+    }
+  },
+  "Studio": {
+    "defaultName": "Mi galería",
+    "signInTitle": "Entra para ver tu galería",
+    "signInHint": "Tu sala 3D guarda las obras que ganas en subasta.",
+    "preparing": "Preparando la sala…",
+    "opening": "Abriendo tu galería…",
+    "loadFailed": "No se pudo abrir la galería.",
+    "eyebrow": "Sala propia",
+    "description": "Recorre tu sala, acércate a cada obra y ajusta el ambiente a tu gusto.",
+    "design": "Diseñar con el asistente",
+    "modeLabel": "Modo de la sala",
+    "modeTour": "Recorrer",
+    "modeEdit": "Editar montaje",
+    "organize": "Organizar automáticamente",
+    "organized": "Propuesta de montaje lista. Guárdala si te gusta.",
+    "alreadyOrganized": "La sala ya está ordenada.",
+    "saved": "Cambios guardados.",
+    "saveFailed": "No se pudieron guardar los cambios.",
+    "restored": "Volviste a la propuesta del asistente.",
+    "restoreFailed": "No se pudo restaurar la propuesta.",
+    "restore": "Volver a la propuesta del asistente",
+    "removed": "{title} salió de tu galería.",
+    "removeFailed": "No se pudo retirar la obra.",
+    "tourHint": "Arrastra para mirar · WASD o flechas para caminar · clic en una obra para acercarte",
+    "editHint": "Elige una obra para moverla · arrastra para girar la vista",
+    "overlap": "Hay obras superpuestas. Entra en <strong>Editar montaje</strong> y usa <strong>Organizar automáticamente</strong>.",
+    "empty": {
+      "title": "Tu sala está vacía",
+      "description": "Tus proyectos propios y las obras que ganes en subasta se cuelgan aquí solos. Lo que publicaste y aún no se vende lo cuelgas desde Mis obras.",
+      "upload": "Subir un proyecto propio",
+      "myWorks": "Mis obras"
+    },
+    "works": {
+      "title": "Obras en la sala",
+      "empty": "Aún no hay obras.",
+      "onPedestal": "Sobre pedestal",
+      "onWall": "En la pared",
+      "goTo": "Ir a la obra",
+      "edit": "Editar"
+    },
+    "unsaved": {
+      "title": "Tienes cambios sin guardar",
+      "ambience": "ambiente",
+      "moved": "{count, plural, one {# obra movida} other {# obras movidas}}",
+      "and": " y ",
+      "discard": "Descartar",
+      "save": "Guardar cambios"
+    },
+    "removeDialog": {
+      "title": "¿Retirar la obra de tu galería?",
+      "confirm": "Retirar",
+      "body": "{title} dejará de verse en tu sala. Podrás volver a colgarla desde su ficha."
+    },
+    "ambience": {
+      "title": "Ambiente",
+      "walls": "Paredes",
+      "wallMaterial": "Material de las paredes",
+      "wallColor": "Color de las paredes",
+      "wallOptions": {
+        "plaster": "Yeso",
+        "marble": "Mármol",
+        "concrete": "Concreto",
+        "wood": "Madera",
+        "metal": "Metal"
+      },
+      "floor": "Suelo",
+      "floorMaterial": "Material del suelo",
+      "floorColor": "Tono del suelo",
+      "floorOptions": {
+        "wood": "Parqué",
+        "stone": "Piedra",
+        "concrete": "Concreto pulido",
+        "marble": "Mármol"
+      },
+      "light": "Luz",
+      "ambient": "Luz general",
+      "spot": "Focos sobre las obras",
+      "warmth": "Calidez (cálida a fría)"
+    },
+    "card": {
+      "label": "Ficha de {title}",
+      "eyebrow": "En la sala",
+      "unattributedArtist": "Artista sin atribuir",
+      "materials": "Materiales",
+      "measures": "Medidas",
+      "back": "Seguir el recorrido",
+      "fullSheet": "Ver ficha completa"
+    },
+    "pad": {
+      "label": "Caminar por la sala",
+      "forward": "Avanzar",
+      "turnLeft": "Girar a la izquierda",
+      "backward": "Retroceder",
+      "turnRight": "Girar a la derecha"
+    },
+    "placement": {
+      "label": "Montaje de {title}",
+      "eyebrow": "Montaje",
+      "close": "Cerrar el panel de montaje",
+      "scale": "Escala",
+      "remove": "Retirar de la galería",
+      "wall": "Pared",
+      "walls": {
+        "back": "Fondo",
+        "left": "Izquierda",
+        "right": "Derecha",
+        "front": "Entrada"
+      },
+      "position": "Posición en la pared",
+      "center": "Centro",
+      "toLeft": "{meters} m a la izquierda",
+      "toRight": "{meters} m a la derecha",
+      "centerHeight": "Altura del centro",
+      "leftRight": "De izquierda a derecha",
+      "backFront": "Del fondo a la entrada",
+      "rotation": "Giro"
+    },
+    "viewer": {
+      "loadFailed": "No se pudo cargar el modelo 3D. Prueba de nuevo más tarde.",
+      "label": "Modelo 3D de {title}. Arrastra para girarlo.",
+      "hint": "Arrastra para girar · rueda o pellizca para acercar"
+    }
+  },
+  "Admin": {
+    "signInTitle": "Entra con una cuenta administradora",
+    "eyebrow": "Administración",
+    "title": "Revisión manual",
+    "description": "Obras que la auditoría no pudo aprobar sola, con los hallazgos y las evidencias que usó.",
+    "loading": "Cargando la cola…",
+    "loadFailed": "No se pudo cargar la cola de revisión.",
+    "resolveFailed": "No se pudo resolver la obra.",
+    "empty": {
+      "title": "No hay obras esperando revisión",
+      "description": "Cuando la auditoría deje una obra en revisión manual, aparecerá aquí."
+    },
+    "severity": {
+      "CRITICAL": "Crítico",
+      "WARNING": "Advertencia",
+      "INFO": "Nota"
+    },
+    "evidence": "Evidencias ({count})",
+    "decidedBy": {
+      "RULES": "Decidió una regla del sistema",
+      "AI": "Evaluó la IA sobre el expediente",
+      "LOCAL": "Evaluación local, sin IA: el modelo de IA no respondió",
+      "FALLBACK": "La auditoría automática no terminó",
+      "legacy": "Auditoría anterior al expediente de evidencias"
+    },
+    "resolved": {
+      "APROBADO": "{title} quedó publicada.",
+      "BORRADOR": "{title} volvió al vendedor con tu motivo.",
+      "REAUDITAR": "{title} volvió a la cola de auditoría."
+    },
+    "noAuthor": "Autoría sin declarar",
+    "score": "score",
+    "noFindings": "La auditoría no dejó hallazgos.",
+    "noDossier": "El expediente de auditoría no está disponible ahora. Puedes resolver igual.",
+    "price": {
+      "legend": "Rango de precio al publicar (artacoins)",
+      "min": "Mínimo",
+      "max": "Máximo",
+      "required": "Esta obra no tiene precio sugerido: fija el rango para aprobarla.",
+      "both": "Indica el precio mínimo y el máximo.",
+      "range": "El rango va de 1 a {max} artacoins.",
+      "order": "El máximo no puede ser menor que el mínimo.",
+      "hintRequired": "La auditoría no estimó precio: es obligatorio para aprobar.",
+      "hintSuggested": "Viene de la auditoría; puedes ajustarlo antes de aprobar."
+    },
+    "approve": "Aprobar y publicar",
+    "returnToSeller": "Devolver al vendedor",
+    "reaudit": "Re-auditar con IA",
+    "returnDialog": {
+      "title": "Devolver la obra al vendedor",
+      "confirm": "Devolver con este motivo",
+      "body": "La obra vuelve a borrador. El vendedor recibe un aviso con el motivo y puede corregirla y reenviarla.",
+      "reason": "Motivo",
+      "hint": "{length}/{max} · al menos {min} caracteres. Di qué debe corregir."
+    }
+  },
+  "GalleryWizard": {
+    "metaTitle": "Personaliza tu galería",
+    "signInTitle": "Entra para diseñar tu galería",
+    "designFailed": "No se pudo diseñar la galería.",
+    "eyebrow": "Asistente",
+    "title": "Diseña tu galería",
+    "description": "Responde unas preguntas y el asistente propone paredes, suelo, luz y recorrido para tu sala.",
+    "stepOf": "Paso {step} de {total}",
+    "multiple": "Puedes elegir varias.",
+    "favorite": "Preferido",
+    "yourFavorite": "Tu preferido:",
+    "contrast": "Quiero que los colores del espacio contrasten con las obras",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "seeSummary": "Ver resumen",
+    "replaceDialog": {
+      "title": "¿Reemplazar tu sala?",
+      "confirm": "Reemplazar",
+      "body": "Hiciste cambios a mano en tu sala. La propuesta nueva los reemplaza; las obras colgadas no cambian."
+    },
+    "review": {
+      "title": "Resumen",
+      "hint": "El asistente usará estas respuestas para proponer tu sala. Nada se aplica hasta que la propuesta esté lista.",
+      "styles": "Estilos",
+      "palette": "Paleta",
+      "architecture": "Arquitectura",
+      "layout": "Distribución",
+      "light": "Iluminación",
+      "materials": "Materiales",
+      "tour": "Recorrido",
+      "designing": "Diseñando el espacio según tus preferencias…",
+      "back": "Volver a editar",
+      "generate": "Generar mi galería",
+      "surprise": "Sorpréndeme"
+    },
+    "steps": {
+      "identidad": "Identidad artística",
+      "color": "Preferencias cromáticas",
+      "arquitectura": "Arquitectura y distribución",
+      "luz": "Iluminación y atmósfera",
+      "materiales": "Materiales y detalles",
+      "experiencia": "Experiencia personal"
+    },
+    "questions": {
+      "artStyles": {
+        "prompt": "¿Qué estilos artísticos te gustan más?",
+        "options": {
+          "clasico": "Arte clásico",
+          "renacimiento": "Renacimiento",
+          "barroco": "Barroco",
+          "romanticismo": "Romanticismo",
+          "impresionismo": "Impresionismo",
+          "postimpresionismo": "Postimpresionismo",
+          "moderno": "Arte moderno",
+          "contemporaneo": "Arte contemporáneo",
+          "minimalismo": "Minimalismo",
+          "abstracto": "Arte abstracto",
+          "surrealismo": "Surrealismo",
+          "digital": "Arte digital",
+          "combinacion": "Una combinación de estilos"
+        }
+      },
+      "atmosphere": {
+        "prompt": "¿Qué tipo de ambiente artístico te gustaría sentir al entrar en tu galería?",
+        "options": {
+          "elegante": "Elegante y clásico",
+          "sereno": "Sereno y contemplativo",
+          "minimalista": "Moderno y minimalista",
+          "vanguardista": "Experimental y vanguardista",
+          "calido": "Cálido y acogedor",
+          "dramatico": "Dramático y sofisticado",
+          "futurista": "Futurista y tecnológico",
+          "eclectico": "Ecléctico y creativo"
+        }
+      },
+      "colorFamily": {
+        "prompt": "¿Qué tipo de colores prefieres para tu galería?",
+        "options": {
+          "claros": "Tonos claros",
+          "oscuros": "Tonos oscuros",
+          "calidos": "Tonos cálidos",
+          "frios": "Tonos fríos",
+          "neutros": "Tonos neutros",
+          "intensos": "Colores intensos y contrastados",
+          "equilibrada": "Una combinación equilibrada"
+        }
+      },
+      "paletteId": {
+        "prompt": "¿Qué combinación de colores te resulta más atractiva?",
+        "options": {
+          "marfil": "Marfil, arena y madera",
+          "piedra": "Blanco, gris y piedra",
+          "grafito": "Negro, carbón y grafito",
+          "terracota": "Beige, terracota y marrón",
+          "oliva": "Verde oliva, crema y madera",
+          "azul": "Azul profundo, gris y blanco",
+          "borgona": "Borgoña, carbón y dorado",
+          "personalizada": "Una paleta personalizada"
+        }
+      },
+      "architecture": {
+        "prompt": "¿Cómo imaginas el espacio donde expondrás tus obras?",
+        "options": {
+          "minimal": "Galería minimalista de paredes lisas",
+          "museo-clasico": "Museo clásico con molduras",
+          "loft": "Loft industrial",
+          "hormigon": "Hormigón y piedra",
+          "madera": "Espacio cálido con madera",
+          "futurista": "Galería futurista",
+          "experimental": "Formas arquitectónicas originales"
+        }
+      },
+      "layout": {
+        "prompt": "¿Qué tipo de distribución prefieres?",
+        "options": {
+          "pocas": "Pocas obras destacadas",
+          "equilibrada": "Muchas obras equilibradas",
+          "abiertos": "Grandes espacios abiertos",
+          "habitaciones": "Habitaciones conectadas",
+          "intimas": "Zonas íntimas",
+          "esculturas": "Un centro para esculturas",
+          "combinacion": "Abierto y contemplativo"
+        }
+      },
+      "sculptureRole": {
+        "prompt": "¿Qué importancia quieres dar a las esculturas y los objetos tridimensionales?",
+        "options": {
+          "protagonistas": "Serán protagonistas",
+          "igual": "La misma que las pinturas",
+          "complementarias": "Elementos complementarios",
+          "murales": "Prefiero obras murales"
+        }
+      },
+      "light": {
+        "prompt": "¿Cómo prefieres que esté iluminada tu galería?",
+        "options": {
+          "natural": "Luz natural abundante",
+          "calida": "Iluminación cálida e íntima",
+          "neutra": "Luz neutra de museo",
+          "blanca": "Iluminación blanca y moderna",
+          "dramatica": "Dramática, con sombras",
+          "focos": "Focos dirigidos a cada obra",
+          "indirecta": "Luz ambiental indirecta",
+          "combinada": "General y focos"
+        }
+      },
+      "lightMood": {
+        "prompt": "¿Qué ambiente debe transmitir la iluminación?",
+        "options": {
+          "serenidad": "Serenidad",
+          "energia": "Energía y creatividad",
+          "misterio": "Misterio",
+          "elegancia": "Elegancia",
+          "calidez": "Calidez",
+          "fidelidad": "Neutralidad para ver el color real"
+        }
+      },
+      "intensity": {
+        "prompt": "¿Qué intensidad de iluminación prefieres?",
+        "options": {
+          "baja": "Baja",
+          "media": "Media",
+          "alta": "Alta"
+        }
+      },
+      "materials": {
+        "prompt": "¿Qué materiales te gustaría encontrar en tu galería?",
+        "options": {
+          "madera": "Madera natural",
+          "marmol": "Mármol o piedra",
+          "hormigon": "Hormigón pulido",
+          "yeso": "Yeso y superficies lisas",
+          "metal": "Metal",
+          "cristal": "Cristal",
+          "artesanal": "Texturas artesanales",
+          "combinacion": "Una combinación"
+        }
+      },
+      "sculptureDisplay": {
+        "prompt": "¿Cómo prefieres que se exhiban las esculturas y los objetos?",
+        "options": {
+          "pedestales": "Pedestales individuales",
+          "plataformas": "Plataformas bajas",
+          "nichos": "Nichos arquitectónicos",
+          "suelo": "Directamente sobre el suelo",
+          "combinacion": "Una combinación de soportes"
+        }
+      },
+      "tour": {
+        "prompt": "¿Cómo te gustaría recorrer tu galería?",
+        "options": {
+          "libre": "Exploración libre",
+          "guiado": "Recorrido guiado",
+          "habitaciones": "Habitaciones conectadas",
+          "abiertos": "Espacios abiertos",
+          "tematicas": "Zonas por estilos",
+          "cronologico": "Recorrido cronológico"
+        }
+      },
+      "approach": {
+        "prompt": "¿Qué prefieres que ocurra cuando te acercas a una obra?",
+        "options": {
+          "ficha": "Una ficha discreta",
+          "detallada": "Una ficha detallada",
+          "camara": "Acercar la cámara",
+          "relacionadas": "Información y obras relacionadas"
+        }
+      },
+      "accessibility": {
+        "prompt": "¿Tienes alguna preferencia para facilitar la navegación?",
+        "options": {
+          "lento": "Movimiento lento y suave",
+          "reducir": "Reducir movimientos de cámara",
+          "sencillos": "Controles sencillos",
+          "contraste": "Mayor contraste",
+          "ninguna": "Ninguna preferencia adicional"
+        }
+      }
+    }
+  }
+}

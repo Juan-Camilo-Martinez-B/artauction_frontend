@@ -23,28 +23,33 @@ export function sellerStatus(lot: Pick<Lot, 'status' | 'lastReview'>): string {
   return isReturned(lot) ? 'DEVUELTA' : lot.status;
 }
 
+/** Quien evaluo la obra; el componente lo pone en palabras del idioma activo. */
+export type AuditSource =
+  | { kind: 'personal' | 'manualApproval' | 'localRules' | 'systemRule' | 'unfinished' }
+  | { kind: 'ai'; model: string };
+
 /**
- * Quien evaluo la obra, en palabras. Si un administrador la aprobo despues de
- * la auditoria, eso es lo que cuenta para quien la mira.
+ * Quien evaluo la obra. Si un administrador la aprobo despues de la auditoria,
+ * eso es lo que cuenta para quien la mira.
  */
-export function auditSourceLabel(summary: Pick<AuditSummary, 'modelName'> | undefined, lot: Pick<Lot, 'lastReview' | 'status'>): string | null {
+export function auditSource(summary: Pick<AuditSummary, 'modelName'> | undefined, lot: Pick<Lot, 'lastReview' | 'status'>): AuditSource | null {
   if (isPersonal(lot)) {
-    return 'Proyecto propio, sin auditar';
+    return { kind: 'personal' };
   }
   if (lot.lastReview?.decision === 'APPROVE' && lot.status !== 'BORRADOR') {
-    return 'Aprobada por revisión manual de un administrador';
+    return { kind: 'manualApproval' };
   }
   if (!summary) {
     return null;
   }
   switch (summary.modelName) {
     case LOCAL_MODEL:
-      return 'Evaluación local (sin IA): la IA no estaba disponible';
+      return { kind: 'localRules' };
     case 'rules':
-      return 'Decidió una regla del sistema';
+      return { kind: 'systemRule' };
     case 'fallback':
-      return 'La auditoría automática no terminó';
+      return { kind: 'unfinished' };
     default:
-      return `Evaluada por la IA (${summary.modelName})`;
+      return { kind: 'ai', model: summary.modelName };
   }
 }

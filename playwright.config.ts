@@ -6,6 +6,8 @@ export default defineConfig({
   use: {
     ...devices['Desktop Chrome'],
     baseURL: 'http://127.0.0.1:3000',
+    // La plataforma sigue el idioma del navegador: la prueba valida los textos en espanol.
+    locale: 'es-CO',
   },
   webServer: {
     command: 'npm run start -- --port 3000',

@@ -61,7 +61,7 @@ Los hooks que sirven a una sola pantalla viven junto a ella. En `app/(private)/p
 - **Componentes.** Toda página usa `src/components/ui`: `PageHeader`, `Panel`, `Button` y `ButtonLink` (primaria, acento para dinero, secundaria, fantasma y peligro), campos con validación en línea, `Notice` para errores en línea, toasts para confirmar acciones, `ConfirmDialog` para lo destructivo, y `LoadingState` y `EmptyState` con un siguiente paso.
 - **Sesión.** Las páginas privadas van dentro de `RequireSession`: el mismo estado de carga, la misma invitación a entrar y la vuelta a la página tras el login (`/entrar?next=`, solo rutas internas). Las secciones que dependen del rol (publicar, revisión) lo explican en vez de fallar. `/api/session/refresh` responde 204 a un visitante anónimo.
 - **Navegación.** La cabecera marca la sección activa y tiene menú móvil. El menú de cuenta y `/perfil` comparten la lista de secciones (`ACCOUNT_SECTIONS`).
-- **Textos.** Avisos, actividad, estados y veredictos se muestran en palabras (`describe-events.ts`, `StatusPill`), y las fechas en un solo formato (`lib/format.ts`).
+- **Textos.** Avisos, actividad, estados y veredictos se muestran en palabras (`describe-events.ts`, `useEventText`, `StatusPill`), y las fechas en un solo formato (`lib/format.ts`).
 - **Saldo en el encabezado.** Con sesión, una pastilla junto al perfil muestra las artacoins disponibles y lleva al bolsillo; el título dice además lo retenido en pujas. Se refresca al iniciar sesión, al volver a la pestaña, cada minuto y justo después de pujar, comprar o recargar (`lib/session/wallet-balance.ts`).
 - **Sala de subasta.** Muestra la obra, la oferta mínima siguiente, ofertas rápidas, el saldo con enlace a recargar, la cuenta regresiva de apertura o cierre, el historial con postores anónimos ("Tú", "Postor 1"…) y la confirmación antes de retirarse. Las reglas viven en `lib/auction/room.ts`.
 - **Compra inmediata.** Bajo el formulario de puja, **Comprar ahora por X** abre una confirmación con el precio, el saldo (más lo ya retenido en la sala) y el aviso de que la subasta termina; sin saldo suficiente ofrece recargar. Cada intento lleva una sola clave de idempotencia. Se ofrece con la sala abierta mientras el precio no llegue al 80 % del precio de compra (`lib/auction/buy-now.ts`, la misma regla del servidor, que la vuelve a comprobar). Al cerrar, la sala dice «Se vendió por compra inmediata» o «¡La compraste!», y el historial marca la compra. La cartelera y la ficha muestran el precio de compra mientras esté vigente.
@@ -71,7 +71,7 @@ Los hooks que sirven a una sola pantalla viven junto a ella. En `app/(private)/p
 La sala personal (`/mi-galeria`) simula una galería real con React Three Fiber.
 
 - **Sala.** Paredes, suelo, techo y pedestales usan texturas PBR CC0 de Poly Haven (`public/textures`, con créditos en su README), repetidas a su tamaño real. El yeso y el concreto toman de la textura solo el relieve y la rugosidad, y el color de la paleta. Luz ambiental, un entorno de paneles de luz para los reflejos y un foco por obra (hasta 8 murales y 4 objetos).
-- **Obras murales.** La imagen real de la obra con su tamaño en centímetros, y un marco según el soporte:
+- **Obras murales.** La imagen real de la obra, con un marco que sigue su proporción y según el soporte. Se exhiben a su tamaño en centímetros, salvo las pequeñas, que se amplían enteras hasta 80 cm de lado mayor para verse desde la sala:
   - moldura dorada para un óleo;
   - marco negro con paspartú y vidrio para obras sobre papel o fotografías;
   - marco flotante para arte digital;
@@ -91,6 +91,22 @@ La sala personal (`/mi-galeria`) simula una galería real con React Three Fiber.
 - **Imágenes.** WebGL exige CORS. Las imágenes de Garage se piden con `?texture=1` para no reutilizar la copia sin CORS que dejó el catálogo. Las del Met pasan por `/api/artwork-image`, un proxy con lista de hosts permitidos, sin redirecciones y con límite de tamaño.
 - **Recorrido.** Se arrastra para mirar. WASD o flechas para caminar (Shift corre), Q/E para girar, o los botones en pantalla. Hay colisión con paredes y pedestales. Un clic en una obra lleva hasta ella y abre su ficha. Con `prefers-reduced-motion`, el salto es instantáneo.
 - **Montaje.** En **Editar montaje** se elige una obra para cambiarla de pared, moverla, subirla o escalarla. **Organizar automáticamente** reparte todo según las medidas reales. Ambiente y montaje son un borrador: **Guardar cambios** solo aparece si hay cambios, y avisa antes de cerrar la pestaña.
+
+## Idiomas
+
+La interfaz está en español e inglés con [next-intl](https://next-intl.dev), **sin prefijo en la URL**: `/catalogo` es la misma ruta en los dos idiomas.
+
+- **Qué idioma se ve.** `src/i18n/request.ts` lo decide en cada render. Primero la cookie `NEXT_LOCALE` (la elección de la persona o el idioma de su cuenta). Sin cookie, el idioma del navegador (`Accept-Language`). Si ninguno se ofrece, español. `<html lang>` sigue al idioma activo.
+- **Dónde se cambia.** Con los botones ES · EN del pie, o en **Ajustes → Idioma**, que lo guarda al instante en la cuenta (`PATCH /auth/me/preferences`). Al entrar manda el idioma de la cuenta (`LocaleSync`), así sigue a la persona en cualquier dispositivo. El registro crea la cuenta en el idioma con que la persona veía la plataforma.
+- **Diccionarios.** `src/i18n/messages/es.json` y `en.json`, por espacios de nombres (`Nav`, `Account`, `Settings`…). El español es la referencia: las claves están tipadas (`next-intl.d.ts`), una clave inexistente no compila, y una prueba exige que los dos idiomas tengan las mismas claves y los mismos marcadores (`{name}`).
+- **Fichas de las obras.** Las traduce el backend (Opus-MT). El frontend pide cada ficha en el idioma activo enviando `Accept-Language`, desde el navegador (`api()`) y desde el servidor (`server.ts`, con una entrada de caché por idioma).
+- **Números y fechas.** `src/lib/format.ts` y el hook `useFormat` formatean según el idioma: `es-CO` en español (12.345) y `en-US` en inglés (12,345).
+- **Lógica sin frases.** Las funciones puras de `lib` (validadores, reglas de tarjeta y de modelo 3D, avisos) devuelven claves y datos. El texto lo pone el componente, en el idioma activo.
+- **Errores del backend.** `useErrorText` convierte un error en texto. Un `code` específico (`INSUFFICIENT_FUNDS`) sale del diccionario `Errors`, con sus `params`. Con un código genérico, en español se muestra el mensaje del servidor, más preciso, y en inglés el texto genérico.
+- **Ficha traducida.** Bajo el título, «Traducido automáticamente · Ver original» alterna la ficha en el mismo lugar. Al editar, el formulario parte siempre de `lot.original`: guardar una traducción sobrescribiría el texto del autor.
+- **Cambio de idioma.** Las páginas de servidor se refrescan con `router.refresh`. Las pantallas que piden fichas desde el navegador tienen el idioma entre las dependencias de su carga; la sala 3D conserva los cambios sin guardar.
+- **Sala 3D.** El `Canvas` de three no lee el idioma: los textos de las cartelas entran a la escena como datos.
+- **Lo que no se traduce.** Los títulos en la galería pública y en la actividad, los hallazgos de auditoría del panel de administración y el resumen de una sala ya generada vienen del backend en su idioma original.
 
 ## Convenciones
 

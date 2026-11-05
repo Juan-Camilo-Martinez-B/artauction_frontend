@@ -1,6 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react';
 import type { NoticeTone } from './notice';
 
@@ -24,6 +25,7 @@ const toneClasses: Record<NoticeTone, string> = {
 
 /** Avisos breves y efimeros para confirmar acciones (guardado, retiro, etc.). */
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const t = useTranslations('Common');
   const [toasts, setToasts] = useState<Toast[]>([]);
   const nextId = useRef(0);
 
@@ -52,7 +54,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             className={`pointer-events-auto flex animate-toast-in items-start justify-between gap-3 rounded-field border px-4 py-3 text-sm shadow-lift ${toneClasses[toast.tone]}`}
           >
             <span>{toast.message}</span>
-            <button type="button" aria-label="Cerrar aviso" onClick={() => { dismiss(toast.id); }} className="opacity-80 hover:opacity-100">
+            <button type="button" aria-label={t('closeNotice')} onClick={() => { dismiss(toast.id); }} className="opacity-80 hover:opacity-100">
               <X aria-hidden="true" className="h-4 w-4" />
             </button>
           </div>

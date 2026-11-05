@@ -2,6 +2,7 @@
 
 import { Box, Eye, EyeOff, Frame, Gavel, Images, Pencil, Send, Share2, Upload } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { ArtworkImage } from '@/components/artwork-image';
@@ -12,11 +13,13 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { EmptyState, LoadingState, PageHeader } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { useToast } from '@/components/ui/toast';
-import { ApiError, artApi } from '@/lib/api/client';
+import { useErrorText } from '@/hooks/use-error-text';
+import { artApi } from '@/lib/api/client';
 import type { GalleryItem, Lot } from '@/lib/api/types';
 import { isEditable, isPersonal, isReturned, sellerStatus } from '@/lib/artwork/lot-review';
 import {
   ACQUIRED_FILTERS,
+  ALL_FILTER,
   applyFilter,
   canHang,
   collectWorks,
@@ -29,24 +32,17 @@ import {
   type WorkFilter,
 } from '@/lib/artwork/my-works';
 import { purchasedSheetHref } from '@/lib/artwork/sheet-href';
-import { formatDateTime } from '@/lib/format';
+import { useFormat } from '@/hooks/use-format';
 import { browserSession, type AccountProfile } from '@/lib/session/browser-session';
 import { canSell } from '@/lib/session/roles';
 import { canShowGalleryItem } from '@/lib/visibility';
 
-/** Lo que significa cada estado para quien creo la obra. */
-const STATUS_HINT: Record<string, string> = {
-  DEVUELTA: 'Un administrador la devolvió. Corrígela y reenvíala a auditoría.',
-  PERSONAL: 'Proyecto propio: solo para tu galería, sin auditoría.',
-  BORRADOR: 'Aún no se ha enviado a auditoría.',
-  PENDIENTE_AUDITORIA: 'La auditoría la está revisando.',
-  REVISION_MANUAL: 'Un administrador la revisará pronto.',
-  APROBADO: 'Está en el catálogo.',
-  PUBLICADA: 'Está en el catálogo.',
-  EN_SUBASTA: 'Tiene una sala de subasta.',
-  VENDIDA: 'Se vendió en subasta: ahora es de quien la ganó.',
-  CERRADO: 'La subasta cerró sin venta.',
-};
+/** Estados con explicacion para quien creo la obra (diccionario MyWorks.hints). */
+const HINTED_STATUSES = ['DEVUELTA', 'PERSONAL', 'BORRADOR', 'PENDIENTE_AUDITORIA', 'REVISION_MANUAL', 'APROBADO', 'PUBLICADA', 'EN_SUBASTA', 'VENDIDA', 'CERRADO'] as const;
+
+function isHintedStatus(status: string): status is (typeof HINTED_STATUSES)[number] {
+  return (HINTED_STATUSES as readonly string[]).includes(status);
+}
 
 /** Acciones de una fila; cada una devuelve si salio bien. */
 interface WorkActions {
@@ -60,11 +56,12 @@ interface WorkActions {
 }
 
 export default function MyWorksPage() {
+  const t = useTranslations('MyWorks');
   return (
-    <RequireSession title="Entra para ver tus obras">
+    <RequireSession title={t('signInTitle')}>
       {(profile) => (
         // useSearchParams necesita un limite de Suspense en una pagina de cliente.
-        <Suspense fallback={<LoadingState label="Cargando tus obras…" />}>
+        <Suspense fallback={<LoadingState label={t('loading')} />}>
           <MyWorks profile={profile} />
         </Suspense>
       )}
@@ -73,6 +70,8 @@ export default function MyWorksPage() {
 }
 
 function MyWorks({ profile }: { profile: AccountProfile }) {
+  const t = useTranslations('MyWorks');
+  const errorText = useErrorText();
   const notify = useToast();
   const filter = parseFilter(useSearchParams().get('estado'));
   const sells = canSell(profile.role);
@@ -95,7 +94,7 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
     ]);
     const failed: unknown = lots.status === 'rejected' ? lots.reason : items.status === 'rejected' ? items.reason : null;
     if (failed !== null) {
-      setError(failed instanceof ApiError ? failed.message : 'No se pudieron cargar todas tus obras.');
+      setError(errorText(failed, t('loadFailed')));
     }
     setWorks(
       collectWorks(
@@ -106,7 +105,7 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
     if (room.status === 'fulfilled') {
       setHung(new Set(room.value.artworks.map((artwork) => artwork.lotId)));
     }
-  }, [profile.userId]);
+  }, [profile.userId, errorText, t]);
 
   useEffect(() => {
     void load();
@@ -125,7 +124,7 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
       notify(done, 'success');
       await load();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : failed);
+      setError(errorText(caught, failed));
     } finally {
       setBusy(null);
     }
@@ -135,7 +134,7 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
     busy,
     sells,
     hung,
-    resubmit: (lot) => void run(lot.id, (token) => artApi.submitLot(token, lot.id), `${lot.title} volvió a auditoría.`, 'No se pudo enviar la obra a auditoría.'),
+    resubmit: (lot) => void run(lot.id, (token) => artApi.submitLot(token, lot.id), t('actions.resubmitted', { title: lot.title }), t('actions.resubmitFailed')),
     toCatalog: (lot) => {
       setMoving(lot);
     },
@@ -144,8 +143,8 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
       void run(
         lot.id,
         (token) => artApi.setLotVisibility(token, lot.id, next),
-        next === 'PUBLIC' ? `${lot.title} ya se ve en tu galería pública.` : `${lot.title} ahora solo la ves tú.`,
-        'No se pudo cambiar quién ve la obra.',
+        next === 'PUBLIC' ? t('actions.nowPublic', { title: lot.title }) : t('actions.nowPrivate', { title: lot.title }),
+        t('actions.visibilityFailed'),
       );
     },
     toggleHang: (lotId, title) => {
@@ -153,8 +152,8 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
       void run(
         lotId,
         (token) => (hanging ? artApi.addToGallery(token, lotId) : artApi.removeFromGallery(token, lotId)),
-        hanging ? `${title} quedó colgada en tu sala.` : `${title} salió de tu sala.`,
-        hanging ? 'No se pudo colgar la obra.' : 'No se pudo quitar la obra de la sala.',
+        hanging ? t('actions.hung', { title }) : t('actions.unhung', { title }),
+        hanging ? t('actions.hangFailed') : t('actions.unhangFailed'),
       );
     },
   };
@@ -165,46 +164,42 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
   return (
     <>
       <PageHeader
-        eyebrow="Tu cuenta"
-        title="Mis obras"
-        description={
-          sells
-            ? 'Tus proyectos propios, lo que publicaste en el catálogo con su estado, y lo que ganaste. Las devueltas se pueden corregir y reenviar.'
-            : 'Tus proyectos propios y las obras que ganaste en subasta.'
-        }
+        eyebrow={t('eyebrow')}
+        title={t('title')}
+        description={sells ? t('descriptionSeller') : t('descriptionBuyer')}
         actions={
           <>
             <ButtonLink href="/publicar" icon={<Upload aria-hidden="true" className="h-4 w-4" />}>
-              Nueva obra
+              {t('newWork')}
             </ButtonLink>
             <ButtonLink href="/mi-galeria" variant="secondary" icon={<Box aria-hidden="true" className="h-4 w-4" />}>
-              Sala 3D
+              {t('room')}
             </ButtonLink>
             <ButtonLink href={`/galerias/${profile.userId}`} variant="secondary" icon={<Share2 aria-hidden="true" className="h-4 w-4" />}>
-              Galería pública
+              {t('publicGallery')}
             </ButtonLink>
           </>
         }
       />
       {error ? <Notice tone="error" className="mb-6">{error}</Notice> : null}
-      {works === null ? <LoadingState label="Cargando tus obras…" /> : null}
+      {works === null ? <LoadingState label={t('loading')} /> : null}
       {works?.length === 0 ? (
         <EmptyState
           icon={<Images aria-hidden="true" className="h-6 w-6" />}
-          title="Todavía no tienes obras"
-          description="Sube un proyecto propio para tu sala 3D o gana una subasta: aquí verás cada obra y su estado."
-          action={<ButtonLink href="/publicar">Subir la primera</ButtonLink>}
+          title={t('empty.title')}
+          description={t('empty.description')}
+          action={<ButtonLink href="/publicar">{t('empty.action')}</ButtonLink>}
         />
       ) : null}
       {works && works.length > 0 ? (
         <>
-          <nav aria-label="Filtrar por estado" className="mb-6 space-y-3">
-            <FilterChips groups={[{ label: '', filters: [{ key: 'todas', label: 'Todas' }] }]} counts={counts} active={filter} />
+          <nav aria-label={t('filterLabel')} className="mb-6 space-y-3">
+            <FilterChips groups={[ALL_FILTER]} counts={counts} active={filter} />
             <FilterChips groups={[PUBLISHED_FILTERS]} counts={counts} active={filter} />
             <FilterChips groups={[ACQUIRED_FILTERS]} counts={counts} active={filter} />
           </nav>
           {shown?.length === 0 ? (
-            <EmptyState title="No hay obras con esta etiqueta" action={<ButtonLink href="/mis-obras" variant="secondary">Ver todas</ButtonLink>} />
+            <EmptyState title={t('emptyFilter.title')} action={<ButtonLink href="/mis-obras" variant="secondary">{t('emptyFilter.action')}</ButtonLink>} />
           ) : (
             <ul className="max-w-4xl space-y-4">
               {shown?.map((work) => (
@@ -219,21 +214,21 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
 
       <ConfirmDialog
         open={moving !== null}
-        title="Pasar al catálogo"
-        confirmLabel="Enviar a auditoría"
+        title={t('moveDialog.title')}
+        confirmLabel={t('moveDialog.confirm')}
         tone="accent"
         confirmLoading={moving !== null && busy === moving.id}
         onConfirm={() => {
           const lot = moving;
           if (lot) {
-            void run(lot.id, (token) => artApi.submitLot(token, lot.id), `${lot.title} entró a la auditoría.`, 'No se pudo pasar la obra al catálogo.').then(() => {
+            void run(lot.id, (token) => artApi.submitLot(token, lot.id), t('actions.moved', { title: lot.title }), t('actions.moveFailed')).then(() => {
               setMoving(null);
             });
           }
         }}
         onCancel={() => { setMoving(null); }}
       >
-        La auditoría revisa la obra y, si la aprueba, la publica con su sala de subasta. Mientras tanto se oculta de tu galería pública y ya no la podrás editar.
+        {t('moveDialog.body')}
       </ConfirmDialog>
     </>
   );
@@ -241,31 +236,32 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
 
 /** Chips con contador; los que no tienen obras no se muestran. */
 function FilterChips({ groups, counts, active }: { groups: FilterGroup[]; counts: Map<WorkFilter, number>; active: WorkFilter }) {
+  const t = useTranslations('MyWorks');
   return (
     <>
       {groups.map((group) => {
-        const visible = group.filters.filter((filter) => (counts.get(filter.key) ?? 0) > 0 || filter.key === active);
+        const visible = group.filters.filter((filter) => (counts.get(filter) ?? 0) > 0 || filter === active);
         if (visible.length === 0) {
           return null;
         }
         return (
-          <div key={group.label || 'todas'} className="flex items-center gap-3">
-            {group.label ? <span className="shrink-0 text-xs uppercase tracking-[0.16em] text-muted">{group.label}</span> : null}
+          <div key={group.id} className="flex items-center gap-3">
+            {group.id === 'all' ? null : <span className="shrink-0 text-xs uppercase tracking-[0.16em] text-muted">{t(`groups.${group.id}`)}</span>}
             <ul className="flex gap-2 overflow-x-auto pb-1">
               {visible.map((filter) => {
-                const selected = filter.key === active;
+                const selected = filter === active;
                 return (
-                  <li key={filter.key} className="shrink-0">
+                  <li key={filter} className="shrink-0">
                     <Link
-                      href={filter.key === 'todas' ? '/mis-obras' : `/mis-obras?estado=${filter.key}`}
+                      href={filter === 'todas' ? '/mis-obras' : `/mis-obras?estado=${filter}`}
                       aria-current={selected ? 'page' : undefined}
                       scroll={false}
                       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors ${
                         selected ? 'border-ink bg-ink text-paper' : 'border-line-strong bg-surface hover:border-ink'
                       }`}
                     >
-                      {filter.label}
-                      <span className={`text-xs ${selected ? 'text-paper/80' : 'text-muted'}`}>{counts.get(filter.key) ?? 0}</span>
+                      {t(`filters.${filter}`)}
+                      <span className={`text-xs ${selected ? 'text-paper/80' : 'text-muted'}`}>{counts.get(filter) ?? 0}</span>
                     </Link>
                   </li>
                 );
@@ -280,6 +276,7 @@ function FilterChips({ groups, counts, active }: { groups: FilterGroup[]; counts
 
 /** Colgar o quitar de la sala 3D: solo para lo que es de uno. */
 function HangButton({ lotId, title, actions }: { lotId: string; title: string; actions: WorkActions }) {
+  const t = useTranslations('MyWorks');
   const inRoom = actions.hung.has(lotId);
   return (
     <Button
@@ -289,12 +286,14 @@ function HangButton({ lotId, title, actions }: { lotId: string; title: string; a
       icon={<Frame aria-hidden="true" className="h-4 w-4" />}
       onClick={() => { actions.toggleHang(lotId, title); }}
     >
-      {inRoom ? 'Quitar de mi sala' : 'Colgar en mi sala'}
+      {inRoom ? t('unhang') : t('hang')}
     </Button>
   );
 }
 
 function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
+  const t = useTranslations('MyWorks');
+  const format = useFormat();
   const status = sellerStatus(lot);
   const hasImage = Boolean(lot.images?.some((image) => image.url));
   const busy = actions.busy === lot.id;
@@ -312,13 +311,14 @@ function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
           </Link>
         </div>
         <p className="mt-1 text-sm text-muted">
-          {STATUS_HINT[status] ?? ''}
-          {isPersonal(lot) ? (lot.visibility === 'PUBLIC' ? ' Se ve en tu galería pública.' : ' Solo la ves tú.') : ''}
+          {isHintedStatus(status) ? t(`hints.${status}`) : ''}
+          {isPersonal(lot) ? ` ${lot.visibility === 'PUBLIC' ? t('seenPublic') : t('seenPrivate')}` : ''}
         </p>
         {isReturned(lot) && lot.lastReview?.reason ? (
           <blockquote className="mt-3 rounded-field border-l-4 border-oxide bg-paper px-3 py-2 text-sm">
             <span className="block text-xs uppercase tracking-wide text-muted">
-              Motivo{lot.lastReview.createdAt ? ` · ${formatDateTime(lot.lastReview.createdAt)}` : ''}
+              {t('reason')}
+              {lot.lastReview.createdAt ? ` · ${format.dateTime(lot.lastReview.createdAt)}` : ''}
             </span>
             {lot.lastReview.reason}
           </blockquote>
@@ -326,7 +326,7 @@ function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
         <div className="mt-4 flex flex-wrap gap-2">
           {isEditable(lot) ? (
             <ButtonLink href={`/publicar/${lot.id}`} size="sm" icon={<Pencil aria-hidden="true" className="h-4 w-4" />}>
-              Editar
+              {t('edit')}
             </ButtonLink>
           ) : null}
           {lot.status === 'BORRADOR' ? (
@@ -335,11 +335,11 @@ function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
               variant="secondary"
               loading={busy}
               disabled={!hasImage}
-              title={hasImage ? undefined : 'Agrega una imagen antes de enviarla'}
+              title={hasImage ? undefined : t('needImageSend')}
               icon={<Send aria-hidden="true" className="h-4 w-4" />}
               onClick={() => { actions.resubmit(lot); }}
             >
-              {isReturned(lot) ? 'Reenviar sin cambios' : 'Enviar a auditoría'}
+              {isReturned(lot) ? t('resubmit') : t('sendToAudit')}
             </Button>
           ) : null}
           {isPersonal(lot) ? (
@@ -350,7 +350,7 @@ function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
               icon={lot.visibility === 'PUBLIC' ? <EyeOff aria-hidden="true" className="h-4 w-4" /> : <Eye aria-hidden="true" className="h-4 w-4" />}
               onClick={() => { actions.toggleVisibility(lot); }}
             >
-              {lot.visibility === 'PUBLIC' ? 'Hacer privada' : 'Hacer pública'}
+              {lot.visibility === 'PUBLIC' ? t('makePrivate') : t('makePublic')}
             </Button>
           ) : null}
           {isPersonal(lot) && actions.sells ? (
@@ -358,11 +358,11 @@ function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
               size="sm"
               variant="secondary"
               disabled={!hasImage || busy}
-              title={hasImage ? undefined : 'Agrega una imagen antes de pasarla al catálogo'}
+              title={hasImage ? undefined : t('needImageMove')}
               icon={<Gavel aria-hidden="true" className="h-4 w-4" />}
               onClick={() => { actions.toCatalog(lot); }}
             >
-              Pasar al catálogo
+              {t('moveToCatalog')}
             </Button>
           ) : null}
           {canHang(work) ? <HangButton lotId={lot.id} title={lot.title} actions={actions} /> : null}
@@ -373,22 +373,24 @@ function CreatedRow({ lot, actions }: { lot: Lot; actions: WorkActions }) {
 }
 
 function WonRow({ item, actions }: { item: GalleryItem; actions: WorkActions }) {
+  const t = useTranslations('MyWorks');
+  const format = useFormat();
   return (
     <article className="rounded-panel border border-line bg-surface p-4 shadow-panel">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-oxide">Ganada en subasta</p>
+      <p className="text-xs font-medium uppercase tracking-[0.18em] text-oxide">{t('filters.ganadas')}</p>
       <h2 className="mt-1 font-serif text-xl leading-snug">
         {/* La ficha original ya no es publica: se abre la que guardo la galeria. */}
         <Link href={purchasedSheetHref(item.ownerId, item.lotId)} className="hover:underline">
           {item.title}
         </Link>
       </h2>
-      <p className="text-sm text-muted">{item.artistName ?? 'Artista sin atribuir'}</p>
+      <p className="text-sm text-muted">{item.artistName ?? t('unattributedArtist')}</p>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
         <span className="inline-flex items-center gap-1.5">
           {item.visibility === 'PUBLIC' ? <Eye aria-hidden="true" className="h-3.5 w-3.5" /> : <EyeOff aria-hidden="true" className="h-3.5 w-3.5" />}
-          {item.visibility === 'PUBLIC' ? 'Pública en tu galería' : 'Solo tú la ves'}
+          {item.visibility === 'PUBLIC' ? t('publicInGallery') : t('onlyYou')}
         </span>
-        <time dateTime={item.acquiredAt}>{formatDateTime(item.acquiredAt)}</time>
+        <time dateTime={item.acquiredAt}>{format.dateTime(item.acquiredAt)}</time>
       </div>
       <div className="mt-3">
         <HangButton lotId={item.lotId} title={item.title} actions={actions} />

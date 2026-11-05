@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE, isLocale, type Locale } from '@/i18n/locales';
 import { artApi } from '@/lib/api/client';
 import type { AuthUser, TokenPair } from '@/lib/api/types';
 import { clearAccessToken, readAccessToken, writeAccessToken } from '@/lib/session';
@@ -8,6 +9,8 @@ export interface AccountProfile {
   role: string;
   displayName: string;
   avatarUrl: string | null;
+  /** Idioma guardado en la cuenta; al entrar, la interfaz cambia a este. */
+  locale: Locale;
 }
 
 export interface SessionSnapshot {
@@ -111,13 +114,14 @@ class BrowserSession {
   }
 }
 
-function toProfile(user: AuthUser): AccountProfile {
+export function toProfile(user: AuthUser): AccountProfile {
   return {
     userId: user.userId,
     email: user.email,
     role: user.role,
     displayName: user.displayName?.trim() || user.email,
     avatarUrl: user.avatarUrl ?? null,
+    locale: isLocale(user.locale) ? user.locale : DEFAULT_LOCALE,
   };
 }
 

@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { renderWithIntl } from '../intl';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const createLot = vi.fn();
@@ -26,7 +27,7 @@ describe('formulario de publicación', () => {
   });
 
   it('una obra tridimensional pide su modelo 3D y no se guarda sin él', async () => {
-    render(<LotForm canSell />);
+    renderWithIntl(<LotForm canSell />);
     await screen.findByRole('option', { name: 'Escultura' });
     fill('Título', 'Estatua de pie');
     fill('Descripción', 'Figura de tamaño natural en mármol.');
@@ -45,7 +46,7 @@ describe('formulario de publicación', () => {
   });
 
   it('una obra plana no muestra el panel del modelo ni lo pide', async () => {
-    render(<LotForm canSell />);
+    renderWithIntl(<LotForm canSell />);
     await screen.findByRole('option', { name: 'Escultura' });
     expect(screen.queryByRole('heading', { name: 'Modelo 3D' })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Enviar a auditoría' }));

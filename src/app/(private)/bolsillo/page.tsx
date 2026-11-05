@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { CardPreview } from '@/components/payments/card-preview';
 import { RequireSession } from '@/components/session/require-session';
@@ -8,10 +9,11 @@ import { LoadingState, PageHeader, Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { TextField } from '@/components/ui/text-field';
 import { useToast } from '@/components/ui/toast';
+import { useErrorText } from '@/hooks/use-error-text';
+import { useFormat } from '@/hooks/use-format';
 import { useFormValidation } from '@/hooks/use-form-validation';
-import { ApiError, artApi } from '@/lib/api/client';
+import { artApi } from '@/lib/api/client';
 import type { WalletEntry, WalletSnapshot } from '@/lib/api/types';
-import { formatArtacoins } from '@/lib/auction/policy';
 import {
   BRANDS,
   cardNameError,
@@ -25,34 +27,46 @@ import {
   formatExpiry,
   onlyDigits,
   parseExpiry,
+  type CardBrand,
+  type CardProblem,
 } from '@/lib/payments/card';
 import { browserSession } from '@/lib/session/browser-session';
 import { walletBalance } from '@/lib/session/wallet-balance';
 
 const PACKS = [100, 250, 500, 1000];
 
-const entryLabel: Record<WalletEntry['kind'], string> = {
-  RECARGA: 'Recarga',
-  RETENCION: 'Retenido en una sala',
-  LIBERACION: 'Devolución de una sala',
-  CANJE: 'Pago de una obra ganada',
-  VENTA: 'Venta de una obra',
-  REEMBOLSO: 'Reembolso de una compra anulada',
-  ANULACION: 'Venta anulada',
-};
-
 // Movimientos que suman al saldo disponible; el resto lo descuentan.
 const CREDIT_KINDS = new Set<WalletEntry['kind']>(['RECARGA', 'LIBERACION', 'VENTA', 'REEMBOLSO']);
 
-const dateFormat = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
-
 type WalletState = { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; wallet: WalletSnapshot };
 
+/** Texto de un problema de la tarjeta, con la marca o los digitos que correspondan. */
+function useCardProblem(brand: CardBrand): (problem: CardProblem | undefined) => string | undefined {
+  const t = useTranslations('Card');
+  return (problem) => {
+    if (!problem) {
+      return undefined;
+    }
+    if (problem === 'numberLength') {
+      return t('numberLength', { brand: BRANDS[brand].label || t('genericBrand'), digits: BRANDS[brand].digits });
+    }
+    if (problem === 'cvvLength') {
+      return t('cvvLength', { digits: BRANDS[brand].cvvDigits });
+    }
+    return t(problem);
+  };
+}
+
 export default function WalletPage() {
-  return <RequireSession title="Entra para ver tu bolsillo">{() => <Wallet />}</RequireSession>;
+  const t = useTranslations('Wallet');
+  return <RequireSession title={t('signInTitle')}>{() => <Wallet />}</RequireSession>;
 }
 
 function Wallet() {
+  const t = useTranslations('Wallet');
+  const tCard = useTranslations('Card');
+  const format = useFormat();
+  const errorText = useErrorText();
   const notify = useToast();
   const [state, setState] = useState<WalletState>({ status: 'loading' });
   const [coins, setCoins] = useState(250);
@@ -67,11 +81,12 @@ function Wallet() {
   const attemptKey = useRef<string | null>(null);
 
   const brand = detectBrand(onlyDigits(cardNumber));
+  const cardProblem = useCardProblem(brand);
   const { touch, visibleError, attemptSubmit, reset } = useFormValidation({
-    cardName: cardNameError(cardName),
-    cardNumber: cardNumberError(cardNumber),
-    expiry: expiryError(expiry),
-    cvv: cvvError(cvv, brand),
+    cardName: cardProblem(cardNameError(cardName)),
+    cardNumber: cardProblem(cardNumberError(cardNumber)),
+    expiry: cardProblem(expiryError(expiry)),
+    cvv: cardProblem(cvvError(cvv, brand)),
   });
 
   useEffect(() => {
@@ -86,10 +101,10 @@ function Wallet() {
       try {
         setState({ status: 'ready', wallet: await artApi.wallet(token) });
       } catch (caught) {
-        setState({ status: 'error', message: caught instanceof ApiError ? caught.message : 'No se pudo abrir el bolsillo.' });
+        setState({ status: 'error', message: errorText(caught, t('loadFailed')) });
       }
     });
-  }, []);
+  }, [errorText, t]);
 
   function onCardNumber(value: string) {
     setCardNumber(value);
@@ -122,19 +137,19 @@ function Wallet() {
       attemptKey.current = null;
       setCvv('');
       reset();
-      notify(`Entraron ${formatArtacoins(result.credited)} con la tarjeta terminada en ${result.last4}.`, 'success');
+      notify(t('credited', { amount: format.artacoins(result.credited), last4: result.last4 }), 'success');
       setState({ status: 'ready', wallet: await artApi.wallet(token) });
       // El saldo del encabezado sube con la recarga.
       void walletBalance.refresh();
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'La pasarela no completó el cobro. Intenta de nuevo.');
+      setError(errorText(caught, t('payFailed')));
     } finally {
       setPending(false);
     }
   }
 
   if (state.status === 'loading') {
-    return <LoadingState label="Abriendo tu bolsillo…" />;
+    return <LoadingState label={t('opening')} />;
   }
   if (state.status === 'error') {
     return <Notice tone="error">{state.message}</Notice>;
@@ -144,16 +159,16 @@ function Wallet() {
   return (
     <>
       <PageHeader
-        eyebrow="Artacoins"
-        title="Bolsillo"
-        description="Las artacoins son la moneda de la sala. El cobro es simulado: sirve cualquier tarjeta inventada que no esté vencida."
+        eyebrow={t('eyebrow')}
+        title={t('title')}
+        description={t('description')}
       />
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <Panel as="section">
-          <h2 className="font-serif text-2xl">Recargar</h2>
+          <h2 className="font-serif text-2xl">{t('topUp')}</h2>
           <form noValidate onSubmit={(event) => void onPay(event)} className="mt-5 space-y-5">
             <fieldset>
-              <legend className="mb-2 text-sm font-medium">Paquete</legend>
+              <legend className="mb-2 text-sm font-medium">{t('pack')}</legend>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {PACKS.map((pack) => (
                   <label
@@ -162,7 +177,7 @@ function Wallet() {
                   >
                     <input type="radio" name="pack" value={pack} checked={coins === pack} onChange={() => { setCoins(pack); }} className="sr-only" />
                     <span className="block font-serif text-2xl">{pack}</span>
-                    <span className="block text-xs opacity-80">{pack}.00 USD</span>
+                    <span className="block text-xs opacity-80">{format.money(pack)}</span>
                   </label>
                 ))}
               </div>
@@ -171,7 +186,7 @@ function Wallet() {
               <div className="space-y-4">
                 <TextField
                   id="card-name"
-                  label="Nombre en la tarjeta"
+                  label={tCard('nameLabel')}
                   autoComplete="cc-name"
                   required
                   value={cardName}
@@ -182,7 +197,7 @@ function Wallet() {
                 />
                 <TextField
                   id="card-number"
-                  label="Número de la tarjeta"
+                  label={tCard('numberLabel')}
                   inputMode="numeric"
                   autoComplete="cc-number"
                   required
@@ -191,14 +206,14 @@ function Wallet() {
                   onValueChange={onCardNumber}
                   onBlur={() => { touch('cardNumber'); }}
                   error={visibleError('cardNumber')}
-                  hint="Visa, Mastercard, American Express o Diners Club."
-                  trailing={cardNumber ? <span className="px-2 text-xs font-medium text-muted">{BRANDS[brand].label}</span> : null}
+                  hint={tCard('numberHint')}
+                  trailing={cardNumber ? <span className="px-2 text-xs font-medium text-muted">{BRANDS[brand].label || tCard('genericBrand')}</span> : null}
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <TextField
                     id="card-expiry"
-                    label="Vencimiento"
-                    placeholder="MM/AA"
+                    label={tCard('expiryLabel')}
+                    placeholder={tCard('expiryPlaceholder')}
                     inputMode="numeric"
                     autoComplete="cc-exp"
                     required
@@ -210,7 +225,7 @@ function Wallet() {
                   />
                   <TextField
                     id="card-cvv"
-                    label="Código de seguridad"
+                    label={tCard('cvvLabel')}
                     inputMode="numeric"
                     autoComplete="cc-csc"
                     required
@@ -219,7 +234,7 @@ function Wallet() {
                     onValueChange={setCvv}
                     onBlur={() => { touch('cvv'); }}
                     error={visibleError('cvv')}
-                    hint={`${String(BRANDS[brand].cvvDigits)} dígitos, al ${brand === 'amex' ? 'frente' : 'respaldo'}.`}
+                    hint={brand === 'amex' ? tCard('cvvHintFront', { digits: BRANDS[brand].cvvDigits }) : tCard('cvvHintBack', { digits: BRANDS[brand].cvvDigits })}
                   />
                 </div>
               </div>
@@ -229,9 +244,9 @@ function Wallet() {
             </div>
             {error ? <Notice tone="error">{error}</Notice> : null}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
-              <p className="text-sm text-muted">No se guarda el número ni el código.</p>
+              <p className="text-sm text-muted">{t('notStored')}</p>
               <Button type="submit" variant="accent" loading={pending}>
-                {pending ? 'Cobrando…' : `Pagar ${String(coins)}.00 USD`}
+                {pending ? t('charging') : t('pay', { amount: format.money(coins) })}
               </Button>
             </div>
           </form>
@@ -240,19 +255,19 @@ function Wallet() {
           <Panel>
             <dl className="space-y-4">
               <div>
-                <dt className="text-sm text-muted">Disponible</dt>
-                <dd className="font-serif text-4xl">{formatArtacoins(wallet.balance)}</dd>
+                <dt className="text-sm text-muted">{t('available')}</dt>
+                <dd className="font-serif text-4xl">{format.artacoins(wallet.balance)}</dd>
               </div>
               <div className="border-t border-line pt-4">
-                <dt className="text-sm text-muted">Retenido en salas</dt>
-                <dd className="font-serif text-2xl">{formatArtacoins(wallet.held)}</dd>
+                <dt className="text-sm text-muted">{t('held')}</dt>
+                <dd className="font-serif text-2xl">{format.artacoins(wallet.held)}</dd>
               </div>
             </dl>
           </Panel>
           <Panel>
-            <h2 className="font-serif text-xl">Movimientos</h2>
+            <h2 className="font-serif text-xl">{t('entriesTitle')}</h2>
             {wallet.entries.length === 0 ? (
-              <p className="mt-3 text-sm text-muted">Aún no hay movimientos. Tu primera recarga aparecerá aquí.</p>
+              <p className="mt-3 text-sm text-muted">{t('noEntries')}</p>
             ) : (
               <ul className="mt-3 divide-y divide-line">
                 {wallet.entries.map((entry) => {
@@ -260,12 +275,12 @@ function Wallet() {
                   return (
                     <li key={entry.id} className="flex items-baseline justify-between gap-4 py-3 text-sm">
                       <span>
-                        <span className="block">{entryLabel[entry.kind]}</span>
-                        <span className="text-xs text-muted">{dateFormat.format(new Date(entry.createdAt))}</span>
+                        <span className="block">{t(`entries.${entry.kind}`)}</span>
+                        <span className="text-xs text-muted">{format.dateTime(entry.createdAt)}</span>
                       </span>
                       <span className={`shrink-0 font-medium ${credit ? 'text-moss' : 'text-ink'}`}>
                         {credit ? '+' : '−'}
-                        {formatArtacoins(Math.abs(entry.coins))}
+                        {format.artacoins(Math.abs(entry.coins))}
                       </span>
                     </li>
                   );

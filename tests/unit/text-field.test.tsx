@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { renderWithIntl } from '../intl';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 import { PasswordField, TextAreaField, TextField } from '@/components/ui/text-field';
@@ -35,21 +36,21 @@ function Controlled({ type, initial = '' }: { type?: string; initial?: string })
 
 describe('TextField', () => {
   it('no deja empezar un nombre por espacio', () => {
-    render(<Controlled />);
+    renderWithIntl(<Controlled />);
     const input = screen.getByLabelText<HTMLInputElement>('Campo');
     fireEvent.change(input, { target: { value: '  Nora' } });
     expect(input.value).toBe('Nora');
   });
 
   it('no deja espacios en el correo', () => {
-    render(<Controlled type="email" />);
+    renderWithIntl(<Controlled type="email" />);
     const input = screen.getByLabelText<HTMLInputElement>('Campo');
     fireEvent.change(input, { target: { value: ' nora @artauction.local' } });
     expect(input.value).toBe('nora@artauction.local');
   });
 
   it('enlaza el error con el campo para lectores de pantalla', () => {
-    render(<TextField id="x" label="Correo" value="" onValueChange={() => undefined} error="Escribe tu correo." />);
+    renderWithIntl(<TextField id="x" label="Correo" value="" onValueChange={() => undefined} error="Escribe tu correo." />);
     const input = screen.getByLabelText('Correo');
     expect(input).toHaveAttribute('aria-invalid', 'true');
     expect(input).toHaveAccessibleDescription('Escribe tu correo.');
@@ -62,7 +63,7 @@ describe('TextAreaField', () => {
       const [value, setValue] = useState('');
       return <TextAreaField id="d" label="Descripción" value={value} onValueChange={setValue} />;
     }
-    render(<Area />);
+    renderWithIntl(<Area />);
     const area = screen.getByLabelText<HTMLTextAreaElement>('Descripción');
     fireEvent.change(area, { target: { value: '\n Óleo sobre lienzo' } });
     expect(area.value).toBe('Óleo sobre lienzo');
@@ -76,7 +77,7 @@ describe('PasswordField', () => {
   }
 
   it('oculta la contraseña y permite mostrarla y volver a ocultarla', () => {
-    render(<Password />);
+    renderWithIntl(<Password />);
     const input = screen.getByLabelText('Contraseña');
     expect(input).toHaveAttribute('type', 'password');
 
@@ -89,7 +90,7 @@ describe('PasswordField', () => {
   });
 
   it('sigue sin admitir espacios cuando está visible', () => {
-    render(<Password />);
+    renderWithIntl(<Password />);
     fireEvent.click(screen.getByRole('button', { name: 'Mostrar contraseña' }));
     const input = screen.getByLabelText<HTMLInputElement>('Contraseña');
     fireEvent.change(input, { target: { value: ' Dev Password!234' } });

@@ -2,6 +2,7 @@
 
 import { Environment, Lightformer, OrbitControls } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
+import { useTranslations } from 'next-intl';
 import { Suspense, useEffect, useMemo, type RefObject } from 'react';
 import { ACESFilmicToneMapping } from 'three';
 import type { GalleryConfig, Lot } from '@/lib/api/types';
@@ -45,6 +46,8 @@ export function GalleryScene({
   intent: RefObject<MoveIntent>;
   reducedMotion: boolean;
 }) {
+  // Fuera del Canvas: el texto entra a la escena 3D como dato.
+  const unattributed = useTranslations('Studio.card')('unattributedArtist');
   const room = roomOf(config);
   const lightColor = kelvinToHex(config.lighting.colorTemperature);
   // spotIntensity va de 0 a ~1.2 en la configuracion; en candelas, un foco de galeria ronda 20-60.
@@ -97,6 +100,7 @@ export function GalleryScene({
             selected: item.id === selectedId,
             lightColor,
             lightIntensity: spot,
+            unattributed,
             onSelect: (id: string) => { onSelect(id); },
           };
           if (item.object) {

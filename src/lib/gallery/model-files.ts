@@ -27,6 +27,13 @@ export function isUnreadableTexture(name: string): boolean {
   return UNREADABLE_TEXTURE.test(companionKey(name));
 }
 
+/** Por que no sirve un modelo; useModelImport lo pone en palabras del idioma activo. */
+export type ModelProblem =
+  | { kind: 'noMain' | 'manyMains' | 'tooLarge' | 'choose' | 'badGlb' | 'convertFailed' | 'convertedTooLarge' }
+  | { kind: 'stray'; name: string }
+  | { kind: 'tooFewTriangles' | 'tooManyTriangles'; triangles: number }
+  | { kind: 'openFailed'; format: ModelFormat };
+
 export interface ModelSelection {
   /** Indice del archivo principal en la lista elegida. */
   main: number;
@@ -41,29 +48,29 @@ export function formatOf(name: string): ModelFormat | null {
 /**
  * Elige el archivo principal de lo que selecciono el vendedor: uno y solo uno
  * de .glb, .gltf, .fbx u .obj, mas sus archivos acompanantes. Devuelve la
- * seleccion o el mensaje de error.
+ * seleccion o el problema.
  */
-export function pickModelFile(files: ReadonlyArray<{ name: string; size: number }>): ModelSelection | string {
+export function pickModelFile(files: ReadonlyArray<{ name: string; size: number }>): ModelSelection | ModelProblem {
   const mains = files.flatMap((file, index) => {
     const format = formatOf(file.name);
     return format ? [{ index, format }] : [];
   });
   if (mains.length === 0) {
-    return 'Elige el modelo: un archivo .glb, .gltf, .fbx u .obj (un .blend no se abre en la web: expórtalo desde Blender).';
+    return { kind: 'noMain' };
   }
   if (mains.length > 1) {
-    return 'Elige un solo modelo a la vez; junto a él solo van sus materiales (.mtl), buffers (.bin) y texturas.';
+    return { kind: 'manyMains' };
   }
   const stray = files.find((file) => !MAIN.test(file.name) && !COMPANION.test(file.name));
   if (stray) {
-    return `«${stray.name}» no es parte de un modelo 3D.`;
+    return { kind: 'stray', name: stray.name };
   }
   const total = files.reduce((sum, file) => sum + file.size, 0);
   if (total > MODEL_LIMITS.maxBytes) {
-    return 'El modelo y sus texturas superan los 30 MB. Redúcelo con el modificador Decimate de Blender o usa texturas más pequeñas.';
+    return { kind: 'tooLarge' };
   }
   const [main] = mains;
-  return main ? { main: main.index, format: main.format } : 'Elige el modelo.';
+  return main ? { main: main.index, format: main.format } : { kind: 'choose' };
 }
 
 /** Firma de un GLB: los cuatro primeros bytes dicen `glTF`. */
@@ -71,13 +78,13 @@ export function isGlbHeader(header: Uint8Array): boolean {
   return String.fromCharCode(...header.slice(0, 4)) === 'glTF';
 }
 
-/** Revisa los triangulos del modelo ya cargado. Devuelve el mensaje de error o null. */
-export function checkTriangles(triangles: number): string | null {
+/** Revisa los triangulos del modelo ya cargado. Devuelve el problema o null. */
+export function checkTriangles(triangles: number): ModelProblem | null {
   if (triangles < MODEL_LIMITS.minTriangles) {
-    return `El modelo tiene ${triangles.toLocaleString('es-CO')} triángulos: muy poco detalle. El mínimo es 1.000.`;
+    return { kind: 'tooFewTriangles', triangles };
   }
   if (triangles > MODEL_LIMITS.maxTriangles) {
-    return `El modelo tiene ${triangles.toLocaleString('es-CO')} triángulos: la sala se volvería lenta. El máximo es 300.000; redúcelo con Decimate en Blender.`;
+    return { kind: 'tooManyTriangles', triangles };
   }
   return null;
 }

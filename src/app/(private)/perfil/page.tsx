@@ -1,41 +1,34 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { sectionsFor } from '@/components/account/account-menu';
 import { ProfileMark } from '@/components/account/profile-mark';
 import { RequireSession } from '@/components/session/require-session';
 import { PageHeader } from '@/components/ui/layout';
 
-const ROLE_LABEL: Record<string, string> = {
-  USER: 'Coleccionista',
-  SELLER: 'Vendedor',
-  ADMIN: 'Administración',
-};
+const ROLES = ['USER', 'SELLER', 'ADMIN'] as const;
 
-const DESCRIPTIONS: Record<string, string> = {
-  '/bolsillo': 'Saldo de artacoins, recargas y lo retenido en salas.',
-  '/mis-obras': 'Lo que publicaste con su estado, y lo que ganaste en subasta.',
-  '/feed': 'Lo que hacen las personas que sigues.',
-  '/notificaciones': 'Resultados de auditorías y cierres de subasta.',
-  '/publicar': 'Sube un proyecto propio para tu galería o, si vendes, una obra para el catálogo.',
-  '/admin': 'Obras que esperan una decisión manual.',
-  '/ajustes': 'Tu nombre y tu imagen de perfil.',
-};
+function isRole(value: string): value is (typeof ROLES)[number] {
+  return (ROLES as readonly string[]).includes(value);
+}
 
 export default function ProfilePage() {
+  const t = useTranslations('Profile');
+  const tAccount = useTranslations('Account');
   return (
-    <RequireSession title="Entra para ver tu cuenta">
+    <RequireSession title={t('signInTitle')}>
       {(profile) => (
         <>
           <PageHeader
-            eyebrow={ROLE_LABEL[profile.role] ?? 'Cuenta'}
+            eyebrow={isRole(profile.role) ? t(`roles.${profile.role}`) : t('account')}
             title={profile.displayName}
             description={profile.email}
             actions={<ProfileMark name={profile.displayName} avatarUrl={profile.avatarUrl} />}
           />
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {sectionsFor(profile.role)
-              .filter((section) => section.href !== '/perfil')
+              .filter((section) => section.label !== 'profile')
               .map(({ href, label, Icon }) => (
                 <li key={href}>
                   <Link
@@ -46,8 +39,8 @@ export default function ProfilePage() {
                       <Icon aria-hidden="true" className="h-5 w-5" />
                     </span>
                     <span>
-                      <span className="block font-serif text-xl group-hover:underline">{label}</span>
-                      <span className="mt-1 block text-sm text-muted">{DESCRIPTIONS[href]}</span>
+                      <span className="block font-serif text-xl group-hover:underline">{tAccount(label)}</span>
+                      <span className="mt-1 block text-sm text-muted">{t(`descriptions.${label}`)}</span>
                     </span>
                   </Link>
                 </li>

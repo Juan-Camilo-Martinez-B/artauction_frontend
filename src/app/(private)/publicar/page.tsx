@@ -1,23 +1,21 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { RequireSession } from '@/components/session/require-session';
 import { PageHeader } from '@/components/ui/layout';
 import { canSell } from '@/lib/session/roles';
 import { LotForm } from './lot-form';
 
 export default function NewArtworkPage() {
+  const t = useTranslations('Publish.newPage');
   return (
-    <RequireSession title="Entra para subir una obra">
+    <RequireSession title={t('signInTitle')}>
       {(profile) => (
         <>
           <PageHeader
-            eyebrow="Nueva obra"
-            title={canSell(profile.role) ? 'Subir una obra' : 'Subir un proyecto propio'}
-            description={
-              canSell(profile.role)
-                ? 'Guárdala solo para tu galería o publícala en el catálogo. En el catálogo, la auditoría revisa que materiales, fecha e imagen sean coherentes antes de darle una sala de subasta.'
-                : 'Tus propias obras se cuelgan en tu sala 3D sin pasar por auditoría. Tú decides si se ven en tu galería pública.'
-            }
+            eyebrow={t('eyebrow')}
+            title={canSell(profile.role) ? t('titleSeller') : t('titleOwn')}
+            description={canSell(profile.role) ? t('descriptionSeller') : t('descriptionOwn')}
           />
           <LotForm canSell={canSell(profile.role)} />
         </>

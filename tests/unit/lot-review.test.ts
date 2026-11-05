@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { NotificationItem } from '@/lib/api/types';
-import { auditSourceLabel, isReturned, sellerStatus } from '@/lib/artwork/lot-review';
+import { auditSource, isReturned, sellerStatus } from '@/lib/artwork/lot-review';
 import { describeNotification } from '@/lib/describe-events';
 
 const RETURNED = { decision: 'RETURN_TO_DRAFT' as const, reason: 'Corrige las medidas declaradas.', createdAt: null };
@@ -16,12 +16,12 @@ describe('ciclo de revision en la interfaz', () => {
 
   it('dice quien evaluo la obra sin confundir la evaluacion local con la IA', () => {
     const published = { status: 'PUBLICADA', lastReview: null };
-    expect(auditSourceLabel({ modelName: 'local-rules' }, published)).toContain('sin IA');
-    expect(auditSourceLabel({ modelName: 'openai/gpt-oss-120b' }, published)).toBe('Evaluada por la IA (openai/gpt-oss-120b)');
-    expect(auditSourceLabel({ modelName: 'fallback' }, published)).toBe('La auditoría automática no terminó');
+    expect(auditSource({ modelName: 'local-rules' }, published)).toEqual({ kind: 'localRules' });
+    expect(auditSource({ modelName: 'openai/gpt-oss-120b' }, published)).toEqual({ kind: 'ai', model: 'openai/gpt-oss-120b' });
+    expect(auditSource({ modelName: 'fallback' }, published)).toEqual({ kind: 'unfinished' });
     const approved = { status: 'PUBLICADA', lastReview: { decision: 'APPROVE' as const, reason: null, createdAt: null } };
-    expect(auditSourceLabel({ modelName: 'local-rules' }, approved)).toBe('Aprobada por revisión manual de un administrador');
-    expect(auditSourceLabel(undefined, published)).toBeNull();
+    expect(auditSource({ modelName: 'local-rules' }, approved)).toEqual({ kind: 'manualApproval' });
+    expect(auditSource(undefined, published)).toBeNull();
   });
 
   it('el aviso de obra devuelta muestra el motivo y lleva a editarla', () => {
@@ -33,8 +33,7 @@ describe('ciclo de revision en la interfaz', () => {
       readAt: null,
     };
     expect(describeNotification(item, 'u1')).toEqual({
-      title: 'Retrato volvió a borrador',
-      body: 'Motivo: Corrige las medidas declaradas. Corrígela y reenvíala a auditoría.',
+      message: { kind: 'lotReturned', title: 'Retrato', reason: 'Corrige las medidas declaradas.' },
       href: '/publicar/l1',
       tone: 'warning',
     });

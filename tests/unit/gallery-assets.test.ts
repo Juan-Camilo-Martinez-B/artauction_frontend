@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fitFrameToSize, frameStyle } from '@/lib/gallery/frames';
+import { frameStyle } from '@/lib/gallery/frames';
 import { parseProxiedImageUrl, textureSource } from '@/lib/gallery/image-source';
 import { kelvinToHex, shade, tintColor, wallMaterial } from '@/lib/gallery/materials';
 
@@ -32,12 +32,6 @@ describe('enmarcado', () => {
     expect(frameStyle(lot('Técnica mixta')).kind).toBe('wood');
   });
 
-  it('da paspartú ancho a las obras diminutas', () => {
-    const style = frameStyle(lot('Albumen photograph'));
-    const fitted = fitFrameToSize(style, { width: 0.037, height: 0.064 });
-    expect(0.064 + 2 * fitted.mat).toBeCloseTo(0.34);
-    expect(fitFrameToSize(style, { width: 0.6, height: 0.8 })).toBe(style);
-  });
 });
 
 describe('materiales', () => {

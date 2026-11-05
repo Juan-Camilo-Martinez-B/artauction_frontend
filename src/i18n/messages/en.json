@@ -1,0 +1,1276 @@
+{
+  "Meta": {
+    "title": "ArtAuction AI",
+    "description": "Art and antiques auctions with authenticity audits."
+  },
+  "Layout": {
+    "skipToContent": "Skip to content",
+    "mainNavigation": "Main"
+  },
+  "Nav": {
+    "catalog": "Catalog",
+    "myGallery": "My gallery",
+    "howItWorks": "How it works",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "Account": {
+    "signIn": "Sign in",
+    "menuLabel": "{name}'s account",
+    "profile": "My account",
+    "wallet": "Wallet",
+    "myWorks": "My works",
+    "activity": "Activity",
+    "notifications": "Notifications",
+    "newWork": "New work",
+    "review": "Manual review",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "signingOut": "Signing out…"
+  },
+  "Balance": {
+    "held": " and {held} held in bids",
+    "title": "Available balance: {balance} artacoins{held}. Open your wallet.",
+    "label": "Balance: {balance} artacoins{held}. Open wallet",
+    "unit": "AC"
+  },
+  "Footer": {
+    "tagline": "Art and antiques auctions with authenticity audits. Every room runs on the server's clock.",
+    "catalog": "Catalog and live rooms",
+    "myGallery": "My 3D gallery",
+    "howItWorks": "How it works",
+    "wallet": "Artacoin wallet",
+    "notifications": "Notifications",
+    "privacy": "A private work is never shown to others."
+  },
+  "Language": {
+    "label": "Language",
+    "switchTo": "Switch to {language}",
+    "settingsTitle": "Language",
+    "settingsHint": "The platform is shown in this language on all your devices. Artwork sheets are translated automatically.",
+    "saveFailed": "Your account could not store the language. It applies only in this browser."
+  },
+  "Profile": {
+    "signInTitle": "Sign in to see your account",
+    "account": "Account",
+    "roles": {
+      "USER": "Collector",
+      "SELLER": "Seller",
+      "ADMIN": "Administration"
+    },
+    "descriptions": {
+      "profile": "Your account and its sections.",
+      "wallet": "Artacoin balance, top-ups and what is held in rooms.",
+      "myWorks": "What you published and its status, and what you won at auction.",
+      "activity": "What the people you follow are doing.",
+      "notifications": "Audit results and auction closings.",
+      "newWork": "Upload a personal project for your gallery or, if you sell, a work for the catalog.",
+      "review": "Works waiting for a manual decision.",
+      "settings": "Your name, profile picture and language."
+    }
+  },
+  "Settings": {
+    "signInTitle": "Sign in to change your settings",
+    "eyebrow": "Your account",
+    "title": "Settings",
+    "description": "Your name and picture appear in the header and in your public gallery.",
+    "accountFallback": "Account",
+    "preview": "This is how others will see you.",
+    "nameLabel": "Name",
+    "avatarLabel": "Profile picture",
+    "avatarHint": "An https address. Leave it empty to use your initials.",
+    "avatarHttps": "The picture must be an https address.",
+    "avatarComplete": "Write a full address, for example https://…",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Your settings were saved.",
+    "saveFailed": "Your settings could not be saved."
+  },
+  "Errors": {
+    "EMAIL_TAKEN": "That email already has an account. Sign in with it or use another one.",
+    "INVALID_CREDENTIALS": "The email or password does not match.",
+    "SESSION_INVALID": "Your session ended. Please sign in again.",
+    "ROLE_NOT_ALLOWED": "That role cannot be chosen when signing up.",
+    "ACCOUNT_NOT_FOUND": "The account does not exist.",
+    "USER_NOT_FOUND": "We could not find that person.",
+    "LOT_NOT_FOUND": "We could not find that work.",
+    "LOT_CHANGED": "The work changed while you were editing it. Please try again.",
+    "LOT_NOT_EDITABLE": "Only a draft or a personal project can be changed. If an administrator returns it to you, you can edit it.",
+    "LOT_VISIBILITY_FIXED": "Only a personal project can be shown or hidden by hand. The audit decides the visibility of a catalog work.",
+    "MODEL_ONLY_THREE_D": "Only a three-dimensional work (sculpture or object) has a 3D model.",
+    "MODEL_REQUIRED": "A three-dimensional work needs its 3D model (.glb, .gltf, .fbx or .obj) before it can be shown.",
+    "MODEL_REMOVE_PUBLIC": "Your work is public: upload another model to replace it, or hide the work before removing it.",
+    "SELLER_ONLY": "Only a seller account can do this.",
+    "ADMIN_ONLY": "Only an administrator can do this.",
+    "AUCTION_NOT_FOUND": "We could not find that auction.",
+    "AUCTION_NOT_ACTIVE": "The auction is not active.",
+    "AUCTION_CLOSED": "The auction has already closed.",
+    "AUCTION_ALREADY_EXISTS": "That work already has an open or closed auction.",
+    "LOT_NOT_READY_FOR_AUCTION": "The work is not ready to be auctioned yet.",
+    "BID_BELOW_INCREMENT": "The bid does not reach the minimum increment.",
+    "BID_TAKEN": "Someone else already placed the {amount} bid.",
+    "BID_ALREADY_PLACED": "You already placed the {amount} bid.",
+    "OWN_LOT_BID": "You cannot bid on your own work.",
+    "OWN_LOT_PURCHASE": "You cannot buy your own work.",
+    "WITHDRAW_LOCKED": "You cannot withdraw during the last 4 minutes of the auction.",
+    "BUY_NOW_EXCEEDED": "Buy now is no longer available: bids reached 80% of its price.",
+    "BUY_NOW_ROOM_CLOSED": "Buy now is only available while the room is open.",
+    "IDEMPOTENCY_KEY_REUSED": "That operation was already sent with different data. Reload the page and try again.",
+    "INSUFFICIENT_FUNDS": "You do not have enough artacoins. You are {missing} short in your wallet.",
+    "PAYMENT_REJECTED": "The payment gateway declined the card: check that it has not expired and that the number and code are complete.",
+    "TOP_UP_OUT_OF_RANGE": "Top-ups go from {min} to {max} whole artacoins.",
+    "WALLET_UNAVAILABLE": "The wallet is not responding. Please try again.",
+    "GALLERY_NOT_FOUND": "You do not have a gallery yet.",
+    "GALLERY_MANUAL_CHANGES": "There are manual changes. Confirm whether you want to replace the current room.",
+    "ARTWORK_NOT_OWNED": "You can only hang your own works: your projects, what you published without selling, and what you won.",
+    "ARTWORK_NEEDS_MODEL": "This three-dimensional work has no 3D model: upload it to show it in your room.",
+    "ARTWORK_NOT_IN_GALLERY": "The work is not in your gallery.",
+    "SHEET_NOT_FOUND": "We could not find that sheet.",
+    "AI_NOT_CONFIGURED": "AI design is not available right now.",
+    "AI_UNAVAILABLE": "The AI did not respond. Please try again in a moment.",
+    "TRANSLATION_DISABLED": "Automatic translation is turned off.",
+    "INVALID_ARGUMENT": "Some of the data is not valid.",
+    "NOT_FOUND": "We could not find what you are looking for.",
+    "CONFLICT": "Something changed in the meantime. Reload and try again.",
+    "PERMISSION_DENIED": "You do not have permission to do this.",
+    "UNAUTHENTICATED": "Your session ended. Please sign in again.",
+    "FAILED_PRECONDITION": "This cannot be done right now.",
+    "UNAVAILABLE": "The service is not responding. Please try again in a moment.",
+    "TIMEOUT": "The service took too long. Please try again.",
+    "RATE_LIMITED": "Too many attempts in a row. Wait a few seconds.",
+    "VALIDATION_FAILED": "Check the data: some fields are incomplete or have an invalid format.",
+    "INVALID_JSON": "The request arrived damaged. Please try again.",
+    "PAYLOAD_TOO_LARGE": "What you sent is too large.",
+    "INTERNAL": "Something failed on our side. Please try again."
+  },
+  "Auth": {
+    "loginEyebrow": "Your account",
+    "loginTitle": "Sign in",
+    "loggingIn": "Signing in…",
+    "loginFailed": "We could not sign you in. Please try again.",
+    "noAccount": "Don't have an account yet?",
+    "haveAccount": "Already have an account?",
+    "registerEyebrow": "New account",
+    "createAccount": "Create account",
+    "creatingAccount": "Creating account…",
+    "registerFailed": "We could not create the account. Please try again.",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least {min} characters, no spaces.",
+    "sellerTitle": "I want to publish works",
+    "sellerHint": "Your account will be able to send works to audit and auction them."
+  },
+  "Validation": {
+    "emailRequired": "Enter your email.",
+    "emailInvalid": "Check the email: it should look like name@domain.com.",
+    "passwordRequired": "Enter your password.",
+    "passwordShort": "The password must be at least {minPassword} characters long.",
+    "passwordLong": "The password is too long.",
+    "nameLength": "The name must be between 2 and 80 characters."
+  },
+  "Common": {
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "closeNotice": "Close notice"
+  },
+  "Session": {
+    "checking": "Checking your session…",
+    "signInTitle": "Sign in to continue",
+    "signInHint": "This section belongs to your account. Sign in and you will come right back here.",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "wrongRole": "This section is not for your account",
+    "sellerOnly": "Only a seller account can publish works.",
+    "adminOnly": "Only an administrator account can enter here.",
+    "toCatalog": "Go to the catalog"
+  },
+  "Status": {
+    "BORRADOR": "Draft",
+    "DEVUELTA": "Returned",
+    "PERSONAL": "Personal project",
+    "PENDIENTE_AUDITORIA": "In audit",
+    "APROBADO": "Approved",
+    "PUBLICADA": "Published",
+    "REVISION_MANUAL": "Manual review",
+    "EN_SUBASTA": "At auction",
+    "VENDIDA": "Sold",
+    "CERRADO": "Closed",
+    "ACTIVA": "Room open",
+    "PROGRAMADA": "Scheduled",
+    "CERRADA": "Closed"
+  },
+  "Score": {
+    "title": "Authenticity",
+    "score": "Authenticity score {score}",
+    "noScore": "Authenticity score not available",
+    "noVerdict": "No verdict yet"
+  },
+  "Home": {
+    "eyebrow": "Art room",
+    "title": "A work gets in when its material and its century agree.",
+    "lead": "Art and antiques auctions with authenticity audits. The price only goes up, the closing extends if someone bids at the last moment, and what you win is shown in your own room.",
+    "toCatalog": "See the catalog",
+    "howItWorks": "How it works",
+    "steps": {
+      "audit": {
+        "title": "We audit",
+        "text": "Every work goes through an authenticity audit: material, period and image must agree."
+      },
+      "auction": {
+        "title": "We auction",
+        "text": "Live rooms on the server's clock. A bid at the last moment extends the closing."
+      },
+      "exhibit": {
+        "title": "You exhibit",
+        "text": "The work you win hangs in your 3D gallery, which you can walk through and arrange as you like."
+      }
+    }
+  },
+  "Categories": {
+    "arte-digital": "Digital art",
+    "ceramica": "Ceramics and vases",
+    "escultura": "Sculpture",
+    "fotografia": "Photography",
+    "objetos-artisticos": "Art objects",
+    "otras": "Other",
+    "pinturas": "Paintings"
+  },
+  "Catalog": {
+    "eyebrow": "Exhibition",
+    "title": "Catalog",
+    "description": "Paintings, photographs and objects with authenticity audits. Every few minutes a work goes up for auction.",
+    "errors": {
+      "unavailable": "The catalog is not available.",
+      "offline": "There is no connection to the room."
+    },
+    "categories": "Categories",
+    "allCatalog": "Whole catalog",
+    "empty": {
+      "title": "No works match that search",
+      "description": "Try another category, another format or a shorter search.",
+      "action": "See the whole catalog"
+    },
+    "featured": "Featured work",
+    "unattributedArtist": "Unattributed artist",
+    "unattributed": "Unattributed",
+    "noCategory": "No category",
+    "total": "{total, plural, one {# work} other {# works}} in this selection.",
+    "object": "Object",
+    "wallWork": "Wall work",
+    "search": {
+      "label": "Search work, artist or material",
+      "placeholder": "Portrait, oil, Vásquez…",
+      "clear": "Clear the search",
+      "format": "Format",
+      "all": "All",
+      "flat": "Flat works",
+      "objects": "Objects",
+      "submit": "Search"
+    },
+    "pager": {
+      "label": "Catalog pages",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {page} of {pages}"
+    }
+  },
+  "LiveAuctions": {
+    "eyebrow": "Room open",
+    "title": "Live and upcoming",
+    "description": "Every few minutes a new room opens with a work from the catalog.",
+    "toCatalog": "See the whole catalog",
+    "unavailable": "The lineup is not available right now.",
+    "empty": "We are preparing the next room. Come back in a few minutes.",
+    "live": "Live",
+    "upcoming": "Upcoming",
+    "unattributedArtist": "Unattributed artist",
+    "currentPrice": "Current price",
+    "openingPrice": "Opening price",
+    "closesIn": "Closes in",
+    "opensIn": "Opens in",
+    "closing": "Closing…",
+    "opening": "Opening…",
+    "buyNow": "Buy now:"
+  },
+  "HowItWorks": {
+    "metaTitle": "How it works",
+    "eyebrow": "Guide",
+    "title": "How the room works",
+    "description": "From the audit to your gallery: everything that happens to a work on ArtAuction.",
+    "toLive": "See live rooms",
+    "createAccount": "Create account",
+    "sections": {
+      "audit": {
+        "title": "Authenticity audit",
+        "p1": "Every published work goes through an audit: rules that catch anachronisms (for example, acrylic before 1950) or repeated images, and a model that assesses the whole sheet.",
+        "p2": "If everything fits, the work is published with an authenticity score and a suggested price. If something does not fit, it goes to manual review and a person decides."
+      },
+      "rooms": {
+        "title": "Auction rooms",
+        "p1": "There are always some rooms open or about to open: every few minutes a catalog work goes up for auction and the room lasts between 15 and 30 minutes.",
+        "p2": "The price only goes up. If someone bids in the last 30 seconds, the closing extends another 30. You can withdraw your bid up to 4 minutes before closing.",
+        "p3": "The countdown uses the server's clock, so everyone sees the same time."
+      },
+      "wallet": {
+        "title": "Artacoins and wallet",
+        "p1": "Bids are paid in artacoins. You top them up in your wallet with a simulated charge: any card that has not expired works.",
+        "p2": "When you bid, only the difference from your previous bid is held. If you lose, the hold comes back; if you win, it is charged, and the seller gets the price minus a 10% fee."
+      },
+      "gallery": {
+        "title": "Your 3D gallery",
+        "p1": "The works you win hang in your 3D room. You can walk through it, get close to each work and arrange it as you like: walls, floor, light and the position of each piece.",
+        "p2": "Public works also appear in your public gallery, and other people can follow you."
+      }
+    }
+  },
+  "Artwork": {
+    "work": "Work",
+    "sheetTitle": "Work sheet",
+    "preparingModel": "Preparing the 3D model…",
+    "noCategory": "No category",
+    "threeD": "Three-dimensional object",
+    "twoD": "Two-dimensional work",
+    "unclassified": "Unclassified format",
+    "format": {
+      "landscape": "Landscape format",
+      "portrait": "Portrait format",
+      "square": "Square format"
+    },
+    "returned": "An administrator returned this work",
+    "editAndResend": "Edit and resubmit",
+    "notAudited": "Not audited",
+    "unattributed": "Unattributed",
+    "unknownYear": "unknown year",
+    "facts": {
+      "materials": "Materials",
+      "presentation": "Presentation",
+      "measures": "Dimensions",
+      "noMeasures": "No dimensions on the sheet",
+      "provenance": "Provenance",
+      "noProvenance": "No provenance on the sheet",
+      "priceBand": "Suggested range"
+    },
+    "personalTitle": "Personal project, not audited",
+    "personalText": "Its author uploaded it for their personal gallery. It did not go through the authenticity audit and it is not for sale.",
+    "audit": {
+      "critical": "The audit found a critical inconsistency.",
+      "clean": "The audit found no critical inconsistencies.",
+      "soldWith": "Authenticity score the work was sold with.",
+      "pending": "The authenticity report appears when the audit finishes."
+    },
+    "source": {
+      "personal": "Personal project, not audited",
+      "manualApproval": "Approved by an administrator's manual review",
+      "localRules": "Local assessment (no AI): the AI was not available",
+      "systemRule": "A system rule decided",
+      "unfinished": "The automatic audit did not finish",
+      "ai": "Assessed by the AI ({model})"
+    },
+    "translation": {
+      "automatic": "Automatically translated",
+      "original": "Original text",
+      "showOriginal": "Show original",
+      "showTranslation": "Show translation"
+    },
+    "auction": {
+      "openNow": "Room open now",
+      "scheduled": "Auction scheduled",
+      "currentPrice": "Now at {price}",
+      "openingPrice": "Opens at {price}",
+      "openingAt": "Opens at {price} · starts {date}",
+      "buyNow": "Buy now:",
+      "buyNowWhenOpen": "once the room opens",
+      "enterRoom": "Enter the room",
+      "seeRoom": "See the room"
+    },
+    "purchase": {
+      "title": "Saved purchase sheet",
+      "byBuyNow": "with buy now",
+      "atAuction": "at auction",
+      "onArtAuction": "on ArtAuction",
+      "bought": "Bought {how}",
+      "on": "on {date}",
+      "for": "for {price}",
+      "snapshot": "This is the work's sheet as it was when it sold."
+    },
+    "view": "Work view",
+    "photo": "Photo",
+    "model": "3D model",
+    "noImage": "This work has no published image yet.",
+    "verifiedModel": "Verified 3D model · {triangles} triangles",
+    "unavailable": {
+      "title": "This work is not available",
+      "description": "It may be private, it may have been sold, or the link may be wrong.",
+      "action": "Back to the catalog",
+      "opening": "Opening the sheet…"
+    },
+    "unavailableSheet": {
+      "title": "This sheet is not available",
+      "description": "The work may be private in this gallery, or the link may be wrong.",
+      "action": "See the gallery",
+      "opening": "Opening the sheet…"
+    }
+  },
+  "PublicGallery": {
+    "metaTitle": "Gallery",
+    "eyebrow": "Collection",
+    "title": "Public gallery",
+    "description": "The public works in this collection: what its owner won, published or created for their gallery. Follow it to see what they win in your feed.",
+    "empty": {
+      "title": "No public works yet",
+      "description": "When this person wins or publishes public works, they will appear here."
+    },
+    "sources": {
+      "GANADA": "Won at auction",
+      "PROPIA": "Their own work",
+      "PROYECTO": "Personal project, not audited",
+      "other": "In the collection"
+    },
+    "unattributedArtist": "Unattributed artist",
+    "follow": {
+      "signIn": "Sign in to follow",
+      "own": "It's your gallery: go to the 3D room",
+      "done": "You now follow this gallery. Its activity will appear in your feed.",
+      "failed": "We could not follow this gallery.",
+      "following": "Following",
+      "follow": "Follow gallery"
+    }
+  },
+  "Room": {
+    "metaTitle": "Auction room",
+    "eyebrow": "Auction room",
+    "fallbackTitle": "The auction",
+    "unattributedArtist": "Unattributed artist",
+    "workAlt": "Work at auction",
+    "seeSheet": "See the sheet and the authenticity report",
+    "preparing": "Preparing the room…",
+    "unavailable": {
+      "title": "Room not available",
+      "description": "This room does not exist or is no longer available.",
+      "action": "See live rooms"
+    },
+    "live": "Live",
+    "connecting": "Connecting…",
+    "highestBid": "Highest bid",
+    "openingPrice": "Opening price",
+    "leaderYou": "Your bid is leading",
+    "leader": "{bidder} is leading",
+    "you": "You",
+    "bidder": "Bidder {number}",
+    "withdraw": "Withdraw my bid",
+    "history": "Bid history",
+    "noBids": "No bids yet. The first bid opens at {amount}.",
+    "buyNowTag": "Buy now",
+    "minimumBid": "The minimum bid is {amount}.",
+    "bidExtended": "Bid accepted. The closing was extended by 30 seconds.",
+    "bidAccepted": "Bid accepted: you are winning with {amount}.",
+    "bidFailed": "The bid did not go through. Please try again.",
+    "withdrawn": "You withdrew. {amount} went back to your wallet.",
+    "withdrawFailed": "You could not withdraw.",
+    "bought": "You bought it for {amount}! It is already in your gallery.",
+    "buyFailed": "The purchase did not complete. Please try again.",
+    "extendedByOther": "Last-moment bid: the closing was extended by 30 seconds.",
+    "available": "Available: {amount}",
+    "heldHere": "plus {amount} already held in this room",
+    "topUp": "Top up",
+    "withdrawDialog": {
+      "title": "Withdraw your bid?",
+      "confirm": "Withdraw",
+      "body": "The held artacoins go back to your wallet and you stop competing for this work. Only possible up to 4 minutes before closing."
+    },
+    "buyDialog": {
+      "title": "Buy now?",
+      "confirm": "Buy for {price}",
+      "body": "You pay <strong>{price}</strong>, you take the work and the auction ends for everyone. Bidders get their holds back."
+    },
+    "clock": {
+      "unsold": "Closed without a sale: another date will be scheduled.",
+      "youBought": "You bought it! It is already in your gallery.",
+      "soldBuyNow": "Sold with buy now.",
+      "youWon": "You won this work! It is already in your gallery.",
+      "closedWithWinner": "Closed with a winner.",
+      "opening": "Opening the room…",
+      "closing": "Closing the room…",
+      "opensIn": "Opens in",
+      "closesIn": "Closes in"
+    },
+    "bid": {
+      "wantToBid": "Want to bid?",
+      "signInHint": "Sign in with your account and top up artacoins in your wallet.",
+      "signIn": "Sign in to bid",
+      "ownWork": "It's your work: you can follow the room, but you cannot bid in it.",
+      "notYet": "You can bid once the room opens.",
+      "noMore": "The room no longer takes bids.",
+      "amountLabel": "Your bid in artacoins",
+      "minimum": "Minimum {amount}.",
+      "quick": "Quick bids",
+      "available": "Available: {amount}.",
+      "topUp": "Top up",
+      "onlyIncrease": "Only the increase of your bid is held.",
+      "submit": "Bid",
+      "submitAmount": "Bid {amount}"
+    },
+    "buyNow": {
+      "whenOpen": "Buy now once the room opens: {price}.",
+      "exceeded": "Buy now is no longer available: bids reached {threshold}, 80% of {price}.",
+      "price": "Buy now: {price}.",
+      "pitch": "Don't want to wait? Take it now and the auction ends.",
+      "action": "Buy now for {price}"
+    }
+  },
+  "Wallet": {
+    "signInTitle": "Sign in to see your wallet",
+    "loadFailed": "We could not open your wallet.",
+    "payFailed": "The payment gateway did not complete the charge. Please try again.",
+    "credited": "{amount} were added with the card ending in {last4}.",
+    "opening": "Opening your wallet…",
+    "eyebrow": "Artacoins",
+    "title": "Wallet",
+    "description": "Artacoins are the room's currency. The charge is simulated: any made-up card that has not expired works.",
+    "topUp": "Top up",
+    "pack": "Pack",
+    "notStored": "The number and code are not stored.",
+    "charging": "Charging…",
+    "pay": "Pay {amount}",
+    "available": "Available",
+    "held": "Held in rooms",
+    "entriesTitle": "Activity",
+    "noEntries": "No activity yet. Your first top-up will appear here.",
+    "entries": {
+      "RECARGA": "Top-up",
+      "RETENCION": "Held in a room",
+      "LIBERACION": "Released from a room",
+      "CANJE": "Payment for a won work",
+      "VENTA": "Sale of a work",
+      "REEMBOLSO": "Refund of a cancelled purchase",
+      "ANULACION": "Cancelled sale"
+    }
+  },
+  "Card": {
+    "genericBrand": "Card",
+    "namePlaceholder": "NAME ON CARD",
+    "expiryPlaceholder": "MM/YY",
+    "nameLabel": "Name on card",
+    "numberLabel": "Card number",
+    "numberHint": "Visa, Mastercard, American Express or Diners Club.",
+    "expiryLabel": "Expiry date",
+    "cvvLabel": "Security code",
+    "cvvHintFront": "{digits} digits, on the front.",
+    "cvvHintBack": "{digits} digits, on the back.",
+    "numberRequired": "Enter the card number.",
+    "numberLength": "A {brand} card has {digits} digits.",
+    "expiryRequired": "Enter the expiry date.",
+    "expiryFormat": "Enter the expiry date as MM/YY.",
+    "expiryMonth": "The month must be between 01 and 12.",
+    "expired": "The card has expired.",
+    "expiryYear": "Check the expiry year.",
+    "cvvLength": "The security code has {digits} digits.",
+    "nameRequired": "Enter the name as it appears on the card."
+  },
+  "Events": {
+    "auditApproved": {
+      "title": "Your work passed the audit",
+      "body": "It is now published in the catalog and will get its auction room."
+    },
+    "auditManual": {
+      "title": "Your work went to manual review",
+      "body": "The audit found something a person must look at. We will let you know when it is resolved."
+    },
+    "auditDone": {
+      "title": "Your work's audit finished",
+      "result": "Result: {verdict}.",
+      "noResult": "Check the sheet to see the result."
+    },
+    "lotReturned": {
+      "title": "{title} went back to draft",
+      "genericTitle": "Your work went back to draft",
+      "reason": "Reason: {reason} Fix it and resubmit it for audit.",
+      "noReason": "An administrator returned it. Fix it and resubmit it for audit."
+    },
+    "boughtNow": {
+      "title": "You bought it now",
+      "body": "You paid {amount} and the auction ended. The work already hangs in your gallery."
+    },
+    "wonAuction": {
+      "title": "You won the auction!",
+      "body": "You paid {amount}. The work already hangs in your gallery."
+    },
+    "soldBuyNow": {
+      "title": "You sold with buy now",
+      "body": "Someone paid {amount} and closed the auction. The payment, minus the fee, is already in your wallet."
+    },
+    "sold": {
+      "title": "You sold a work",
+      "body": "The auction closed at {amount}. The payment, minus the fee, is already in your wallet."
+    },
+    "lostBuyNow": {
+      "title": "The work sold with buy now",
+      "body": "You are no longer competing for it. What you had held went back to your wallet."
+    },
+    "lost": {
+      "title": "The auction closed with another winner",
+      "body": "You are no longer competing for it. What you had held went back to your wallet."
+    },
+    "generic": {
+      "title": "Notice",
+      "body": "There is news on your account."
+    },
+    "activity": {
+      "followed": "Followed {name}",
+      "boughtNow": "Bought {name} instantly",
+      "won": "Won {name}"
+    }
+  },
+  "Feed": {
+    "signInTitle": "Sign in to see the activity",
+    "eyebrow": "Community",
+    "title": "Activity",
+    "description": "What happens with your works and with the galleries you follow.",
+    "loadFailed": "We could not load the activity.",
+    "loading": "Loading activity…",
+    "empty": {
+      "title": "No activity yet",
+      "description": "Win an auction or follow someone's gallery and their activity will appear here.",
+      "action": "Explore the catalog"
+    },
+    "you": "You",
+    "followed": "Someone you follow"
+  },
+  "Notifications": {
+    "signInTitle": "Sign in to see your notifications",
+    "eyebrow": "Your account",
+    "title": "Notifications",
+    "description": "Results of your audits and of the auctions you took part in.",
+    "loadFailed": "We could not load your notifications.",
+    "loading": "Loading notifications…",
+    "empty": {
+      "title": "No notifications for now",
+      "description": "When an audit finishes or an auction you are in closes, you will see it here.",
+      "action": "See live rooms"
+    }
+  },
+  "Publish": {
+    "categoriesFailed": "We could not load the categories.",
+    "imageFailed": "We could not prepare the image. Try a JPG or PNG.",
+    "returnReason": "Reason it was returned:",
+    "titleFallback": "the work",
+    "destination": {
+      "title": "What is this work for?",
+      "label": "Work destination",
+      "personalTitle": "Only for my gallery",
+      "personalText": "A personal project: it hangs in your 3D room with no audit. It is not sold.",
+      "catalogTitle": "Publish in the catalog",
+      "catalogText": "It goes through the audit and, if approved, gets its auction room.",
+      "sellerOnly": "Seller accounts only."
+    },
+    "visibility": {
+      "title": "Who can see it?",
+      "label": "Project visibility",
+      "privateTitle": "Only me",
+      "privateText": "In your 3D room and in My works.",
+      "publicTitle": "Public in my gallery",
+      "publicText": "It appears in your public gallery as “Personal project, not audited”. Never in the catalog."
+    },
+    "sections": {
+      "work": "The work",
+      "materials": "Materials and dimensions",
+      "image": "Image"
+    },
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "artist": "Artist",
+      "artistHint": "Leave it empty if unknown.",
+      "year": "Year",
+      "materials": "Materials",
+      "materialsPlaceholder": "Oil on canvas",
+      "category": "Category",
+      "format": "Format",
+      "formatFlat": "Flat work (painting, drawing, photo)",
+      "formatObject": "Object (sculpture, ceramics)",
+      "width": "Width (cm)",
+      "height": "Height (cm)",
+      "depth": "Depth (cm)",
+      "provenance": "Provenance",
+      "provenanceHint": "Previous collections or sales, if you know them."
+    },
+    "image": {
+      "previewAlt": "Preview of the work",
+      "preparing": "Preparing the image…",
+      "choose": "Choose a photo of the work",
+      "hint": "At least 800 px. It is resized in your browser before being sent.",
+      "change": "Tap the image to change it."
+    },
+    "submit": {
+      "saveChanges": "Save changes",
+      "saveToGallery": "Save to my gallery",
+      "saveAndResend": "Save and resubmit for audit",
+      "send": "Send to audit",
+      "saving": "Saving the sheet…",
+      "uploading": "Uploading the image…",
+      "modeling": "Checking the 3D model…",
+      "submitting": "Sending to audit…",
+      "saveOnly": "Save without sending"
+    },
+    "problems": {
+      "titleShort": "The title needs at least 3 characters.",
+      "descriptionShort": "Describe the work in at least 10 characters.",
+      "materialsRequired": "Enter the materials.",
+      "yearRange": "The year must be between 1 and {max}.",
+      "widthRequired": "Enter the width.",
+      "widthRange": "The width must be between 0.1 and 2000 cm.",
+      "heightRequired": "Enter the height.",
+      "heightRange": "The height must be between 0.1 and 2000 cm.",
+      "depthRequired": "Enter the depth.",
+      "depthRange": "The depth must be between 0.1 and 2000 cm.",
+      "provenanceShort": "The provenance needs at least 3 characters.",
+      "imageRequired": "Choose the image of the work.",
+      "modelRequired": "Upload the 3D model of the work."
+    },
+    "saveErrors": {
+      "image": "We could not save the image.",
+      "model": "We could not save the 3D model.",
+      "generic": "We could not save the work."
+    },
+    "model": {
+      "title": "3D model",
+      "preparing": "Preparing the preview…",
+      "help": "Required for sculptures and objects: the 3D room shows them with their real volume and at the height you declared. A .glb or .gltf works (Blender: File › Export › glTF 2.0), as does a .fbx or .obj, like those from Sketchfab or the Unity Asset Store. If the .obj or .gltf comes with separate materials (.mtl), buffers (.bin) or textures, choose them all at once. A .blend does not open on the web: export it. Between {min} and {max} triangles and up to 30 MB.",
+      "checking": "Opening and checking the model…",
+      "verified": "Verified model",
+      "triangles": "{triangles} triangles",
+      "uploadsOnSave": "uploads when you save",
+      "skipped": "Without {files}: the browser cannot read that texture format. If the piece looks colorless or flat, export it with .png or .jpg textures.",
+      "change": "Change model",
+      "choose": "Choose 3D model",
+      "converted": "{name} (converted from .{source})"
+    },
+    "modelErrors": {
+      "unknown": "We could not open the 3D model.",
+      "noMain": "Choose the model: a .glb, .gltf, .fbx or .obj file (a .blend does not open on the web: export it from Blender).",
+      "manyMains": "Choose one model at a time; only its materials (.mtl), buffers (.bin) and textures go with it.",
+      "stray": "“{name}” is not part of a 3D model.",
+      "tooLarge": "The model and its textures exceed 30 MB. Reduce it with Blender's Decimate modifier or use smaller textures.",
+      "choose": "Choose the model.",
+      "badGlb": "The file is not a valid GLB: it lacks the glTF header.",
+      "convertFailed": "We could not convert the model to GLB.",
+      "convertedTooLarge": "Converted to GLB, the model exceeds 30 MB. Reduce it with Decimate in Blender or use smaller textures.",
+      "tooFewTriangles": "The model has {triangles} triangles: too little detail. The minimum is {min}.",
+      "tooManyTriangles": "The model has {triangles} triangles: the room would become slow. The maximum is {max}; reduce it with Decimate in Blender.",
+      "openFailed": "We could not open the .{format} model. Check that all its files (materials and textures) are there, or export it as .glb."
+    },
+    "newPage": {
+      "signInTitle": "Sign in to upload a work",
+      "eyebrow": "New work",
+      "titleSeller": "Upload a work",
+      "titleOwn": "Upload a personal project",
+      "descriptionSeller": "Keep it only for your gallery or publish it in the catalog. In the catalog, the audit checks that materials, date and image are consistent before giving it an auction room.",
+      "descriptionOwn": "Your own works hang in your 3D room without an audit. You decide whether they appear in your public gallery."
+    },
+    "editPage": {
+      "signInTitle": "Sign in to edit your work",
+      "opening": "Opening the sheet…",
+      "missing": {
+        "title": "We could not find this work among yours",
+        "description": "Only the person who published a work can edit it.",
+        "action": "Go to my works"
+      },
+      "locked": {
+        "title": "This work can no longer be edited",
+        "description": "Only personal projects and drafts can be edited, for example those an administrator returned. A work in audit or published keeps its sheet.",
+        "action": "See the sheet"
+      },
+      "eyebrow": "My works",
+      "title": "Edit “{title}”",
+      "descriptionOwn": "Change the sheet, the image or who can see it. A personal project does not go through the audit.",
+      "descriptionCatalog": "Fix the sheet or change the image. When you resubmit it, the audit reviews it again."
+    }
+  },
+  "MyWorks": {
+    "signInTitle": "Sign in to see your works",
+    "loading": "Loading your works…",
+    "loadFailed": "We could not load all your works.",
+    "eyebrow": "Your account",
+    "title": "My works",
+    "descriptionSeller": "Your personal projects, what you published in the catalog with its status, and what you won. Returned works can be fixed and resubmitted.",
+    "descriptionBuyer": "Your personal projects and the works you won at auction.",
+    "newWork": "New work",
+    "room": "3D room",
+    "publicGallery": "Public gallery",
+    "empty": {
+      "title": "You have no works yet",
+      "description": "Upload a personal project for your 3D room or win an auction: you will see each work and its status here.",
+      "action": "Upload the first one"
+    },
+    "emptyFilter": {
+      "title": "No works with this label",
+      "action": "See all"
+    },
+    "filterLabel": "Filter by status",
+    "groups": {
+      "published": "Created by me",
+      "acquired": "Acquired"
+    },
+    "filters": {
+      "todas": "All",
+      "devueltas": "Returned",
+      "proyectos": "Personal projects",
+      "borrador": "Draft",
+      "auditoria": "In audit",
+      "revision": "Manual review",
+      "publicada": "Published",
+      "subasta": "At auction",
+      "vendida": "Sold",
+      "cerrada": "Closed unsold",
+      "ganadas": "Won at auction"
+    },
+    "hints": {
+      "DEVUELTA": "An administrator returned it. Fix it and resubmit it for audit.",
+      "PERSONAL": "Personal project: only for your gallery, no audit.",
+      "BORRADOR": "It has not been sent to audit yet.",
+      "PENDIENTE_AUDITORIA": "The audit is reviewing it.",
+      "REVISION_MANUAL": "An administrator will review it soon.",
+      "APROBADO": "It is in the catalog.",
+      "PUBLICADA": "It is in the catalog.",
+      "EN_SUBASTA": "It has an auction room.",
+      "VENDIDA": "It sold at auction: it now belongs to the winner.",
+      "CERRADO": "The auction closed unsold."
+    },
+    "seenPublic": "It appears in your public gallery.",
+    "seenPrivate": "Only you can see it.",
+    "reason": "Reason",
+    "edit": "Edit",
+    "needImageSend": "Add an image before sending it",
+    "needImageMove": "Add an image before moving it to the catalog",
+    "resubmit": "Resubmit unchanged",
+    "sendToAudit": "Send to audit",
+    "makePrivate": "Make private",
+    "makePublic": "Make public",
+    "moveToCatalog": "Move to catalog",
+    "hang": "Hang in my room",
+    "unhang": "Remove from my room",
+    "unattributedArtist": "Unattributed artist",
+    "publicInGallery": "Public in your gallery",
+    "onlyYou": "Only you can see it",
+    "moveDialog": {
+      "title": "Move to catalog",
+      "confirm": "Send to audit",
+      "body": "The audit reviews the work and, if approved, publishes it with its auction room. Meanwhile it is hidden from your public gallery and you can no longer edit it."
+    },
+    "actions": {
+      "resubmitted": "{title} went back to audit.",
+      "resubmitFailed": "We could not send the work to audit.",
+      "nowPublic": "{title} now appears in your public gallery.",
+      "nowPrivate": "{title} is now visible only to you.",
+      "visibilityFailed": "We could not change who can see the work.",
+      "hung": "{title} now hangs in your room.",
+      "unhung": "{title} left your room.",
+      "hangFailed": "We could not hang the work.",
+      "unhangFailed": "We could not remove the work from the room.",
+      "moved": "{title} entered the audit.",
+      "moveFailed": "We could not move the work to the catalog."
+    }
+  },
+  "Studio": {
+    "defaultName": "My gallery",
+    "signInTitle": "Sign in to see your gallery",
+    "signInHint": "Your 3D room keeps the works you win at auction.",
+    "preparing": "Preparing the room…",
+    "opening": "Opening your gallery…",
+    "loadFailed": "We could not open the gallery.",
+    "eyebrow": "Your own room",
+    "description": "Walk through your room, get close to each work and adjust the atmosphere to your taste.",
+    "design": "Design with the assistant",
+    "modeLabel": "Room mode",
+    "modeTour": "Walk",
+    "modeEdit": "Edit layout",
+    "organize": "Arrange automatically",
+    "organized": "Layout proposal ready. Save it if you like it.",
+    "alreadyOrganized": "The room is already arranged.",
+    "saved": "Changes saved.",
+    "saveFailed": "We could not save the changes.",
+    "restored": "You went back to the assistant's proposal.",
+    "restoreFailed": "We could not restore the proposal.",
+    "restore": "Back to the assistant's proposal",
+    "removed": "{title} left your gallery.",
+    "removeFailed": "We could not remove the work.",
+    "tourHint": "Drag to look · WASD or arrows to walk · click a work to get closer",
+    "editHint": "Choose a work to move it · drag to turn the view",
+    "overlap": "Some works overlap. Go to <strong>Edit layout</strong> and use <strong>Arrange automatically</strong>.",
+    "empty": {
+      "title": "Your room is empty",
+      "description": "Your personal projects and the works you win at auction hang here on their own. What you published and has not sold yet can be hung from My works.",
+      "upload": "Upload a personal project",
+      "myWorks": "My works"
+    },
+    "works": {
+      "title": "Works in the room",
+      "empty": "No works yet.",
+      "onPedestal": "On a pedestal",
+      "onWall": "On the wall",
+      "goTo": "Go to the work",
+      "edit": "Edit"
+    },
+    "unsaved": {
+      "title": "You have unsaved changes",
+      "ambience": "atmosphere",
+      "moved": "{count, plural, one {# work moved} other {# works moved}}",
+      "and": " and ",
+      "discard": "Discard",
+      "save": "Save changes"
+    },
+    "removeDialog": {
+      "title": "Remove the work from your gallery?",
+      "confirm": "Remove",
+      "body": "{title} will no longer appear in your room. You can hang it again from its sheet."
+    },
+    "ambience": {
+      "title": "Atmosphere",
+      "walls": "Walls",
+      "wallMaterial": "Wall material",
+      "wallColor": "Wall color",
+      "wallOptions": {
+        "plaster": "Plaster",
+        "marble": "Marble",
+        "concrete": "Concrete",
+        "wood": "Wood",
+        "metal": "Metal"
+      },
+      "floor": "Floor",
+      "floorMaterial": "Floor material",
+      "floorColor": "Floor tone",
+      "floorOptions": {
+        "wood": "Parquet",
+        "stone": "Stone",
+        "concrete": "Polished concrete",
+        "marble": "Marble"
+      },
+      "light": "Light",
+      "ambient": "General light",
+      "spot": "Spotlights on the works",
+      "warmth": "Warmth (warm to cool)"
+    },
+    "card": {
+      "label": "Sheet of {title}",
+      "eyebrow": "In the room",
+      "unattributedArtist": "Unattributed artist",
+      "materials": "Materials",
+      "measures": "Dimensions",
+      "back": "Keep walking",
+      "fullSheet": "See full sheet"
+    },
+    "pad": {
+      "label": "Walk through the room",
+      "forward": "Forward",
+      "turnLeft": "Turn left",
+      "backward": "Backward",
+      "turnRight": "Turn right"
+    },
+    "placement": {
+      "label": "Layout of {title}",
+      "eyebrow": "Layout",
+      "close": "Close the layout panel",
+      "scale": "Scale",
+      "remove": "Remove from the gallery",
+      "wall": "Wall",
+      "walls": {
+        "back": "Back",
+        "left": "Left",
+        "right": "Right",
+        "front": "Entrance"
+      },
+      "position": "Position on the wall",
+      "center": "Center",
+      "toLeft": "{meters} m to the left",
+      "toRight": "{meters} m to the right",
+      "centerHeight": "Center height",
+      "leftRight": "Left to right",
+      "backFront": "Back to entrance",
+      "rotation": "Rotation"
+    },
+    "viewer": {
+      "loadFailed": "We could not load the 3D model. Please try again later.",
+      "label": "3D model of {title}. Drag to rotate it.",
+      "hint": "Drag to rotate · scroll or pinch to zoom"
+    }
+  },
+  "Admin": {
+    "signInTitle": "Sign in with an administrator account",
+    "eyebrow": "Administration",
+    "title": "Manual review",
+    "description": "Works the audit could not approve on its own, with the findings and evidence it used.",
+    "loading": "Loading the queue…",
+    "loadFailed": "We could not load the review queue.",
+    "resolveFailed": "We could not resolve the work.",
+    "empty": {
+      "title": "No works waiting for review",
+      "description": "When the audit leaves a work in manual review, it will appear here."
+    },
+    "severity": {
+      "CRITICAL": "Critical",
+      "WARNING": "Warning",
+      "INFO": "Note"
+    },
+    "evidence": "Evidence ({count})",
+    "decidedBy": {
+      "RULES": "A system rule decided",
+      "AI": "The AI assessed the dossier",
+      "LOCAL": "Local assessment, no AI: the AI model did not respond",
+      "FALLBACK": "The automatic audit did not finish",
+      "legacy": "Audit from before the evidence dossier"
+    },
+    "resolved": {
+      "APROBADO": "{title} was published.",
+      "BORRADOR": "{title} went back to the seller with your reason.",
+      "REAUDITAR": "{title} went back to the audit queue."
+    },
+    "noAuthor": "Authorship not declared",
+    "score": "score",
+    "noFindings": "The audit left no findings.",
+    "noDossier": "The audit dossier is not available right now. You can still resolve it.",
+    "price": {
+      "legend": "Price range when publishing (artacoins)",
+      "min": "Minimum",
+      "max": "Maximum",
+      "required": "This work has no suggested price: set the range to approve it.",
+      "both": "Enter both the minimum and the maximum price.",
+      "range": "The range goes from 1 to {max} artacoins.",
+      "order": "The maximum cannot be lower than the minimum.",
+      "hintRequired": "The audit did not estimate a price: it is required to approve.",
+      "hintSuggested": "It comes from the audit; you can adjust it before approving."
+    },
+    "approve": "Approve and publish",
+    "returnToSeller": "Return to seller",
+    "reaudit": "Re-audit with AI",
+    "returnDialog": {
+      "title": "Return the work to the seller",
+      "confirm": "Return with this reason",
+      "body": "The work goes back to draft. The seller gets a notice with the reason and can fix and resubmit it.",
+      "reason": "Reason",
+      "hint": "{length}/{max} · at least {min} characters. Say what must be fixed."
+    }
+  },
+  "GalleryWizard": {
+    "metaTitle": "Customize your gallery",
+    "signInTitle": "Sign in to design your gallery",
+    "designFailed": "We could not design the gallery.",
+    "eyebrow": "Assistant",
+    "title": "Design your gallery",
+    "description": "Answer a few questions and the assistant proposes walls, floor, light and a route for your room.",
+    "stepOf": "Step {step} of {total}",
+    "multiple": "You can choose several.",
+    "favorite": "Favorite",
+    "yourFavorite": "Your favorite:",
+    "contrast": "I want the colors of the space to contrast with the works",
+    "previous": "Previous",
+    "next": "Next",
+    "seeSummary": "See summary",
+    "replaceDialog": {
+      "title": "Replace your room?",
+      "confirm": "Replace",
+      "body": "You made manual changes to your room. The new proposal replaces them; the hung works do not change."
+    },
+    "review": {
+      "title": "Summary",
+      "hint": "The assistant will use these answers to propose your room. Nothing is applied until the proposal is ready.",
+      "styles": "Styles",
+      "palette": "Palette",
+      "architecture": "Architecture",
+      "layout": "Layout",
+      "light": "Lighting",
+      "materials": "Materials",
+      "tour": "Route",
+      "designing": "Designing the space according to your preferences…",
+      "back": "Back to editing",
+      "generate": "Generate my gallery",
+      "surprise": "Surprise me"
+    },
+    "steps": {
+      "identidad": "Artistic identity",
+      "color": "Color preferences",
+      "arquitectura": "Architecture and layout",
+      "luz": "Lighting and atmosphere",
+      "materiales": "Materials and details",
+      "experiencia": "Personal experience"
+    },
+    "questions": {
+      "artStyles": {
+        "prompt": "Which art styles do you like most?",
+        "options": {
+          "clasico": "Classical art",
+          "renacimiento": "Renaissance",
+          "barroco": "Baroque",
+          "romanticismo": "Romanticism",
+          "impresionismo": "Impressionism",
+          "postimpresionismo": "Post-Impressionism",
+          "moderno": "Modern art",
+          "contemporaneo": "Contemporary art",
+          "minimalismo": "Minimalism",
+          "abstracto": "Abstract art",
+          "surrealismo": "Surrealism",
+          "digital": "Digital art",
+          "combinacion": "A mix of styles"
+        }
+      },
+      "atmosphere": {
+        "prompt": "What artistic atmosphere would you like to feel when entering your gallery?",
+        "options": {
+          "elegante": "Elegant and classic",
+          "sereno": "Serene and contemplative",
+          "minimalista": "Modern and minimalist",
+          "vanguardista": "Experimental and avant-garde",
+          "calido": "Warm and welcoming",
+          "dramatico": "Dramatic and sophisticated",
+          "futurista": "Futuristic and technological",
+          "eclectico": "Eclectic and creative"
+        }
+      },
+      "colorFamily": {
+        "prompt": "What kind of colors do you prefer for your gallery?",
+        "options": {
+          "claros": "Light tones",
+          "oscuros": "Dark tones",
+          "calidos": "Warm tones",
+          "frios": "Cool tones",
+          "neutros": "Neutral tones",
+          "intensos": "Intense, contrasting colors",
+          "equilibrada": "A balanced mix"
+        }
+      },
+      "paletteId": {
+        "prompt": "Which color combination do you find most attractive?",
+        "options": {
+          "marfil": "Ivory, sand and wood",
+          "piedra": "White, gray and stone",
+          "grafito": "Black, charcoal and graphite",
+          "terracota": "Beige, terracotta and brown",
+          "oliva": "Olive green, cream and wood",
+          "azul": "Deep blue, gray and white",
+          "borgona": "Burgundy, charcoal and gold",
+          "personalizada": "A custom palette"
+        }
+      },
+      "architecture": {
+        "prompt": "How do you imagine the space where you will show your works?",
+        "options": {
+          "minimal": "Minimalist gallery with plain walls",
+          "museo-clasico": "Classical museum with moldings",
+          "loft": "Industrial loft",
+          "hormigon": "Concrete and stone",
+          "madera": "Warm space with wood",
+          "futurista": "Futuristic gallery",
+          "experimental": "Original architectural shapes"
+        }
+      },
+      "layout": {
+        "prompt": "What kind of layout do you prefer?",
+        "options": {
+          "pocas": "A few featured works",
+          "equilibrada": "Many balanced works",
+          "abiertos": "Large open spaces",
+          "habitaciones": "Connected rooms",
+          "intimas": "Intimate areas",
+          "esculturas": "A center for sculptures",
+          "combinacion": "Open and contemplative"
+        }
+      },
+      "sculptureRole": {
+        "prompt": "How much importance do you want to give to sculptures and three-dimensional objects?",
+        "options": {
+          "protagonistas": "They will be the stars",
+          "igual": "The same as paintings",
+          "complementarias": "Complementary elements",
+          "murales": "I prefer wall works"
+        }
+      },
+      "light": {
+        "prompt": "How would you like your gallery to be lit?",
+        "options": {
+          "natural": "Abundant natural light",
+          "calida": "Warm, intimate lighting",
+          "neutra": "Neutral museum light",
+          "blanca": "White, modern lighting",
+          "dramatica": "Dramatic, with shadows",
+          "focos": "Spotlights aimed at each work",
+          "indirecta": "Indirect ambient light",
+          "combinada": "General light and spotlights"
+        }
+      },
+      "lightMood": {
+        "prompt": "What mood should the lighting convey?",
+        "options": {
+          "serenidad": "Serenity",
+          "energia": "Energy and creativity",
+          "misterio": "Mystery",
+          "elegancia": "Elegance",
+          "calidez": "Warmth",
+          "fidelidad": "Neutrality to see true color"
+        }
+      },
+      "intensity": {
+        "prompt": "What lighting intensity do you prefer?",
+        "options": {
+          "baja": "Low",
+          "media": "Medium",
+          "alta": "High"
+        }
+      },
+      "materials": {
+        "prompt": "Which materials would you like to find in your gallery?",
+        "options": {
+          "madera": "Natural wood",
+          "marmol": "Marble or stone",
+          "hormigon": "Polished concrete",
+          "yeso": "Plaster and smooth surfaces",
+          "metal": "Metal",
+          "cristal": "Glass",
+          "artesanal": "Handcrafted textures",
+          "combinacion": "A mix"
+        }
+      },
+      "sculptureDisplay": {
+        "prompt": "How would you prefer sculptures and objects to be displayed?",
+        "options": {
+          "pedestales": "Individual pedestals",
+          "plataformas": "Low platforms",
+          "nichos": "Architectural niches",
+          "suelo": "Directly on the floor",
+          "combinacion": "A mix of supports"
+        }
+      },
+      "tour": {
+        "prompt": "How would you like to walk through your gallery?",
+        "options": {
+          "libre": "Free exploration",
+          "guiado": "Guided tour",
+          "habitaciones": "Connected rooms",
+          "abiertos": "Open spaces",
+          "tematicas": "Areas by style",
+          "cronologico": "Chronological tour"
+        }
+      },
+      "approach": {
+        "prompt": "What would you like to happen when you approach a work?",
+        "options": {
+          "ficha": "A discreet sheet",
+          "detallada": "A detailed sheet",
+          "camara": "Move the camera closer",
+          "relacionadas": "Information and related works"
+        }
+      },
+      "accessibility": {
+        "prompt": "Do you have any preference to make navigation easier?",
+        "options": {
+          "lento": "Slow, smooth movement",
+          "reducir": "Reduce camera movement",
+          "sencillos": "Simple controls",
+          "contraste": "Higher contrast",
+          "ninguna": "No additional preference"
+        }
+      }
+    }
+  }
+}

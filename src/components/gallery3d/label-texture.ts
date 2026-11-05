@@ -42,8 +42,11 @@ function wrap(context: CanvasRenderingContext2D, text: string, maxWidth: number,
   return lines;
 }
 
-/** Cartela de museo: titulo, autoria y fecha, y materiales. */
-export function labelTexture(lot: Pick<Lot, 'title' | 'artistName' | 'creationYear' | 'materials'>): CanvasTexture | null {
+/**
+ * Cartela de museo: titulo, autoria y fecha, y materiales. `unattributed` es el
+ * texto para una obra sin artista, ya en el idioma activo.
+ */
+export function labelTexture(lot: Pick<Lot, 'title' | 'artistName' | 'creationYear' | 'materials'>, unattributed: string): CanvasTexture | null {
   if (typeof document === 'undefined') {
     return null;
   }
@@ -69,7 +72,7 @@ export function labelTexture(lot: Pick<Lot, 'title' | 'artistName' | 'creationYe
   }
   y += 12;
   context.font = `28px ${sans}`;
-  const author = lot.artistName ?? 'Artista sin atribuir';
+  const author = lot.artistName ?? unattributed;
   const byline = lot.creationYear ? `${author}, ${String(lot.creationYear)}` : author;
   for (const line of wrap(context, byline, WIDTH - PADDING * 2, 2)) {
     context.fillText(line, PADDING, y);

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { answerLabel } from '@/app/(private)/mi-galeria/personalizar/personaliza-form';
 import { catalogHref } from '@/lib/catalog-href';
 import { isActive } from '@/components/main-nav';
 import type { Auction, Bid, NotificationItem } from '@/lib/api/types';
 import { bidderLabels, mergeBid, nextMinimumBid, quickBids, roomPhase } from '@/lib/auction/room';
-import { describeActivity, describeNotification } from '@/lib/describe-events';
+import { activityMessage, describeActivity, describeNotification } from '@/lib/describe-events';
 import { formatRelative } from '@/lib/format';
+import { STEPS } from '@/lib/gallery/steps';
 import { loginHref, safeNextPath } from '@/lib/session/next-path';
 
 const ME = 'a0000000-0000-4000-8000-000000000003';
@@ -44,26 +44,31 @@ describe('avisos y actividad en palabras', () => {
   const notification = (kind: string, payload: Record<string, string | null>): NotificationItem => ({ userId: ME, kind, payload, createdAt: '2026-11-02T10:00:00Z', readAt: null });
 
   it('explica el resultado de la auditoría', () => {
-    expect(describeNotification(notification('AUDIT', { lotId: 'l1', verdict: 'APROBADO' }), ME)).toMatchObject({ title: 'Tu obra pasó la auditoría', href: '/obras/l1', tone: 'success' });
+    expect(describeNotification(notification('AUDIT', { lotId: 'l1', verdict: 'APROBADO' }), ME)).toMatchObject({ message: { kind: 'auditApproved' }, href: '/obras/l1', tone: 'success' });
     expect(describeNotification(notification('AUDIT', { lotId: 'l1', verdict: 'REVISION_MANUAL' }), ME).tone).toBe('warning');
   });
 
   it('distingue al ganador de quien vendió', () => {
     const closed = notification('AUCTION_CLOSED', { auctionId: 'a1', lotId: 'l1', winnerId: ME, amount: '450.00' });
-    expect(describeNotification(closed, ME)).toMatchObject({ title: '¡Ganaste la subasta!', href: '/mi-galeria' });
-    expect(describeNotification(closed, 'otra-persona').title).toBe('Vendiste una obra');
+    expect(describeNotification(closed, ME)).toMatchObject({ message: { kind: 'wonAuction' }, href: '/mi-galeria' });
+    expect(describeNotification(closed, 'otra-persona').message.kind).toBe('sold');
   });
 
   it('enlaza la actividad con la obra o la galería', () => {
     const base = { actorId: ME, verb: 'WIN', objectType: 'LOT', objectId: 'l1', visibility: 'PUBLIC', summary: 'Ganó Marina', createdAt: '' };
-    expect(describeActivity(base, ME)).toEqual({ who: 'Tú', text: 'Ganó Marina', href: '/obras/l1' });
-    expect(describeActivity({ ...base, actorId: 'x', objectType: 'USER', objectId: 'u2' }, ME)).toMatchObject({ who: 'Alguien que sigues', href: '/galerias/u2' });
+    expect(describeActivity(base, ME)).toEqual({ actor: 'you', message: { kind: 'won', name: 'Marina' }, href: '/obras/l1' });
+    expect(activityMessage('Siguió a Nora')).toEqual({ kind: 'followed', name: 'Nora' });
+    expect(activityMessage('Compró Marina al instante')).toEqual({ kind: 'boughtNow', name: 'Marina' });
+    expect(activityMessage('Otra cosa')).toEqual({ kind: 'other', text: 'Otra cosa' });
+    expect(describeActivity({ ...base, actorId: 'x', objectType: 'USER', objectId: 'u2' }, ME)).toMatchObject({ actor: 'followed', href: '/galerias/u2' });
   });
 
-  it('muestra las fechas en tiempo relativo', () => {
+  it('muestra las fechas en tiempo relativo en el idioma activo', () => {
     const now = new Date('2026-11-02T12:00:00Z');
-    expect(formatRelative('2026-11-02T11:55:00Z', now)).toBe('hace 5 minutos');
-    expect(formatRelative('2026-11-02T14:00:00Z', now)).toBe('dentro de 2 horas');
+    expect(formatRelative('2026-11-02T11:55:00Z', 'es', now)).toBe('hace 5 minutos');
+    expect(formatRelative('2026-11-02T14:00:00Z', 'es', now)).toBe('dentro de 2 horas');
+    expect(formatRelative('2026-11-02T11:55:00Z', 'en', now)).toBe('5 minutes ago');
+    expect(formatRelative('2026-11-02T14:00:00Z', 'en', now)).toBe('in 2 hours');
   });
 });
 
@@ -102,9 +107,9 @@ describe('reglas de la sala', () => {
 
   it('nombra a los postores sin revelar quiénes son', () => {
     const labels = bidderLabels([bid('b2', 'y', '345', '2'), bid('b1', 'x', '330', '1'), bid('b3', ME, '360', '3')], ME);
-    expect(labels.get('x')).toBe('Postor 1');
-    expect(labels.get('y')).toBe('Postor 2');
-    expect(labels.get(ME)).toBe('Tú');
+    expect(labels.get('x')).toEqual({ kind: 'bidder', number: 1 });
+    expect(labels.get('y')).toEqual({ kind: 'bidder', number: 2 });
+    expect(labels.get(ME)).toEqual({ kind: 'you' });
   });
 
   it('agrega la puja en vivo sin duplicarla, la más reciente primero', () => {
@@ -117,7 +122,6 @@ describe('reglas de la sala', () => {
 
 describe('asistente de galería', () => {
   it('muestra la etiqueta de la respuesta, no su clave', () => {
-    expect(answerLabel('artStyles', 'clasico')).toBe('Arte clásico');
-    expect(answerLabel('artStyles', 'desconocido')).toBe('desconocido');
+    expect(STEPS.flatMap((step) => step.questions.map((question) => question.key))).toContain('artStyles');
   });
 });

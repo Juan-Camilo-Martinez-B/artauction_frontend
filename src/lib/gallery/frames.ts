@@ -40,17 +40,3 @@ export function frameStyle(lot: Pick<Lot, 'materials' | 'categories'>): FrameSty
   return { kind: 'wood', width: 0.06, depth: 0.05, color: '#3d2a1e', metalness: 0, roughness: 0.6, mat: 0, glass: false };
 }
 
-/** Lado minimo (obra + paspartu) para que una pieza diminuta se lea desde la sala. */
-const MIN_FRAMED_SIDE = 0.34;
-
-/**
- * Las obras muy pequenas (cromos, miniaturas) se montan con un paspartu ancho,
- * como en los museos: la obra conserva su tamano real y el conjunto se ve.
- */
-export function fitFrameToSize(style: FrameStyle, size: { width: number; height: number }): FrameStyle {
-  const longest = Math.max(size.width, size.height);
-  if (longest >= MIN_FRAMED_SIDE - 2 * style.mat) {
-    return style;
-  }
-  return { ...style, mat: Math.max(style.mat, (MIN_FRAMED_SIDE - longest) / 2) };
-}

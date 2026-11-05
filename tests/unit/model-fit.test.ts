@@ -46,10 +46,10 @@ describe('archivos del modelo 3D', () => {
   });
 
   it('rechaza un .blend, dos modelos, archivos ajenos y mas de 30 MB', () => {
-    expect(pickModelFile([file('venus.blend')])).toMatch(/\.blend/);
-    expect(pickModelFile([file('a.glb'), file('b.fbx')])).toMatch(/un solo modelo/);
-    expect(pickModelFile([file('venus.obj'), file('notas.pdf')])).toMatch(/notas\.pdf/);
-    expect(pickModelFile([file('venus.fbx', 20 * 1024 * 1024), file('marmol.png', 11 * 1024 * 1024)])).toMatch(/30 MB/);
+    expect(pickModelFile([file('venus.blend')])).toEqual({ kind: 'noMain' });
+    expect(pickModelFile([file('a.glb'), file('b.fbx')])).toEqual({ kind: 'manyMains' });
+    expect(pickModelFile([file('venus.obj'), file('notas.pdf')])).toEqual({ kind: 'stray', name: 'notas.pdf' });
+    expect(pickModelFile([file('venus.fbx', 20 * 1024 * 1024), file('marmol.png', 11 * 1024 * 1024)])).toEqual({ kind: 'tooLarge' });
   });
 
   it('acepta texturas que el navegador no lee, pero las marca para dejarlas fuera', () => {
@@ -62,8 +62,8 @@ describe('archivos del modelo 3D', () => {
   it('revisa la firma de un GLB y los limites de triangulos', () => {
     expect(isGlbHeader(new TextEncoder().encode('glTF'))).toBe(true);
     expect(isGlbHeader(new TextEncoder().encode('PK\u0003\u0004'))).toBe(false);
-    expect(checkTriangles(999)).toMatch(/mínimo/);
-    expect(checkTriangles(300_001)).toMatch(/máximo/);
+    expect(checkTriangles(999)).toEqual({ kind: 'tooFewTriangles', triangles: 999 });
+    expect(checkTriangles(300_001)).toEqual({ kind: 'tooManyTriangles', triangles: 300_001 });
     expect(checkTriangles(12_000)).toBeNull();
   });
 

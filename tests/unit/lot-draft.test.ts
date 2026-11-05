@@ -40,18 +40,20 @@ describe('ficha de una obra', () => {
   });
 
   it('una obra tridimensional exige su modelo 3D; una plana, no', () => {
-    expect(lotErrors(SCULPTURE, { ...CONTEXT, hasModel: false }).model).toBe('Sube el modelo 3D de la obra.');
+    expect(lotErrors(SCULPTURE, { ...CONTEXT, hasModel: false }).model).toBe('modelRequired');
     expect(lotErrors(SCULPTURE, CONTEXT).model).toBeUndefined();
     expect(lotErrors({ ...SCULPTURE, representation: 'TWO_D' }, { ...CONTEXT, hasModel: false }).model).toBeUndefined();
   });
 
+  it('al editar parte del texto del autor, no de la traduccion', () => {
+    const original = { title: 'Estatua', description: 'Figura de piedra', materials: 'Piedra', provenance: 'Taller' };
+    const translated = { title: 'Statue', description: 'Stone figure', materials: 'Stone', provenance: 'Workshop', translated: true, original } as unknown as Lot;
+    expect(draftFrom(translated)).toMatchObject(original);
+  });
+
   it('valida medidas, año, imagen y la profundidad solo de los objetos', () => {
     const errors = lotErrors({ ...SCULPTURE, widthCm: '', heightCm: '2500', depthCm: '', year: '2099' }, { ...CONTEXT, hasImage: false });
-    expect(errors.width).toBe('Escribe el ancho.');
-    expect(errors.height).toMatch(/entre 0,1 y 2000 cm/);
-    expect(errors.depth).toBe('Escribe la profundidad.');
-    expect(errors.year).toMatch(/entre 1 y 2026/);
-    expect(errors.image).toBe('Elige la imagen de la obra.');
+    expect(errors).toMatchObject({ width: 'widthRequired', height: 'heightRange', depth: 'depthRequired', year: 'yearRange', image: 'imageRequired' });
     expect(lotErrors({ ...SCULPTURE, representation: 'TWO_D', depthCm: '' }, CONTEXT).depth).toBeUndefined();
   });
 });

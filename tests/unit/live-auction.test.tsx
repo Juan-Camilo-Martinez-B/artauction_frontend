@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Auction, AuctionView } from '@/lib/api/types';
+import { IntlWrapper } from '../intl';
 import type { AuctionInbound } from '@/lib/ws/events';
 
 const SERVER_TIME = '2026-11-04T15:00:00.000Z';
@@ -57,7 +58,7 @@ describe('estado vivo de la sala', () => {
   });
 
   it('carga la sala y aplica una puja aceptada por el canal en vivo', async () => {
-    const { result } = renderHook(() => useLiveAuction('a1'));
+    const { result } = renderHook(() => useLiveAuction('a1'), { wrapper: IntlWrapper });
     await waitFor(() => { expect(result.current.auction?.currentPrice).toBe('3000.00'); });
     expect(result.current.phase).toBe('live');
 
@@ -76,7 +77,7 @@ describe('estado vivo de la sala', () => {
   });
 
   it('al cerrar queda cerrada con su ganador y se vuelve a pedir la sala completa', async () => {
-    const { result } = renderHook(() => useLiveAuction('a1'));
+    const { result } = renderHook(() => useLiveAuction('a1'), { wrapper: IntlWrapper });
     await waitFor(() => { expect(result.current.auction).not.toBeNull(); });
     const before = auctionRequests.mock.calls.length;
     auctionRequests.mockResolvedValue({ auction: { ...AUCTION, status: 'CERRADA', currentPrice: '9000.00', winnerId: 'u2', closedBy: 'BUY_NOW' }, serverTime: SERVER_TIME });
@@ -90,8 +91,8 @@ describe('estado vivo de la sala', () => {
 
   it('una sala que no existe se informa sin romper la pantalla', async () => {
     auctionRequests.mockRejectedValue(new Error('404'));
-    const { result } = renderHook(() => useLiveAuction('a1'));
-    await waitFor(() => { expect(result.current.loadError).toBe('Esta sala no existe o ya no está disponible.'); });
+    const { result } = renderHook(() => useLiveAuction('a1'), { wrapper: IntlWrapper });
+    await waitFor(() => { expect(result.current.loadError).toBe(true); });
     expect(result.current.auction).toBeNull();
   });
 });
