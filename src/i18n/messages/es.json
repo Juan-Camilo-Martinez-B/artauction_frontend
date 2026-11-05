@@ -650,5 +650,227 @@
       "description": "Cuando termine una auditoría o cierre una subasta en la que participes, lo verás aquí.",
       "action": "Ver salas en vivo"
     }
+  },
+  "Publish": {
+    "categoriesFailed": "No se pudieron cargar las categorías.",
+    "imageFailed": "No se pudo preparar la imagen. Prueba con un JPG o PNG.",
+    "returnReason": "Motivo de la devolución:",
+    "titleFallback": "la obra",
+    "destination": {
+      "title": "¿Para qué es esta obra?",
+      "label": "Destino de la obra",
+      "personalTitle": "Solo para mi galería",
+      "personalText": "Un proyecto propio: se cuelga en tu sala 3D sin auditoría. No se vende.",
+      "catalogTitle": "Publicar en el catálogo",
+      "catalogText": "Pasa por la auditoría y, si la aprueba, recibe su sala de subasta.",
+      "sellerOnly": "Solo para cuentas de vendedor."
+    },
+    "visibility": {
+      "title": "¿Quién la ve?",
+      "label": "Visibilidad del proyecto",
+      "privateTitle": "Solo yo",
+      "privateText": "En tu sala 3D y en Mis obras.",
+      "publicTitle": "Pública en mi galería",
+      "publicText": "Aparece en tu galería pública como «Proyecto propio, sin auditar». Nunca en el catálogo."
+    },
+    "sections": {
+      "work": "La obra",
+      "materials": "Materiales y medidas",
+      "image": "Imagen"
+    },
+    "fields": {
+      "title": "Título",
+      "description": "Descripción",
+      "artist": "Artista",
+      "artistHint": "Déjalo vacío si no se conoce.",
+      "year": "Año",
+      "materials": "Materiales",
+      "materialsPlaceholder": "Óleo sobre lienzo",
+      "category": "Categoría",
+      "format": "Formato",
+      "formatFlat": "Obra plana (pintura, dibujo, foto)",
+      "formatObject": "Objeto (escultura, cerámica)",
+      "width": "Ancho (cm)",
+      "height": "Alto (cm)",
+      "depth": "Profundidad (cm)",
+      "provenance": "Procedencia",
+      "provenanceHint": "Colecciones o ventas anteriores, si las conoces."
+    },
+    "image": {
+      "previewAlt": "Vista previa de la obra",
+      "preparing": "Preparando la imagen…",
+      "choose": "Elige una foto de la obra",
+      "hint": "Al menos 800 px. Se redimensiona en tu navegador antes de enviarse.",
+      "change": "Toca la imagen para cambiarla."
+    },
+    "submit": {
+      "saveChanges": "Guardar cambios",
+      "saveToGallery": "Guardar en mi galería",
+      "saveAndResend": "Guardar y reenviar a auditoría",
+      "send": "Enviar a auditoría",
+      "saving": "Guardando la ficha…",
+      "uploading": "Subiendo la imagen…",
+      "modeling": "Revisando el modelo 3D…",
+      "submitting": "Enviando a auditoría…",
+      "saveOnly": "Guardar sin enviar"
+    },
+    "problems": {
+      "titleShort": "El título necesita al menos 3 caracteres.",
+      "descriptionShort": "Describe la obra con al menos 10 caracteres.",
+      "materialsRequired": "Indica los materiales.",
+      "yearRange": "El año debe estar entre 1 y {max}.",
+      "widthRequired": "Escribe el ancho.",
+      "widthRange": "El ancho debe estar entre 0,1 y 2000 cm.",
+      "heightRequired": "Escribe el alto.",
+      "heightRange": "El alto debe estar entre 0,1 y 2000 cm.",
+      "depthRequired": "Escribe la profundidad.",
+      "depthRange": "La profundidad debe estar entre 0,1 y 2000 cm.",
+      "provenanceShort": "La procedencia necesita al menos 3 caracteres.",
+      "imageRequired": "Elige la imagen de la obra.",
+      "modelRequired": "Sube el modelo 3D de la obra."
+    },
+    "saveErrors": {
+      "image": "No se pudo guardar la imagen.",
+      "model": "No se pudo guardar el modelo 3D.",
+      "generic": "No se pudo guardar la obra."
+    },
+    "model": {
+      "title": "Modelo 3D",
+      "preparing": "Preparando la vista previa…",
+      "help": "Obligatorio en esculturas y objetos: la sala 3D los expone con su volumen real y a la altura que declaraste. Sirve un .glb o .gltf (Blender: Archivo › Exportar › glTF 2.0), un .fbx o un .obj, como los de Sketchfab o la Asset Store de Unity. Si el .obj o el .gltf traen materiales (.mtl), buffers (.bin) o texturas aparte, elígelos todos a la vez. Un .blend no se abre en la web: expórtalo. Entre {min} y {max} triángulos y hasta 30 MB.",
+      "checking": "Abriendo y revisando el modelo…",
+      "verified": "Modelo verificado",
+      "triangles": "{triangles} triángulos",
+      "uploadsOnSave": "se sube al guardar",
+      "skipped": "Sin {files}: el navegador no lee ese formato de textura. Si la pieza se ve sin color o sin relieve, expórtala con texturas .png o .jpg.",
+      "change": "Cambiar modelo",
+      "choose": "Elegir modelo 3D",
+      "converted": "{name} (convertido desde .{source})"
+    },
+    "modelErrors": {
+      "unknown": "No se pudo abrir el modelo 3D.",
+      "noMain": "Elige el modelo: un archivo .glb, .gltf, .fbx u .obj (un .blend no se abre en la web: expórtalo desde Blender).",
+      "manyMains": "Elige un solo modelo a la vez; junto a él solo van sus materiales (.mtl), buffers (.bin) y texturas.",
+      "stray": "«{name}» no es parte de un modelo 3D.",
+      "tooLarge": "El modelo y sus texturas superan los 30 MB. Redúcelo con el modificador Decimate de Blender o usa texturas más pequeñas.",
+      "choose": "Elige el modelo.",
+      "badGlb": "El archivo no es un GLB válido: le falta la cabecera glTF.",
+      "convertFailed": "No se pudo convertir el modelo a GLB.",
+      "convertedTooLarge": "Convertido a GLB, el modelo supera los 30 MB. Redúcelo con Decimate en Blender o usa texturas más pequeñas.",
+      "tooFewTriangles": "El modelo tiene {triangles} triángulos: muy poco detalle. El mínimo es {min}.",
+      "tooManyTriangles": "El modelo tiene {triangles} triángulos: la sala se volvería lenta. El máximo es {max}; redúcelo con Decimate en Blender.",
+      "openFailed": "No se pudo abrir el modelo .{format}. Revisa que estén todos sus archivos (materiales y texturas) o expórtalo como .glb."
+    },
+    "newPage": {
+      "signInTitle": "Entra para subir una obra",
+      "eyebrow": "Nueva obra",
+      "titleSeller": "Subir una obra",
+      "titleOwn": "Subir un proyecto propio",
+      "descriptionSeller": "Guárdala solo para tu galería o publícala en el catálogo. En el catálogo, la auditoría revisa que materiales, fecha e imagen sean coherentes antes de darle una sala de subasta.",
+      "descriptionOwn": "Tus propias obras se cuelgan en tu sala 3D sin pasar por auditoría. Tú decides si se ven en tu galería pública."
+    },
+    "editPage": {
+      "signInTitle": "Entra para editar tu obra",
+      "opening": "Abriendo la ficha…",
+      "missing": {
+        "title": "No encontramos esta obra entre las tuyas",
+        "description": "Solo quien publicó una obra puede editarla.",
+        "action": "Ir a mis obras"
+      },
+      "locked": {
+        "title": "Esta obra ya no se puede editar",
+        "description": "Solo se editan los proyectos propios y las obras en borrador, por ejemplo las que un administrador devolvió. Una obra en auditoría o publicada conserva su ficha.",
+        "action": "Ver la ficha"
+      },
+      "eyebrow": "Mis obras",
+      "title": "Editar «{title}»",
+      "descriptionOwn": "Cambia la ficha, la imagen o quién la ve. Un proyecto propio no pasa por auditoría.",
+      "descriptionCatalog": "Corrige la ficha o cambia la imagen. Al reenviarla, la auditoría la revisa de nuevo."
+    }
+  },
+  "MyWorks": {
+    "signInTitle": "Entra para ver tus obras",
+    "loading": "Cargando tus obras…",
+    "loadFailed": "No se pudieron cargar todas tus obras.",
+    "eyebrow": "Tu cuenta",
+    "title": "Mis obras",
+    "descriptionSeller": "Tus proyectos propios, lo que publicaste en el catálogo con su estado, y lo que ganaste. Las devueltas se pueden corregir y reenviar.",
+    "descriptionBuyer": "Tus proyectos propios y las obras que ganaste en subasta.",
+    "newWork": "Nueva obra",
+    "room": "Sala 3D",
+    "publicGallery": "Galería pública",
+    "empty": {
+      "title": "Todavía no tienes obras",
+      "description": "Sube un proyecto propio para tu sala 3D o gana una subasta: aquí verás cada obra y su estado.",
+      "action": "Subir la primera"
+    },
+    "emptyFilter": {
+      "title": "No hay obras con esta etiqueta",
+      "action": "Ver todas"
+    },
+    "filterLabel": "Filtrar por estado",
+    "groups": {
+      "published": "Creadas por mí",
+      "acquired": "Adquiridas"
+    },
+    "filters": {
+      "todas": "Todas",
+      "devueltas": "Devueltas",
+      "proyectos": "Proyectos propios",
+      "borrador": "Borrador",
+      "auditoria": "En auditoría",
+      "revision": "Revisión manual",
+      "publicada": "Publicada",
+      "subasta": "En subasta",
+      "vendida": "Vendida",
+      "cerrada": "Cerrada sin venta",
+      "ganadas": "Ganadas en subasta"
+    },
+    "hints": {
+      "DEVUELTA": "Un administrador la devolvió. Corrígela y reenvíala a auditoría.",
+      "PERSONAL": "Proyecto propio: solo para tu galería, sin auditoría.",
+      "BORRADOR": "Aún no se ha enviado a auditoría.",
+      "PENDIENTE_AUDITORIA": "La auditoría la está revisando.",
+      "REVISION_MANUAL": "Un administrador la revisará pronto.",
+      "APROBADO": "Está en el catálogo.",
+      "PUBLICADA": "Está en el catálogo.",
+      "EN_SUBASTA": "Tiene una sala de subasta.",
+      "VENDIDA": "Se vendió en subasta: ahora es de quien la ganó.",
+      "CERRADO": "La subasta cerró sin venta."
+    },
+    "seenPublic": "Se ve en tu galería pública.",
+    "seenPrivate": "Solo la ves tú.",
+    "reason": "Motivo",
+    "edit": "Editar",
+    "needImageSend": "Agrega una imagen antes de enviarla",
+    "needImageMove": "Agrega una imagen antes de pasarla al catálogo",
+    "resubmit": "Reenviar sin cambios",
+    "sendToAudit": "Enviar a auditoría",
+    "makePrivate": "Hacer privada",
+    "makePublic": "Hacer pública",
+    "moveToCatalog": "Pasar al catálogo",
+    "hang": "Colgar en mi sala",
+    "unhang": "Quitar de mi sala",
+    "unattributedArtist": "Artista sin atribuir",
+    "publicInGallery": "Pública en tu galería",
+    "onlyYou": "Solo tú la ves",
+    "moveDialog": {
+      "title": "Pasar al catálogo",
+      "confirm": "Enviar a auditoría",
+      "body": "La auditoría revisa la obra y, si la aprueba, la publica con su sala de subasta. Mientras tanto se oculta de tu galería pública y ya no la podrás editar."
+    },
+    "actions": {
+      "resubmitted": "{title} volvió a auditoría.",
+      "resubmitFailed": "No se pudo enviar la obra a auditoría.",
+      "nowPublic": "{title} ya se ve en tu galería pública.",
+      "nowPrivate": "{title} ahora solo la ves tú.",
+      "visibilityFailed": "No se pudo cambiar quién ve la obra.",
+      "hung": "{title} quedó colgada en tu sala.",
+      "unhung": "{title} salió de tu sala.",
+      "hangFailed": "No se pudo colgar la obra.",
+      "unhangFailed": "No se pudo quitar la obra de la sala.",
+      "moved": "{title} entró a la auditoría.",
+      "moveFailed": "No se pudo pasar la obra al catálogo."
+    }
   }
 }

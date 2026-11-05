@@ -1,16 +1,19 @@
 'use client';
 
 import { Gavel, ImageUp, Palette } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState, type SubmitEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { SelectField, TextAreaField, TextField } from '@/components/ui/text-field';
+import { useCategoryName } from '@/hooks/use-category-name';
 import { useFormValidation } from '@/hooks/use-form-validation';
 import { useImageProcessor } from '@/hooks/use-image-processor';
 import { artApi } from '@/lib/api/client';
 import type { Category, Lot } from '@/lib/api/types';
 import { digits, draftChanged, draftFrom, lotErrors, measure, type Destination, type Draft, type Visibility } from '@/lib/forms/lot-draft';
+import { problemTexts } from '@/lib/forms/validators';
 import { DestinationOption } from './destination-option';
 import { ModelPanel } from './model-panel';
 import { useLotSubmission, type Intent, type Stage } from './use-lot-submission';
@@ -27,6 +30,8 @@ import { useModelImport } from './use-model-import';
  * useLotSubmission.
  */
 export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: boolean }) {
+  const t = useTranslations('Publish');
+  const categoryName = useCategoryName();
   const processImage = useImageProcessor();
   const submission = useLotSubmission();
   const editing = lot !== null;
@@ -58,8 +63,11 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
 
   const modelImport = useModelImport();
   const dirty = file !== null || fieldsDirty || visibilityDirty || (threeD && modelImport.model !== null) || dropModel;
+  const currentYear = new Date().getFullYear();
   const { touch, visibleError, attemptSubmit } = useFormValidation(
-    lotErrors(draft, { currentYear: new Date().getFullYear(), hasImage: Boolean(file || savedImage), hasModel: Boolean(modelImport.model || savedModel) }),
+    problemTexts(lotErrors(draft, { currentYear, hasImage: Boolean(file || savedImage), hasModel: Boolean(modelImport.model || savedModel) }), (problem) =>
+      problem === 'yearRange' ? t('problems.yearRange', { max: currentYear }) : t(`problems.${problem}`),
+    ),
   );
 
   useEffect(() => {
@@ -70,9 +78,9 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
         setDraft((current) => (current.categorySlug ? current : { ...current, categorySlug: rows[0]?.slug ?? '' }));
       })
       .catch(() => {
-        setError('No se pudieron cargar las categorías.');
+        setError(t('categoriesFailed'));
       });
-  }, []);
+  }, [t]);
 
   useEffect(() => () => {
     if (preview) {
@@ -90,7 +98,7 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
       setPreview(URL.createObjectURL(processed.blob));
       touch('image');
     } catch {
-      setError('No se pudo preparar la imagen. Prueba con un JPG o PNG.');
+      setError(t('imageFailed'));
     } finally {
       setProcessing(false);
     }
@@ -127,11 +135,11 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
   const pending = stage !== 'idle';
   const shownImage = preview ?? savedImage;
   const submitLabel: Record<Stage, string> = {
-    idle: personal ? (editing ? 'Guardar cambios' : 'Guardar en mi galería') : editing ? 'Guardar y reenviar a auditoría' : 'Enviar a auditoría',
-    saving: 'Guardando la ficha…',
-    uploading: 'Subiendo la imagen…',
-    modeling: 'Revisando el modelo 3D…',
-    submitting: 'Enviando a auditoría…',
+    idle: personal ? (editing ? t('submit.saveChanges') : t('submit.saveToGallery')) : editing ? t('submit.saveAndResend') : t('submit.send'),
+    saving: t('submit.saving'),
+    uploading: t('submit.uploading'),
+    modeling: t('submit.modeling'),
+    submitting: t('submit.submitting'),
   };
   const returned = lot?.lastReview?.decision === 'RETURN_TO_DRAFT' ? lot.lastReview.reason : null;
 
@@ -140,108 +148,108 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
       <div className="space-y-6">
         {returned ? (
           <Notice tone="info">
-            <span className="font-medium">Motivo de la devolución:</span> {returned}
+            <span className="font-medium">{t('returnReason')}</span> {returned}
           </Notice>
         ) : null}
         {!editing ? (
           <Panel as="section">
-            <h2 className="font-serif text-2xl">¿Para qué es esta obra?</h2>
-            <div role="radiogroup" aria-label="Destino de la obra" className="mt-4 grid gap-3 sm:grid-cols-2">
+            <h2 className="font-serif text-2xl">{t('destination.title')}</h2>
+            <div role="radiogroup" aria-label={t('destination.label')} className="mt-4 grid gap-3 sm:grid-cols-2">
               <DestinationOption
                 selected={personal}
                 onSelect={() => { setDestination('PERSONAL'); }}
                 icon={<Palette aria-hidden="true" className="h-5 w-5" />}
-                title="Solo para mi galería"
-                description="Un proyecto propio: se cuelga en tu sala 3D sin auditoría. No se vende."
+                title={t('destination.personalTitle')}
+                description={t('destination.personalText')}
               />
               <DestinationOption
                 selected={!personal}
                 disabled={!canSell}
                 onSelect={() => { setDestination('CATALOG'); }}
                 icon={<Gavel aria-hidden="true" className="h-5 w-5" />}
-                title="Publicar en el catálogo"
-                description={canSell ? 'Pasa por la auditoría y, si la aprueba, recibe su sala de subasta.' : 'Solo para cuentas de vendedor.'}
+                title={t('destination.catalogTitle')}
+                description={canSell ? t('destination.catalogText') : t('destination.sellerOnly')}
               />
             </div>
           </Panel>
         ) : null}
         {personal ? (
           <Panel as="section">
-            <h2 className="font-serif text-2xl">¿Quién la ve?</h2>
-            <div role="radiogroup" aria-label="Visibilidad del proyecto" className="mt-4 grid gap-3 sm:grid-cols-2">
+            <h2 className="font-serif text-2xl">{t('visibility.title')}</h2>
+            <div role="radiogroup" aria-label={t('visibility.label')} className="mt-4 grid gap-3 sm:grid-cols-2">
               <DestinationOption
                 selected={visibility === 'PRIVATE'}
                 onSelect={() => { setVisibility('PRIVATE'); }}
-                title="Solo yo"
-                description="En tu sala 3D y en Mis obras."
+                title={t('visibility.privateTitle')}
+                description={t('visibility.privateText')}
               />
               <DestinationOption
                 selected={visibility === 'PUBLIC'}
                 onSelect={() => { setVisibility('PUBLIC'); }}
-                title="Pública en mi galería"
-                description="Aparece en tu galería pública como «Proyecto propio, sin auditar». Nunca en el catálogo."
+                title={t('visibility.publicTitle')}
+                description={t('visibility.publicText')}
               />
             </div>
           </Panel>
         ) : null}
         <Panel as="section">
-          <h2 className="font-serif text-2xl">La obra</h2>
+          <h2 className="font-serif text-2xl">{t('sections.work')}</h2>
           <div className="mt-4 space-y-4">
-            <TextField id="title" label="Título" required value={draft.title} onValueChange={set('title')} onBlur={() => { touch('title'); }} error={visibleError('title')} />
-            <TextAreaField id="description" label="Descripción" required value={draft.description} onValueChange={set('description')} onBlur={() => { touch('description'); }} error={visibleError('description')} />
+            <TextField id="title" label={t('fields.title')} required value={draft.title} onValueChange={set('title')} onBlur={() => { touch('title'); }} error={visibleError('title')} />
+            <TextAreaField id="description" label={t('fields.description')} required value={draft.description} onValueChange={set('description')} onBlur={() => { touch('description'); }} error={visibleError('description')} />
             <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_9rem]">
-              <TextField id="artist" label="Artista" hint="Déjalo vacío si no se conoce." value={draft.artistName} onValueChange={set('artistName')} />
-              <TextField id="year" label="Año" inputMode="numeric" placeholder="1925" value={draft.year} format={digits} onValueChange={set('year')} onBlur={() => { touch('year'); }} error={visibleError('year')} />
+              <TextField id="artist" label={t('fields.artist')} hint={t('fields.artistHint')} value={draft.artistName} onValueChange={set('artistName')} />
+              <TextField id="year" label={t('fields.year')} inputMode="numeric" placeholder="1925" value={draft.year} format={digits} onValueChange={set('year')} onBlur={() => { touch('year'); }} error={visibleError('year')} />
             </div>
           </div>
         </Panel>
         <Panel as="section">
-          <h2 className="font-serif text-2xl">Materiales y medidas</h2>
+          <h2 className="font-serif text-2xl">{t('sections.materials')}</h2>
           <div className="mt-4 space-y-4">
-            <TextField id="materials" label="Materiales" placeholder="Óleo sobre lienzo" required value={draft.materials} onValueChange={set('materials')} onBlur={() => { touch('materials'); }} error={visibleError('materials')} />
+            <TextField id="materials" label={t('fields.materials')} placeholder={t('fields.materialsPlaceholder')} required value={draft.materials} onValueChange={set('materials')} onBlur={() => { touch('materials'); }} error={visibleError('materials')} />
             <div className="grid gap-4 sm:grid-cols-2">
-              <SelectField id="category" label="Categoría" value={draft.categorySlug} onChange={(event) => { set('categorySlug')(event.target.value); }}>
+              <SelectField id="category" label={t('fields.category')} value={draft.categorySlug} onChange={(event) => { set('categorySlug')(event.target.value); }}>
                 {categories.map((category) => (
                   <option key={category.slug} value={category.slug}>
-                    {category.name}
+                    {categoryName(category)}
                   </option>
                 ))}
               </SelectField>
               <SelectField
                 id="representation"
-                label="Formato"
+                label={t('fields.format')}
                 value={draft.representation}
                 onChange={(event) => { set('representation')(event.target.value === 'THREE_D' ? 'THREE_D' : 'TWO_D'); }}
               >
-                <option value="TWO_D">Obra plana (pintura, dibujo, foto)</option>
-                <option value="THREE_D">Objeto (escultura, cerámica)</option>
+                <option value="TWO_D">{t('fields.formatFlat')}</option>
+                <option value="THREE_D">{t('fields.formatObject')}</option>
               </SelectField>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
-              <TextField id="width" label="Ancho (cm)" inputMode="decimal" required value={draft.widthCm} format={measure} onValueChange={set('widthCm')} onBlur={() => { touch('width'); }} error={visibleError('width')} />
-              <TextField id="height" label="Alto (cm)" inputMode="decimal" required value={draft.heightCm} format={measure} onValueChange={set('heightCm')} onBlur={() => { touch('height'); }} error={visibleError('height')} />
+              <TextField id="width" label={t('fields.width')} inputMode="decimal" required value={draft.widthCm} format={measure} onValueChange={set('widthCm')} onBlur={() => { touch('width'); }} error={visibleError('width')} />
+              <TextField id="height" label={t('fields.height')} inputMode="decimal" required value={draft.heightCm} format={measure} onValueChange={set('heightCm')} onBlur={() => { touch('height'); }} error={visibleError('height')} />
               {draft.representation === 'THREE_D' ? (
-                <TextField id="depth" label="Profundidad (cm)" inputMode="decimal" required value={draft.depthCm} format={measure} onValueChange={set('depthCm')} onBlur={() => { touch('depth'); }} error={visibleError('depth')} />
+                <TextField id="depth" label={t('fields.depth')} inputMode="decimal" required value={draft.depthCm} format={measure} onValueChange={set('depthCm')} onBlur={() => { touch('depth'); }} error={visibleError('depth')} />
               ) : null}
             </div>
-            <TextField id="provenance" label="Procedencia" hint="Colecciones o ventas anteriores, si las conoces." value={draft.provenance} onValueChange={set('provenance')} onBlur={() => { touch('provenance'); }} error={visibleError('provenance')} />
+            <TextField id="provenance" label={t('fields.provenance')} hint={t('fields.provenanceHint')} value={draft.provenance} onValueChange={set('provenance')} onBlur={() => { touch('provenance'); }} error={visibleError('provenance')} />
           </div>
         </Panel>
       </div>
       <div className="space-y-6 lg:sticky lg:top-24">
         <Panel as="section">
-          <h2 className="font-serif text-2xl">Imagen</h2>
+          <h2 className="font-serif text-2xl">{t('sections.image')}</h2>
           <label
             htmlFor="image"
             className={`mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-field border-2 border-dashed p-4 text-center text-sm transition-colors hover:border-ink ${visibleError('image') ? 'border-oxide' : 'border-line-strong'}`}
           >
             {shownImage ? (
-              <img src={shownImage} alt="Vista previa de la obra" className="max-h-72 w-auto rounded-field object-contain" />
+              <img src={shownImage} alt={t('image.previewAlt')} className="max-h-72 w-auto rounded-field object-contain" />
             ) : (
               <>
                 <ImageUp aria-hidden="true" className="h-8 w-8 text-muted" />
-                <span className="font-medium">{processing ? 'Preparando la imagen…' : 'Elige una foto de la obra'}</span>
-                <span className="text-muted">Al menos 800 px. Se redimensiona en tu navegador antes de enviarse.</span>
+                <span className="font-medium">{processing ? t('image.preparing') : t('image.choose')}</span>
+                <span className="text-muted">{t('image.hint')}</span>
               </>
             )}
             <input
@@ -258,7 +266,7 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
               }}
             />
           </label>
-          {shownImage ? <p className="mt-2 text-center text-xs text-muted">Toca la imagen para cambiarla.</p> : null}
+          {shownImage ? <p className="mt-2 text-center text-xs text-muted">{t('image.change')}</p> : null}
           {visibleError('image') ? (
             <p id="image-error" role="alert" className="mt-2 text-sm text-oxide">
               {visibleError('image')}
@@ -269,11 +277,11 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
           <ModelPanel
             preview={modelImport.preview ?? savedModel?.url ?? null}
             triangles={modelFile?.triangles ?? savedModel?.triangleCount ?? null}
-            pendingName={modelFile ? `${modelFile.file.name}${modelFile.source === 'glb' ? '' : ` (convertido desde .${modelFile.source})`}` : null}
+            pendingName={modelFile ? (modelFile.source === 'glb' ? modelFile.file.name : t('model.converted', { name: modelFile.file.name, source: modelFile.source })) : null}
             skipped={modelFile?.skipped ?? []}
             busy={modelImport.busy}
             error={modelImport.error ?? visibleError('model') ?? null}
-            title={draft.title || 'la obra'}
+            title={draft.title || t('titleFallback')}
             onFiles={(next) => {
               void modelImport.choose(next).then((imported) => {
                 if (imported) {
@@ -305,7 +313,7 @@ export function LotForm({ lot = null, canSell }: { lot?: Lot | null; canSell: bo
             className="w-full"
             data-intent="save"
           >
-            {pending && intent === 'save' ? submitLabel[stage] : 'Guardar sin enviar'}
+            {pending && intent === 'save' ? submitLabel[stage] : t('submit.saveOnly')}
           </Button>
         ) : null}
       </div>

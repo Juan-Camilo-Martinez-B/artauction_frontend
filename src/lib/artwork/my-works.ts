@@ -22,33 +22,23 @@ export type WorkFilter =
   | 'cerrada'
   | 'ganadas';
 
+/** Grupo de filtros; los nombres estan en el diccionario MyWorks. */
 export interface FilterGroup {
-  label: string;
-  filters: ReadonlyArray<{ key: WorkFilter; label: string }>;
+  id: 'all' | 'published' | 'acquired';
+  filters: readonly WorkFilter[];
 }
 
-/** Orden y nombre de los filtros; el primer grupo solo existe para quien vende. */
+export const ALL_FILTER: FilterGroup = { id: 'all', filters: ['todas'] };
+
+/** Orden de los filtros; el primer grupo solo existe para quien vende. */
 export const PUBLISHED_FILTERS: FilterGroup = {
-  label: 'Creadas por mí',
-  filters: [
-    { key: 'devueltas', label: 'Devueltas' },
-    { key: 'proyectos', label: 'Proyectos propios' },
-    { key: 'borrador', label: 'Borrador' },
-    { key: 'auditoria', label: 'En auditoría' },
-    { key: 'revision', label: 'Revisión manual' },
-    { key: 'publicada', label: 'Publicada' },
-    { key: 'subasta', label: 'En subasta' },
-    { key: 'vendida', label: 'Vendida' },
-    { key: 'cerrada', label: 'Cerrada sin venta' },
-  ],
+  id: 'published',
+  filters: ['devueltas', 'proyectos', 'borrador', 'auditoria', 'revision', 'publicada', 'subasta', 'vendida', 'cerrada'],
 };
 
-export const ACQUIRED_FILTERS: FilterGroup = {
-  label: 'Adquiridas',
-  filters: [{ key: 'ganadas', label: 'Ganadas en subasta' }],
-};
+export const ACQUIRED_FILTERS: FilterGroup = { id: 'acquired', filters: ['ganadas'] };
 
-const ALL_FILTERS = new Set<string>(['todas', ...[PUBLISHED_FILTERS, ACQUIRED_FILTERS].flatMap((group) => group.filters.map((filter) => filter.key))]);
+const ALL_FILTERS = new Set<string>([ALL_FILTER, PUBLISHED_FILTERS, ACQUIRED_FILTERS].flatMap((group) => group.filters));
 
 /** Lee el filtro de la URL; cualquier valor desconocido muestra todas. */
 export function parseFilter(raw: string | null | undefined): WorkFilter {

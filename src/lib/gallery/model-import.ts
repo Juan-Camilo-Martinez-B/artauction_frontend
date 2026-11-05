@@ -6,7 +6,7 @@ import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import { DRACO_DECODER_PATH } from './model-fit';
-import { checkTriangles, companionKey, isGlbHeader, isUnreadableTexture, MODEL_LIMITS, pickModelFile, type ModelFormat } from './model-files';
+import { checkTriangles, companionKey, isGlbHeader, isUnreadableTexture, MODEL_LIMITS, pickModelFile, type ModelFormat, type ModelProblem } from './model-files';
 
 /** Lo maximo que se espera a que terminen de cargar las texturas. */
 const TEXTURE_WAIT_MS = 30_000;
@@ -22,7 +22,12 @@ export interface ImportedModel {
 }
 
 /** Error con un mensaje para mostrar tal cual en el formulario. */
-export class ModelImportError extends Error {}
+/** El modelo no sirve: `problem` dice por que y la interfaz lo pone en palabras. */
+export class ModelImportError extends Error {
+  constructor(readonly problem: ModelProblem) {
+    super(problem.kind);
+  }
+}
 
 /** Triangulos de todas las mallas de una escena, como los cuenta el catalogo. */
 export function countTriangles(root: Object3D): number {
@@ -47,15 +52,15 @@ export function countTriangles(root: Object3D): number {
  */
 export async function importModel(files: readonly File[]): Promise<ImportedModel> {
   const picked = pickModelFile(files);
-  if (typeof picked === 'string') {
+  if ('kind' in picked) {
     throw new ModelImportError(picked);
   }
   const main = files[picked.main];
   if (!main) {
-    throw new ModelImportError('Elige el modelo.');
+    throw new ModelImportError({ kind: 'choose' });
   }
   if (picked.format === 'glb' && !isGlbHeader(new Uint8Array(await main.slice(0, 4).arrayBuffer()))) {
-    throw new ModelImportError('El archivo no es un GLB válido: le falta la cabecera glTF.');
+    throw new ModelImportError({ kind: 'badGlb' });
   }
 
   // Cada archivo elegido se sirve desde memoria. Se carga por su nombre y cada
@@ -91,10 +96,10 @@ export async function importModel(files: readonly File[]): Promise<ImportedModel
     }
     const exported = await new GLTFExporter().parseAsync(scene, { binary: true, maxTextureSize: 2048, onlyVisible: true });
     if (!(exported instanceof ArrayBuffer)) {
-      throw new ModelImportError('No se pudo convertir el modelo a GLB.');
+      throw new ModelImportError({ kind: 'convertFailed' });
     }
     if (exported.byteLength > MODEL_LIMITS.maxBytes) {
-      throw new ModelImportError('Convertido a GLB, el modelo supera los 30 MB. Redúcelo con Decimate en Blender o usa texturas más pequeñas.');
+      throw new ModelImportError({ kind: 'convertedTooLarge' });
     }
     const name = `${main.name.replace(/\.[^.]+$/, '')}.glb`;
     return { file: new File([exported], name, { type: 'model/gltf-binary' }), triangles, source: picked.format, skipped };
@@ -102,7 +107,7 @@ export async function importModel(files: readonly File[]): Promise<ImportedModel
     if (error instanceof ModelImportError) {
       throw error;
     }
-    throw new ModelImportError(`No se pudo abrir el modelo .${picked.format}. Revisa que estén todos sus archivos (materiales y texturas) o expórtalo como .glb.`);
+    throw new ModelImportError({ kind: 'openFailed', format: picked.format });
   } finally {
     draco.dispose();
     for (const url of urls.values()) {

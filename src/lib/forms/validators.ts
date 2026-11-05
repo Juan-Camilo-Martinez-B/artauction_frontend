@@ -65,6 +65,18 @@ export function validateRegistration(values: {
   };
 }
 
+/** Convierte los problemas de un formulario en textos, con la funcion del idioma activo. */
+export function problemTexts<Field extends string, Problem extends string>(errors: FieldErrors<Field, Problem>, text: (problem: Problem) => string): FieldErrors<Field> {
+  const translated: FieldErrors<Field> = {};
+  for (const field of Object.keys(errors) as Field[]) {
+    const problem: Problem | undefined = errors[field];
+    if (problem) {
+      translated[field] = text(problem);
+    }
+  }
+  return translated;
+}
+
 export function hasErrors<Field extends string>(errors: FieldErrors<Field>): boolean {
   return Object.values(errors).some((message) => message !== undefined);
 }

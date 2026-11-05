@@ -650,5 +650,227 @@
       "description": "When an audit finishes or an auction you are in closes, you will see it here.",
       "action": "See live rooms"
     }
+  },
+  "Publish": {
+    "categoriesFailed": "We could not load the categories.",
+    "imageFailed": "We could not prepare the image. Try a JPG or PNG.",
+    "returnReason": "Reason it was returned:",
+    "titleFallback": "the work",
+    "destination": {
+      "title": "What is this work for?",
+      "label": "Work destination",
+      "personalTitle": "Only for my gallery",
+      "personalText": "A personal project: it hangs in your 3D room with no audit. It is not sold.",
+      "catalogTitle": "Publish in the catalog",
+      "catalogText": "It goes through the audit and, if approved, gets its auction room.",
+      "sellerOnly": "Seller accounts only."
+    },
+    "visibility": {
+      "title": "Who can see it?",
+      "label": "Project visibility",
+      "privateTitle": "Only me",
+      "privateText": "In your 3D room and in My works.",
+      "publicTitle": "Public in my gallery",
+      "publicText": "It appears in your public gallery as “Personal project, not audited”. Never in the catalog."
+    },
+    "sections": {
+      "work": "The work",
+      "materials": "Materials and dimensions",
+      "image": "Image"
+    },
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "artist": "Artist",
+      "artistHint": "Leave it empty if unknown.",
+      "year": "Year",
+      "materials": "Materials",
+      "materialsPlaceholder": "Oil on canvas",
+      "category": "Category",
+      "format": "Format",
+      "formatFlat": "Flat work (painting, drawing, photo)",
+      "formatObject": "Object (sculpture, ceramics)",
+      "width": "Width (cm)",
+      "height": "Height (cm)",
+      "depth": "Depth (cm)",
+      "provenance": "Provenance",
+      "provenanceHint": "Previous collections or sales, if you know them."
+    },
+    "image": {
+      "previewAlt": "Preview of the work",
+      "preparing": "Preparing the image…",
+      "choose": "Choose a photo of the work",
+      "hint": "At least 800 px. It is resized in your browser before being sent.",
+      "change": "Tap the image to change it."
+    },
+    "submit": {
+      "saveChanges": "Save changes",
+      "saveToGallery": "Save to my gallery",
+      "saveAndResend": "Save and resubmit for audit",
+      "send": "Send to audit",
+      "saving": "Saving the sheet…",
+      "uploading": "Uploading the image…",
+      "modeling": "Checking the 3D model…",
+      "submitting": "Sending to audit…",
+      "saveOnly": "Save without sending"
+    },
+    "problems": {
+      "titleShort": "The title needs at least 3 characters.",
+      "descriptionShort": "Describe the work in at least 10 characters.",
+      "materialsRequired": "Enter the materials.",
+      "yearRange": "The year must be between 1 and {max}.",
+      "widthRequired": "Enter the width.",
+      "widthRange": "The width must be between 0.1 and 2000 cm.",
+      "heightRequired": "Enter the height.",
+      "heightRange": "The height must be between 0.1 and 2000 cm.",
+      "depthRequired": "Enter the depth.",
+      "depthRange": "The depth must be between 0.1 and 2000 cm.",
+      "provenanceShort": "The provenance needs at least 3 characters.",
+      "imageRequired": "Choose the image of the work.",
+      "modelRequired": "Upload the 3D model of the work."
+    },
+    "saveErrors": {
+      "image": "We could not save the image.",
+      "model": "We could not save the 3D model.",
+      "generic": "We could not save the work."
+    },
+    "model": {
+      "title": "3D model",
+      "preparing": "Preparing the preview…",
+      "help": "Required for sculptures and objects: the 3D room shows them with their real volume and at the height you declared. A .glb or .gltf works (Blender: File › Export › glTF 2.0), as does a .fbx or .obj, like those from Sketchfab or the Unity Asset Store. If the .obj or .gltf comes with separate materials (.mtl), buffers (.bin) or textures, choose them all at once. A .blend does not open on the web: export it. Between {min} and {max} triangles and up to 30 MB.",
+      "checking": "Opening and checking the model…",
+      "verified": "Verified model",
+      "triangles": "{triangles} triangles",
+      "uploadsOnSave": "uploads when you save",
+      "skipped": "Without {files}: the browser cannot read that texture format. If the piece looks colorless or flat, export it with .png or .jpg textures.",
+      "change": "Change model",
+      "choose": "Choose 3D model",
+      "converted": "{name} (converted from .{source})"
+    },
+    "modelErrors": {
+      "unknown": "We could not open the 3D model.",
+      "noMain": "Choose the model: a .glb, .gltf, .fbx or .obj file (a .blend does not open on the web: export it from Blender).",
+      "manyMains": "Choose one model at a time; only its materials (.mtl), buffers (.bin) and textures go with it.",
+      "stray": "“{name}” is not part of a 3D model.",
+      "tooLarge": "The model and its textures exceed 30 MB. Reduce it with Blender's Decimate modifier or use smaller textures.",
+      "choose": "Choose the model.",
+      "badGlb": "The file is not a valid GLB: it lacks the glTF header.",
+      "convertFailed": "We could not convert the model to GLB.",
+      "convertedTooLarge": "Converted to GLB, the model exceeds 30 MB. Reduce it with Decimate in Blender or use smaller textures.",
+      "tooFewTriangles": "The model has {triangles} triangles: too little detail. The minimum is {min}.",
+      "tooManyTriangles": "The model has {triangles} triangles: the room would become slow. The maximum is {max}; reduce it with Decimate in Blender.",
+      "openFailed": "We could not open the .{format} model. Check that all its files (materials and textures) are there, or export it as .glb."
+    },
+    "newPage": {
+      "signInTitle": "Sign in to upload a work",
+      "eyebrow": "New work",
+      "titleSeller": "Upload a work",
+      "titleOwn": "Upload a personal project",
+      "descriptionSeller": "Keep it only for your gallery or publish it in the catalog. In the catalog, the audit checks that materials, date and image are consistent before giving it an auction room.",
+      "descriptionOwn": "Your own works hang in your 3D room without an audit. You decide whether they appear in your public gallery."
+    },
+    "editPage": {
+      "signInTitle": "Sign in to edit your work",
+      "opening": "Opening the sheet…",
+      "missing": {
+        "title": "We could not find this work among yours",
+        "description": "Only the person who published a work can edit it.",
+        "action": "Go to my works"
+      },
+      "locked": {
+        "title": "This work can no longer be edited",
+        "description": "Only personal projects and drafts can be edited, for example those an administrator returned. A work in audit or published keeps its sheet.",
+        "action": "See the sheet"
+      },
+      "eyebrow": "My works",
+      "title": "Edit “{title}”",
+      "descriptionOwn": "Change the sheet, the image or who can see it. A personal project does not go through the audit.",
+      "descriptionCatalog": "Fix the sheet or change the image. When you resubmit it, the audit reviews it again."
+    }
+  },
+  "MyWorks": {
+    "signInTitle": "Sign in to see your works",
+    "loading": "Loading your works…",
+    "loadFailed": "We could not load all your works.",
+    "eyebrow": "Your account",
+    "title": "My works",
+    "descriptionSeller": "Your personal projects, what you published in the catalog with its status, and what you won. Returned works can be fixed and resubmitted.",
+    "descriptionBuyer": "Your personal projects and the works you won at auction.",
+    "newWork": "New work",
+    "room": "3D room",
+    "publicGallery": "Public gallery",
+    "empty": {
+      "title": "You have no works yet",
+      "description": "Upload a personal project for your 3D room or win an auction: you will see each work and its status here.",
+      "action": "Upload the first one"
+    },
+    "emptyFilter": {
+      "title": "No works with this label",
+      "action": "See all"
+    },
+    "filterLabel": "Filter by status",
+    "groups": {
+      "published": "Created by me",
+      "acquired": "Acquired"
+    },
+    "filters": {
+      "todas": "All",
+      "devueltas": "Returned",
+      "proyectos": "Personal projects",
+      "borrador": "Draft",
+      "auditoria": "In audit",
+      "revision": "Manual review",
+      "publicada": "Published",
+      "subasta": "At auction",
+      "vendida": "Sold",
+      "cerrada": "Closed unsold",
+      "ganadas": "Won at auction"
+    },
+    "hints": {
+      "DEVUELTA": "An administrator returned it. Fix it and resubmit it for audit.",
+      "PERSONAL": "Personal project: only for your gallery, no audit.",
+      "BORRADOR": "It has not been sent to audit yet.",
+      "PENDIENTE_AUDITORIA": "The audit is reviewing it.",
+      "REVISION_MANUAL": "An administrator will review it soon.",
+      "APROBADO": "It is in the catalog.",
+      "PUBLICADA": "It is in the catalog.",
+      "EN_SUBASTA": "It has an auction room.",
+      "VENDIDA": "It sold at auction: it now belongs to the winner.",
+      "CERRADO": "The auction closed unsold."
+    },
+    "seenPublic": "It appears in your public gallery.",
+    "seenPrivate": "Only you can see it.",
+    "reason": "Reason",
+    "edit": "Edit",
+    "needImageSend": "Add an image before sending it",
+    "needImageMove": "Add an image before moving it to the catalog",
+    "resubmit": "Resubmit unchanged",
+    "sendToAudit": "Send to audit",
+    "makePrivate": "Make private",
+    "makePublic": "Make public",
+    "moveToCatalog": "Move to catalog",
+    "hang": "Hang in my room",
+    "unhang": "Remove from my room",
+    "unattributedArtist": "Unattributed artist",
+    "publicInGallery": "Public in your gallery",
+    "onlyYou": "Only you can see it",
+    "moveDialog": {
+      "title": "Move to catalog",
+      "confirm": "Send to audit",
+      "body": "The audit reviews the work and, if approved, publishes it with its auction room. Meanwhile it is hidden from your public gallery and you can no longer edit it."
+    },
+    "actions": {
+      "resubmitted": "{title} went back to audit.",
+      "resubmitFailed": "We could not send the work to audit.",
+      "nowPublic": "{title} now appears in your public gallery.",
+      "nowPrivate": "{title} is now visible only to you.",
+      "visibilityFailed": "We could not change who can see the work.",
+      "hung": "{title} now hangs in your room.",
+      "unhung": "{title} left your room.",
+      "hangFailed": "We could not hang the work.",
+      "unhangFailed": "We could not remove the work from the room.",
+      "moved": "{title} entered the audit.",
+      "moveFailed": "We could not move the work to the catalog."
+    }
   }
 }

@@ -34,12 +34,26 @@ export const measure = (raw: string) => {
   return rest.length > 0 ? `${whole.slice(0, 4)}.${rest.join('').slice(0, 1)}` : whole.slice(0, 4);
 };
 
-export function sizeError(value: string, label: string): string | undefined {
+type Dimension = 'width' | 'height' | 'depth';
+
+/** Problemas de la ficha: claves del diccionario Publish.problems. */
+export type LotProblem =
+  | 'titleShort'
+  | 'descriptionShort'
+  | 'materialsRequired'
+  | 'yearRange'
+  | `${Dimension}Required`
+  | `${Dimension}Range`
+  | 'provenanceShort'
+  | 'imageRequired'
+  | 'modelRequired';
+
+export function sizeError(value: string, dimension: Dimension): LotProblem | undefined {
   const parsed = Number(value);
   if (value === '') {
-    return `Escribe ${label}.`;
+    return `${dimension}Required`;
   }
-  return parsed > 0 && parsed <= 2000 ? undefined : `${label[0]?.toUpperCase() ?? ''}${label.slice(1)} debe estar entre 0,1 y 2000 cm.`;
+  return parsed > 0 && parsed <= 2000 ? undefined : `${dimension}Range`;
 }
 
 /** Medida guardada ("30.00") como la escribiria la persona ("30"). */
@@ -48,11 +62,16 @@ export function storedMeasure(value: string | null | undefined): string {
   return value && Number.isFinite(parsed) && parsed > 0 ? String(parsed) : '';
 }
 
+/**
+ * Ficha que se edita. Se parte siempre del texto del autor: una obra publica
+ * puede llegar traducida y guardar la traduccion sobrescribiria el original.
+ */
 export function draftFrom(lot: Lot | null): Draft {
+  const texts = lot?.original ?? lot;
   return {
-    title: lot?.title ?? '',
-    description: lot?.description ?? '',
-    materials: lot?.materials ?? '',
+    title: texts?.title ?? '',
+    description: texts?.description ?? '',
+    materials: texts?.materials ?? '',
     artistName: lot?.artistName ?? '',
     year: lot?.creationYear ? String(lot.creationYear) : '',
     categorySlug: lot?.categories?.find((link) => link.isPrimary)?.category.slug ?? '',
@@ -60,7 +79,7 @@ export function draftFrom(lot: Lot | null): Draft {
     widthCm: storedMeasure(lot?.widthCm),
     heightCm: storedMeasure(lot?.heightCm),
     depthCm: storedMeasure(lot?.depthCm),
-    provenance: lot?.provenance ?? '',
+    provenance: texts?.provenance ?? '',
   };
 }
 
@@ -89,21 +108,21 @@ export function draftChanged(draft: Draft, initial: Draft): boolean {
  * Errores de la ficha. La imagen guardada sirve al editar, y una obra
  * tridimensional solo se muestra con su modelo real, no con la foto.
  */
-export function lotErrors(draft: Draft, context: { currentYear: number; hasImage: boolean; hasModel: boolean }): FieldErrors<LotField> {
+export function lotErrors(draft: Draft, context: { currentYear: number; hasImage: boolean; hasModel: boolean }): FieldErrors<LotField, LotProblem> {
   const threeD = draft.representation === 'THREE_D';
   return {
-    title: draft.title.trim().length >= 3 ? undefined : 'El título necesita al menos 3 caracteres.',
-    description: draft.description.trim().length >= 10 ? undefined : 'Describe la obra con al menos 10 caracteres.',
-    materials: draft.materials.trim().length >= 2 ? undefined : 'Indica los materiales.',
+    title: draft.title.trim().length >= 3 ? undefined : 'titleShort',
+    description: draft.description.trim().length >= 10 ? undefined : 'descriptionShort',
+    materials: draft.materials.trim().length >= 2 ? undefined : 'materialsRequired',
     year:
       draft.year === '' || (Number(draft.year) >= 1 && Number(draft.year) <= context.currentYear)
         ? undefined
-        : `El año debe estar entre 1 y ${String(context.currentYear)}.`,
-    width: sizeError(draft.widthCm, 'el ancho'),
-    height: sizeError(draft.heightCm, 'el alto'),
-    depth: threeD ? sizeError(draft.depthCm, 'la profundidad') : undefined,
-    provenance: draft.provenance.trim() === '' || draft.provenance.trim().length >= 3 ? undefined : 'La procedencia necesita al menos 3 caracteres.',
-    image: context.hasImage ? undefined : 'Elige la imagen de la obra.',
-    model: !threeD || context.hasModel ? undefined : 'Sube el modelo 3D de la obra.',
+        : 'yearRange',
+    width: sizeError(draft.widthCm, 'width'),
+    height: sizeError(draft.heightCm, 'height'),
+    depth: threeD ? sizeError(draft.depthCm, 'depth') : undefined,
+    provenance: draft.provenance.trim() === '' || draft.provenance.trim().length >= 3 ? undefined : 'provenanceShort',
+    image: context.hasImage ? undefined : 'imageRequired',
+    model: !threeD || context.hasModel ? undefined : 'modelRequired',
   };
 }

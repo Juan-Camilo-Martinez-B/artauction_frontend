@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Lot } from '@/lib/api/types';
+import { IntlWrapper } from '../intl';
 import type { Draft } from '@/lib/forms/lot-draft';
 import type { ImportedModel } from '@/lib/gallery/model-import';
 
@@ -110,7 +111,7 @@ describe('guardado de la ficha', () => {
   });
 
   it('una obra del catalogo se crea, sube su imagen y su modelo y va a auditoria', async () => {
-    const { result } = renderHook(() => useLotSubmission());
+    const { result } = renderHook(() => useLotSubmission(), { wrapper: IntlWrapper });
     await act(() =>
       result.current.submit({ lot: null, draft: DRAFT, draftChanged: true, destination: 'CATALOG', visibility: 'PRIVATE', image: IMAGE, model: MODEL, dropModel: false, intent: 'submit' }),
     );
@@ -120,7 +121,7 @@ describe('guardado de la ficha', () => {
 
   it('un proyecto propio 3D publico nace privado, se hace publico con su modelo y se cuelga en la sala', async () => {
     created = lot({ status: 'PERSONAL', visibility: 'PRIVATE' });
-    const { result } = renderHook(() => useLotSubmission());
+    const { result } = renderHook(() => useLotSubmission(), { wrapper: IntlWrapper });
     await act(() =>
       result.current.submit({ lot: null, draft: DRAFT, draftChanged: true, destination: 'PERSONAL', visibility: 'PUBLIC', image: IMAGE, model: MODEL, dropModel: false, intent: 'submit' }),
     );
@@ -141,7 +142,7 @@ describe('guardado de la ficha', () => {
 
   it('si falla una subida, el reintento reutiliza la obra ya creada en vez de duplicarla', async () => {
     failImageUpload = true;
-    const { result } = renderHook(() => useLotSubmission());
+    const { result } = renderHook(() => useLotSubmission(), { wrapper: IntlWrapper });
     const request = { lot: null, draft: DRAFT, draftChanged: true, destination: 'CATALOG' as const, visibility: 'PRIVATE' as const, image: IMAGE, model: MODEL, dropModel: false, intent: 'submit' as const };
     await act(() => result.current.submit(request));
     expect(result.current.error).toBe('No se pudo guardar la imagen.');
@@ -157,7 +158,7 @@ describe('guardado de la ficha', () => {
 
   it('una obra que pasa a plana pierde su modelo y no sube otro', async () => {
     const editing = lot({ representationKind: 'THREE_D' });
-    const { result } = renderHook(() => useLotSubmission());
+    const { result } = renderHook(() => useLotSubmission(), { wrapper: IntlWrapper });
     await act(() =>
       result.current.submit({
         lot: editing,
