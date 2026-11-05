@@ -993,7 +993,8 @@
     },
     "viewer": {
       "loadFailed": "No se pudo cargar el modelo 3D. Prueba de nuevo más tarde.",
-      "label": "Modelo 3D de {title}. Arrastra para girarlo."
+      "label": "Modelo 3D de {title}. Arrastra para girarlo.",
+      "hint": "Arrastra para girar · rueda o pellizca para acercar"
     }
   },
   "Admin": {

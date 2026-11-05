@@ -993,7 +993,8 @@
     },
     "viewer": {
       "loadFailed": "We could not load the 3D model. Please try again later.",
-      "label": "3D model of {title}. Drag to rotate it."
+      "label": "3D model of {title}. Drag to rotate it.",
+      "hint": "Drag to rotate · scroll or pinch to zoom"
     }
   },
   "Admin": {

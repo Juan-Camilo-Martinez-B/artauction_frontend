@@ -47,7 +47,7 @@ export function ModelViewer({ url, title, className = '' }: { url: string; title
           />
         </Canvas>
         <p className="pointer-events-none absolute bottom-2 left-0 right-0 text-center text-[11px] uppercase tracking-[0.16em] text-muted">
-          Arrastra para girar · rueda o pellizca para acercar
+          {t('hint')}
         </p>
       </div>
     </SceneBoundary>
