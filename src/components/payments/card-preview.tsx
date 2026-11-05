@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { BRANDS, type CardBrand } from '@/lib/payments/card';
 
 /** Muestra el numero con huecos donde faltan digitos, respetando la agrupacion de la marca. */
@@ -17,6 +18,7 @@ function maskedNumber(number: string, brand: CardBrand): string {
  * la misma informacion ya esta en los campos del formulario.
  */
 export function CardPreview({ brand, number, name, expiry }: { brand: CardBrand; number: string; name: string; expiry: string }) {
+  const t = useTranslations('Card');
   return (
     <div
       aria-hidden="true"
@@ -26,12 +28,12 @@ export function CardPreview({ brand, number, name, expiry }: { brand: CardBrand;
       <div className="relative flex h-full flex-col justify-between">
         <div className="flex items-start justify-between">
           <span className="h-8 w-11 rounded-md bg-gradient-to-br from-ochre-tint to-ochre" />
-          <span className="text-sm font-medium tracking-wide">{BRANDS[brand].label}</span>
+          <span className="text-sm font-medium tracking-wide">{BRANDS[brand].label || t('genericBrand')}</span>
         </div>
         <p className="whitespace-nowrap font-mono text-base tracking-[0.08em]">{maskedNumber(number, brand)}</p>
         <div className="flex items-end justify-between gap-4 text-xs uppercase tracking-wider">
-          <span className="truncate">{name || 'NOMBRE EN LA TARJETA'}</span>
-          <span className="shrink-0">{expiry || 'MM/AA'}</span>
+          <span className="truncate">{name || t('namePlaceholder')}</span>
+          <span className="shrink-0">{expiry || t('expiryPlaceholder')}</span>
         </div>
       </div>
     </div>

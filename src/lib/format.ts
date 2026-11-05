@@ -76,3 +76,12 @@ export function formatMoney(value: string | number | null | undefined, locale: L
     () => new Intl.NumberFormat(INTL_LOCALE[locale], { style: 'currency', currency, maximumFractionDigits: 2 }),
   ).format(amount);
 }
+
+/** Importe en artacoins: entero con los miles del idioma (la unidad no se traduce). */
+export function formatArtacoins(value: string | number | null | undefined, locale: Locale): string {
+  const amount = typeof value === 'number' ? value : Number(value ?? '0');
+  if (!Number.isFinite(amount)) {
+    return '—';
+  }
+  return `${formatInteger(amount, locale)} artacoins`;
+}

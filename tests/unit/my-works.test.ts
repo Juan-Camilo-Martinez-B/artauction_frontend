@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { GalleryItem, Lot } from '@/lib/api/types';
 import { applyFilter, canHang, collectWorks, countByFilter, filterOf, parseFilter } from '@/lib/artwork/my-works';
-import { auditSourceLabel, isEditable } from '@/lib/artwork/lot-review';
+import { auditSource, isEditable } from '@/lib/artwork/lot-review';
 import { canSell } from '@/lib/session/roles';
 import { sectionsFor } from '@/components/account/account-menu';
 
@@ -80,7 +80,7 @@ describe('mis obras', () => {
   it('un proyecto propio se edita siempre, se marca sin auditar y lo crea cualquier cuenta', () => {
     expect(isEditable(lot('own', 'PERSONAL'))).toBe(true);
     expect(isEditable(lot('p', 'PUBLICADA'))).toBe(false);
-    expect(auditSourceLabel({ modelName: 'modelo-x' }, lot('own', 'PERSONAL'))).toBe('Proyecto propio, sin auditar');
+    expect(auditSource({ modelName: 'modelo-x' }, lot('own', 'PERSONAL'))).toEqual({ kind: 'personal' });
     expect(canSell('USER')).toBe(false);
     expect(canSell('SELLER')).toBe(true);
   });

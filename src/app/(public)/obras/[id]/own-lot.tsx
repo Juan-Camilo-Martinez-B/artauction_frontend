@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { ButtonLink } from '@/components/ui/button';
 import { EmptyState, LoadingState } from '@/components/ui/layout';
@@ -9,6 +10,7 @@ import { browserSession } from '@/lib/session/browser-session';
 import { ArtworkExhibit } from './artwork-exhibit';
 
 export function OwnLot({ id }: { id: string }) {
+  const t = useTranslations('Artwork.unavailable');
   const [lot, setLot] = useState<Lot | null>(null);
   const [missing, setMissing] = useState(false);
 
@@ -32,11 +34,11 @@ export function OwnLot({ id }: { id: string }) {
   if (missing) {
     return (
       <EmptyState
-        title="Esta obra no está disponible"
-        description="Puede que sea privada, que se haya vendido o que el enlace esté mal."
-        action={<ButtonLink href="/catalogo" variant="secondary">Volver al catálogo</ButtonLink>}
+        title={t('title')}
+        description={t('description')}
+        action={<ButtonLink href="/catalogo" variant="secondary">{t('action')}</ButtonLink>}
       />
     );
   }
-  return <LoadingState label="Abriendo la ficha…" />;
+  return <LoadingState label={t('opening')} />;
 }

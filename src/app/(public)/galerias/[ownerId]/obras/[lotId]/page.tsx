@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { PurchasedSheetView } from './purchased-sheet-view';
 
-export const metadata: Metadata = { title: 'Ficha de la obra' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('Artwork');
+  return { title: t('sheetTitle') };
+}
 
 /**
  * Ficha guardada de una obra comprada. Al venderse, el catalogo deja de

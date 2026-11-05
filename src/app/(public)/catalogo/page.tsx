@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { LiveAuctions } from '@/components/auctions/live-auctions';
 import { PageHeader } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
@@ -6,7 +7,10 @@ import { getCategories, getPublicLots } from '@/lib/api/server';
 import { CatalogExhibit } from './catalog-exhibit';
 
 export const revalidate = 60;
-export const metadata: Metadata = { title: 'Catálogo' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('Catalog');
+  return { title: t('title') };
+}
 
 export default async function CatalogPage({
   searchParams,
@@ -33,16 +37,17 @@ export default async function CatalogPage({
   search.set('pageSize', String(pageSize));
   const suffix = search.size > 0 ? `?${search.toString()}` : '';
   const [{ catalog, error }, categories] = await Promise.all([getPublicLots(suffix), getCategories()]);
+  const t = await getTranslations('Catalog');
 
   return (
     <section>
       <PageHeader
-        eyebrow="Exposición"
-        title="Catálogo"
-        description="Pinturas, fotografías y objetos con auditoría de autenticidad. Cada pocos minutos una obra sale a subasta."
+        eyebrow={t('eyebrow')}
+        title={t('title')}
+        description={t('description')}
       />
       <LiveAuctions />
-      {error ? <Notice tone="error" className="mb-6">{error}</Notice> : null}
+      {error ? <Notice tone="error" className="mb-6">{t(`errors.${error}`)}</Notice> : null}
       <CatalogExhibit
         lots={catalog.items}
         categories={categories}

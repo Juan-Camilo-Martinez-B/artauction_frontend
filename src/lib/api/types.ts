@@ -70,6 +70,14 @@ export interface LotModel {
   size: { x: number; y: number; z: number };
 }
 
+/** Textos de una ficha que se traducen. */
+export interface LotTexts {
+  title: string;
+  description: string;
+  materials: string;
+  provenance: string | null;
+}
+
 export interface Lot {
   id: string;
   sellerId: string;
@@ -94,6 +102,11 @@ export interface Lot {
   categories?: LotCategoryLink[];
   lastReview?: LotReview | null;
   model?: LotModel | null;
+  /** Idioma en que el autor escribio la ficha, si ya se detecto. */
+  sourceLocale?: 'es' | 'en' | null;
+  /** La ficha viene traducida al idioma pedido; el original va en `original` y es el que vale. */
+  translated?: boolean;
+  original?: LotTexts | null;
   auction?: {
     id: string;
     status: string;

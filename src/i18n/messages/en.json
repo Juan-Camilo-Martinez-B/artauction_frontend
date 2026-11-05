@@ -206,5 +206,449 @@
     "score": "Authenticity score {score}",
     "noScore": "Authenticity score not available",
     "noVerdict": "No verdict yet"
+  },
+  "Home": {
+    "eyebrow": "Art room",
+    "title": "A work gets in when its material and its century agree.",
+    "lead": "Art and antiques auctions with authenticity audits. The price only goes up, the closing extends if someone bids at the last moment, and what you win is shown in your own room.",
+    "toCatalog": "See the catalog",
+    "howItWorks": "How it works",
+    "steps": {
+      "audit": {
+        "title": "We audit",
+        "text": "Every work goes through an authenticity audit: material, period and image must agree."
+      },
+      "auction": {
+        "title": "We auction",
+        "text": "Live rooms on the server's clock. A bid at the last moment extends the closing."
+      },
+      "exhibit": {
+        "title": "You exhibit",
+        "text": "The work you win hangs in your 3D gallery, which you can walk through and arrange as you like."
+      }
+    }
+  },
+  "Categories": {
+    "arte-digital": "Digital art",
+    "ceramica": "Ceramics and vases",
+    "escultura": "Sculpture",
+    "fotografia": "Photography",
+    "objetos-artisticos": "Art objects",
+    "otras": "Other",
+    "pinturas": "Paintings"
+  },
+  "Catalog": {
+    "eyebrow": "Exhibition",
+    "title": "Catalog",
+    "description": "Paintings, photographs and objects with authenticity audits. Every few minutes a work goes up for auction.",
+    "errors": {
+      "unavailable": "The catalog is not available.",
+      "offline": "There is no connection to the room."
+    },
+    "categories": "Categories",
+    "allCatalog": "Whole catalog",
+    "empty": {
+      "title": "No works match that search",
+      "description": "Try another category, another format or a shorter search.",
+      "action": "See the whole catalog"
+    },
+    "featured": "Featured work",
+    "unattributedArtist": "Unattributed artist",
+    "unattributed": "Unattributed",
+    "noCategory": "No category",
+    "total": "{total, plural, one {# work} other {# works}} in this selection.",
+    "object": "Object",
+    "wallWork": "Wall work",
+    "search": {
+      "label": "Search work, artist or material",
+      "placeholder": "Portrait, oil, Vásquez…",
+      "clear": "Clear the search",
+      "format": "Format",
+      "all": "All",
+      "flat": "Flat works",
+      "objects": "Objects",
+      "submit": "Search"
+    },
+    "pager": {
+      "label": "Catalog pages",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {page} of {pages}"
+    }
+  },
+  "LiveAuctions": {
+    "eyebrow": "Room open",
+    "title": "Live and upcoming",
+    "description": "Every few minutes a new room opens with a work from the catalog.",
+    "toCatalog": "See the whole catalog",
+    "unavailable": "The lineup is not available right now.",
+    "empty": "We are preparing the next room. Come back in a few minutes.",
+    "live": "Live",
+    "upcoming": "Upcoming",
+    "unattributedArtist": "Unattributed artist",
+    "currentPrice": "Current price",
+    "openingPrice": "Opening price",
+    "closesIn": "Closes in",
+    "opensIn": "Opens in",
+    "closing": "Closing…",
+    "opening": "Opening…",
+    "buyNow": "Buy now:"
+  },
+  "HowItWorks": {
+    "metaTitle": "How it works",
+    "eyebrow": "Guide",
+    "title": "How the room works",
+    "description": "From the audit to your gallery: everything that happens to a work on ArtAuction.",
+    "toLive": "See live rooms",
+    "createAccount": "Create account",
+    "sections": {
+      "audit": {
+        "title": "Authenticity audit",
+        "p1": "Every published work goes through an audit: rules that catch anachronisms (for example, acrylic before 1950) or repeated images, and a model that assesses the whole sheet.",
+        "p2": "If everything fits, the work is published with an authenticity score and a suggested price. If something does not fit, it goes to manual review and a person decides."
+      },
+      "rooms": {
+        "title": "Auction rooms",
+        "p1": "There are always some rooms open or about to open: every few minutes a catalog work goes up for auction and the room lasts between 15 and 30 minutes.",
+        "p2": "The price only goes up. If someone bids in the last 30 seconds, the closing extends another 30. You can withdraw your bid up to 4 minutes before closing.",
+        "p3": "The countdown uses the server's clock, so everyone sees the same time."
+      },
+      "wallet": {
+        "title": "Artacoins and wallet",
+        "p1": "Bids are paid in artacoins. You top them up in your wallet with a simulated charge: any card that has not expired works.",
+        "p2": "When you bid, only the difference from your previous bid is held. If you lose, the hold comes back; if you win, it is charged, and the seller gets the price minus a 10% fee."
+      },
+      "gallery": {
+        "title": "Your 3D gallery",
+        "p1": "The works you win hang in your 3D room. You can walk through it, get close to each work and arrange it as you like: walls, floor, light and the position of each piece.",
+        "p2": "Public works also appear in your public gallery, and other people can follow you."
+      }
+    }
+  },
+  "Artwork": {
+    "work": "Work",
+    "sheetTitle": "Work sheet",
+    "preparingModel": "Preparing the 3D model…",
+    "noCategory": "No category",
+    "threeD": "Three-dimensional object",
+    "twoD": "Two-dimensional work",
+    "unclassified": "Unclassified format",
+    "format": {
+      "landscape": "Landscape format",
+      "portrait": "Portrait format",
+      "square": "Square format"
+    },
+    "returned": "An administrator returned this work",
+    "editAndResend": "Edit and resubmit",
+    "notAudited": "Not audited",
+    "unattributed": "Unattributed",
+    "unknownYear": "unknown year",
+    "facts": {
+      "materials": "Materials",
+      "presentation": "Presentation",
+      "measures": "Dimensions",
+      "noMeasures": "No dimensions on the sheet",
+      "provenance": "Provenance",
+      "noProvenance": "No provenance on the sheet",
+      "priceBand": "Suggested range"
+    },
+    "personalTitle": "Personal project, not audited",
+    "personalText": "Its author uploaded it for their personal gallery. It did not go through the authenticity audit and it is not for sale.",
+    "audit": {
+      "critical": "The audit found a critical inconsistency.",
+      "clean": "The audit found no critical inconsistencies.",
+      "soldWith": "Authenticity score the work was sold with.",
+      "pending": "The authenticity report appears when the audit finishes."
+    },
+    "source": {
+      "personal": "Personal project, not audited",
+      "manualApproval": "Approved by an administrator's manual review",
+      "localRules": "Local assessment (no AI): the AI was not available",
+      "systemRule": "A system rule decided",
+      "unfinished": "The automatic audit did not finish",
+      "ai": "Assessed by the AI ({model})"
+    },
+    "translation": {
+      "automatic": "Automatically translated",
+      "original": "Original text",
+      "showOriginal": "Show original",
+      "showTranslation": "Show translation"
+    },
+    "auction": {
+      "openNow": "Room open now",
+      "scheduled": "Auction scheduled",
+      "currentPrice": "Now at {price}",
+      "openingPrice": "Opens at {price}",
+      "openingAt": "Opens at {price} · starts {date}",
+      "buyNow": "Buy now:",
+      "buyNowWhenOpen": "once the room opens",
+      "enterRoom": "Enter the room",
+      "seeRoom": "See the room"
+    },
+    "purchase": {
+      "title": "Saved purchase sheet",
+      "byBuyNow": "with buy now",
+      "atAuction": "at auction",
+      "onArtAuction": "on ArtAuction",
+      "bought": "Bought {how}",
+      "on": "on {date}",
+      "for": "for {price}",
+      "snapshot": "This is the work's sheet as it was when it sold."
+    },
+    "view": "Work view",
+    "photo": "Photo",
+    "model": "3D model",
+    "noImage": "This work has no published image yet.",
+    "verifiedModel": "Verified 3D model · {triangles} triangles",
+    "unavailable": {
+      "title": "This work is not available",
+      "description": "It may be private, it may have been sold, or the link may be wrong.",
+      "action": "Back to the catalog",
+      "opening": "Opening the sheet…"
+    },
+    "unavailableSheet": {
+      "title": "This sheet is not available",
+      "description": "The work may be private in this gallery, or the link may be wrong.",
+      "action": "See the gallery",
+      "opening": "Opening the sheet…"
+    }
+  },
+  "PublicGallery": {
+    "metaTitle": "Gallery",
+    "eyebrow": "Collection",
+    "title": "Public gallery",
+    "description": "The public works in this collection: what its owner won, published or created for their gallery. Follow it to see what they win in your feed.",
+    "empty": {
+      "title": "No public works yet",
+      "description": "When this person wins or publishes public works, they will appear here."
+    },
+    "sources": {
+      "GANADA": "Won at auction",
+      "PROPIA": "Their own work",
+      "PROYECTO": "Personal project, not audited",
+      "other": "In the collection"
+    },
+    "unattributedArtist": "Unattributed artist",
+    "follow": {
+      "signIn": "Sign in to follow",
+      "own": "It's your gallery: go to the 3D room",
+      "done": "You now follow this gallery. Its activity will appear in your feed.",
+      "failed": "We could not follow this gallery.",
+      "following": "Following",
+      "follow": "Follow gallery"
+    }
+  },
+  "Room": {
+    "metaTitle": "Auction room",
+    "eyebrow": "Auction room",
+    "fallbackTitle": "The auction",
+    "unattributedArtist": "Unattributed artist",
+    "workAlt": "Work at auction",
+    "seeSheet": "See the sheet and the authenticity report",
+    "preparing": "Preparing the room…",
+    "unavailable": {
+      "title": "Room not available",
+      "description": "This room does not exist or is no longer available.",
+      "action": "See live rooms"
+    },
+    "live": "Live",
+    "connecting": "Connecting…",
+    "highestBid": "Highest bid",
+    "openingPrice": "Opening price",
+    "leaderYou": "Your bid is leading",
+    "leader": "{bidder} is leading",
+    "you": "You",
+    "bidder": "Bidder {number}",
+    "withdraw": "Withdraw my bid",
+    "history": "Bid history",
+    "noBids": "No bids yet. The first bid opens at {amount}.",
+    "buyNowTag": "Buy now",
+    "minimumBid": "The minimum bid is {amount}.",
+    "bidExtended": "Bid accepted. The closing was extended by 30 seconds.",
+    "bidAccepted": "Bid accepted: you are winning with {amount}.",
+    "bidFailed": "The bid did not go through. Please try again.",
+    "withdrawn": "You withdrew. {amount} went back to your wallet.",
+    "withdrawFailed": "You could not withdraw.",
+    "bought": "You bought it for {amount}! It is already in your gallery.",
+    "buyFailed": "The purchase did not complete. Please try again.",
+    "extendedByOther": "Last-moment bid: the closing was extended by 30 seconds.",
+    "available": "Available: {amount}",
+    "heldHere": "plus {amount} already held in this room",
+    "topUp": "Top up",
+    "withdrawDialog": {
+      "title": "Withdraw your bid?",
+      "confirm": "Withdraw",
+      "body": "The held artacoins go back to your wallet and you stop competing for this work. Only possible up to 4 minutes before closing."
+    },
+    "buyDialog": {
+      "title": "Buy now?",
+      "confirm": "Buy for {price}",
+      "body": "You pay <strong>{price}</strong>, you take the work and the auction ends for everyone. Bidders get their holds back."
+    },
+    "clock": {
+      "unsold": "Closed without a sale: another date will be scheduled.",
+      "youBought": "You bought it! It is already in your gallery.",
+      "soldBuyNow": "Sold with buy now.",
+      "youWon": "You won this work! It is already in your gallery.",
+      "closedWithWinner": "Closed with a winner.",
+      "opening": "Opening the room…",
+      "closing": "Closing the room…",
+      "opensIn": "Opens in",
+      "closesIn": "Closes in"
+    },
+    "bid": {
+      "wantToBid": "Want to bid?",
+      "signInHint": "Sign in with your account and top up artacoins in your wallet.",
+      "signIn": "Sign in to bid",
+      "ownWork": "It's your work: you can follow the room, but you cannot bid in it.",
+      "notYet": "You can bid once the room opens.",
+      "noMore": "The room no longer takes bids.",
+      "amountLabel": "Your bid in artacoins",
+      "minimum": "Minimum {amount}.",
+      "quick": "Quick bids",
+      "available": "Available: {amount}.",
+      "topUp": "Top up",
+      "onlyIncrease": "Only the increase of your bid is held.",
+      "submit": "Bid",
+      "submitAmount": "Bid {amount}"
+    },
+    "buyNow": {
+      "whenOpen": "Buy now once the room opens: {price}.",
+      "exceeded": "Buy now is no longer available: bids reached {threshold}, 80% of {price}.",
+      "price": "Buy now: {price}.",
+      "pitch": "Don't want to wait? Take it now and the auction ends.",
+      "action": "Buy now for {price}"
+    }
+  },
+  "Wallet": {
+    "signInTitle": "Sign in to see your wallet",
+    "loadFailed": "We could not open your wallet.",
+    "payFailed": "The payment gateway did not complete the charge. Please try again.",
+    "credited": "{amount} were added with the card ending in {last4}.",
+    "opening": "Opening your wallet…",
+    "eyebrow": "Artacoins",
+    "title": "Wallet",
+    "description": "Artacoins are the room's currency. The charge is simulated: any made-up card that has not expired works.",
+    "topUp": "Top up",
+    "pack": "Pack",
+    "notStored": "The number and code are not stored.",
+    "charging": "Charging…",
+    "pay": "Pay {amount}",
+    "available": "Available",
+    "held": "Held in rooms",
+    "entriesTitle": "Activity",
+    "noEntries": "No activity yet. Your first top-up will appear here.",
+    "entries": {
+      "RECARGA": "Top-up",
+      "RETENCION": "Held in a room",
+      "LIBERACION": "Released from a room",
+      "CANJE": "Payment for a won work",
+      "VENTA": "Sale of a work",
+      "REEMBOLSO": "Refund of a cancelled purchase",
+      "ANULACION": "Cancelled sale"
+    }
+  },
+  "Card": {
+    "genericBrand": "Card",
+    "namePlaceholder": "NAME ON CARD",
+    "expiryPlaceholder": "MM/YY",
+    "nameLabel": "Name on card",
+    "numberLabel": "Card number",
+    "numberHint": "Visa, Mastercard, American Express or Diners Club.",
+    "expiryLabel": "Expiry date",
+    "cvvLabel": "Security code",
+    "cvvHintFront": "{digits} digits, on the front.",
+    "cvvHintBack": "{digits} digits, on the back.",
+    "numberRequired": "Enter the card number.",
+    "numberLength": "A {brand} card has {digits} digits.",
+    "expiryRequired": "Enter the expiry date.",
+    "expiryFormat": "Enter the expiry date as MM/YY.",
+    "expiryMonth": "The month must be between 01 and 12.",
+    "expired": "The card has expired.",
+    "expiryYear": "Check the expiry year.",
+    "cvvLength": "The security code has {digits} digits.",
+    "nameRequired": "Enter the name as it appears on the card."
+  },
+  "Events": {
+    "auditApproved": {
+      "title": "Your work passed the audit",
+      "body": "It is now published in the catalog and will get its auction room."
+    },
+    "auditManual": {
+      "title": "Your work went to manual review",
+      "body": "The audit found something a person must look at. We will let you know when it is resolved."
+    },
+    "auditDone": {
+      "title": "Your work's audit finished",
+      "result": "Result: {verdict}.",
+      "noResult": "Check the sheet to see the result."
+    },
+    "lotReturned": {
+      "title": "{title} went back to draft",
+      "genericTitle": "Your work went back to draft",
+      "reason": "Reason: {reason} Fix it and resubmit it for audit.",
+      "noReason": "An administrator returned it. Fix it and resubmit it for audit."
+    },
+    "boughtNow": {
+      "title": "You bought it now",
+      "body": "You paid {amount} and the auction ended. The work already hangs in your gallery."
+    },
+    "wonAuction": {
+      "title": "You won the auction!",
+      "body": "You paid {amount}. The work already hangs in your gallery."
+    },
+    "soldBuyNow": {
+      "title": "You sold with buy now",
+      "body": "Someone paid {amount} and closed the auction. The payment, minus the fee, is already in your wallet."
+    },
+    "sold": {
+      "title": "You sold a work",
+      "body": "The auction closed at {amount}. The payment, minus the fee, is already in your wallet."
+    },
+    "lostBuyNow": {
+      "title": "The work sold with buy now",
+      "body": "You are no longer competing for it. What you had held went back to your wallet."
+    },
+    "lost": {
+      "title": "The auction closed with another winner",
+      "body": "You are no longer competing for it. What you had held went back to your wallet."
+    },
+    "generic": {
+      "title": "Notice",
+      "body": "There is news on your account."
+    },
+    "activity": {
+      "followed": "Followed {name}",
+      "boughtNow": "Bought {name} instantly",
+      "won": "Won {name}"
+    }
+  },
+  "Feed": {
+    "signInTitle": "Sign in to see the activity",
+    "eyebrow": "Community",
+    "title": "Activity",
+    "description": "What happens with your works and with the galleries you follow.",
+    "loadFailed": "We could not load the activity.",
+    "loading": "Loading activity…",
+    "empty": {
+      "title": "No activity yet",
+      "description": "Win an auction or follow someone's gallery and their activity will appear here.",
+      "action": "Explore the catalog"
+    },
+    "you": "You",
+    "followed": "Someone you follow"
+  },
+  "Notifications": {
+    "signInTitle": "Sign in to see your notifications",
+    "eyebrow": "Your account",
+    "title": "Notifications",
+    "description": "Results of your audits and of the auctions you took part in.",
+    "loadFailed": "We could not load your notifications.",
+    "loading": "Loading notifications…",
+    "empty": {
+      "title": "No notifications for now",
+      "description": "When an audit finishes or an auction you are in closes, you will see it here.",
+      "action": "See live rooms"
+    }
   }
 }

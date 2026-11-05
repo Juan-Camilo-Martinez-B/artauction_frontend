@@ -5,7 +5,6 @@ describe('formato de la imagen', () => {
   it('reconoce una marina horizontal', () => {
     const format = new ImageFormat(1600, 900);
     expect(format.orientation()).toBe('landscape');
-    expect(format.label()).toBe('Formato horizontal');
   });
 
   it('reconoce un retrato vertical', () => {

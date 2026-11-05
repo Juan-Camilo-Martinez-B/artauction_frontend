@@ -17,7 +17,8 @@ export const BRANDS: Record<CardBrand, BrandSpec> = {
   mastercard: { label: 'Mastercard', digits: 16, cvvDigits: 3, groups: [4, 4, 4, 4] },
   amex: { label: 'American Express', digits: 15, cvvDigits: 4, groups: [4, 6, 5] },
   diners: { label: 'Diners Club', digits: 14, cvvDigits: 3, groups: [4, 6, 4] },
-  otra: { label: 'Tarjeta', digits: 16, cvvDigits: 3, groups: [4, 4, 4, 4] },
+  // Sin marca reconocida: la etiqueta se traduce en la interfaz (Card.genericBrand).
+  otra: { label: '', digits: 16, cvvDigits: 3, groups: [4, 4, 4, 4] },
 };
 
 /** Cuantos anos hacia adelante se acepta una fecha de vencimiento. */
@@ -91,48 +92,59 @@ export function parseExpiry(value: string): { month: number; year: number } | nu
   return { month: Number(match[1]), year: 2000 + Number(match[2]) };
 }
 
-export function cardNumberError(value: string): string | undefined {
+/**
+ * Problemas de los campos de la tarjeta. Son claves del diccionario Card: el
+ * componente pone el texto (y la marca o los digitos que correspondan).
+ */
+export type CardProblem =
+  | 'numberRequired'
+  | 'numberLength'
+  | 'expiryRequired'
+  | 'expiryFormat'
+  | 'expiryMonth'
+  | 'expired'
+  | 'expiryYear'
+  | 'cvvLength'
+  | 'nameRequired';
+
+export function cardNumberError(value: string): CardProblem | undefined {
   const digits = onlyDigits(value);
   if (digits === '') {
-    return 'Escribe el número de la tarjeta.';
+    return 'numberRequired';
   }
   const spec = BRANDS[detectBrand(digits)];
   if (digits.length !== spec.digits) {
-    return `Una tarjeta ${spec.label} tiene ${String(spec.digits)} dígitos.`;
+    return 'numberLength';
   }
   return undefined;
 }
 
-export function expiryError(value: string, now: Date = new Date()): string | undefined {
+export function expiryError(value: string, now: Date = new Date()): CardProblem | undefined {
   if (value === '') {
-    return 'Escribe el vencimiento.';
+    return 'expiryRequired';
   }
   const parsed = parseExpiry(value);
   if (!parsed) {
-    return 'Escribe el vencimiento como MM/AA.';
+    return 'expiryFormat';
   }
   if (parsed.month < 1 || parsed.month > 12) {
-    return 'El mes debe estar entre 01 y 12.';
+    return 'expiryMonth';
   }
   const current = now.getFullYear() * 12 + now.getMonth() + 1;
   const expiry = parsed.year * 12 + parsed.month;
   if (expiry < current) {
-    return 'La tarjeta está vencida.';
+    return 'expired';
   }
   if (parsed.year > now.getFullYear() + MAX_YEARS_AHEAD) {
-    return 'Revisa el año de vencimiento.';
+    return 'expiryYear';
   }
   return undefined;
 }
 
-export function cvvError(value: string, brand: CardBrand): string | undefined {
-  const size = BRANDS[brand].cvvDigits;
-  if (value.length !== size) {
-    return `El código de seguridad tiene ${String(size)} dígitos.`;
-  }
-  return undefined;
+export function cvvError(value: string, brand: CardBrand): CardProblem | undefined {
+  return value.length !== BRANDS[brand].cvvDigits ? 'cvvLength' : undefined;
 }
 
-export function cardNameError(value: string): string | undefined {
-  return value.trim().length < 3 ? 'Escribe el nombre como aparece en la tarjeta.' : undefined;
+export function cardNameError(value: string): CardProblem | undefined {
+  return value.trim().length < 3 ? 'nameRequired' : undefined;
 }

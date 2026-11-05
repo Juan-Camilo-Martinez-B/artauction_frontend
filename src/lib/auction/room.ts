@@ -32,12 +32,16 @@ export function quickBids(minimum: number, increment: number): number[] {
   return [minimum, minimum + step * 2, minimum + step * 5];
 }
 
+/** Como se nombra a un postor: quien mira, o un numero por orden de llegada. */
+export type BidderLabel = { kind: 'you' } | { kind: 'bidder'; number: number };
+
 /**
- * Nombre visible de cada postor sin revelar quien es: "Tú" para quien mira y
- * "Postor 1", "Postor 2"... por orden de su primera puja en la sala.
+ * Nombre visible de cada postor sin revelar quien es: "tu" para quien mira y
+ * postor 1, 2... por orden de su primera puja en la sala. El texto lo pone el
+ * componente en el idioma activo.
  */
-export function bidderLabels(bids: readonly Bid[], viewerId: string | null): Map<string, string> {
-  const labels = new Map<string, string>();
+export function bidderLabels(bids: readonly Bid[], viewerId: string | null): Map<string, BidderLabel> {
+  const labels = new Map<string, BidderLabel>();
   let next = 1;
   const ordered = [...bids].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   for (const bid of ordered) {
@@ -45,9 +49,9 @@ export function bidderLabels(bids: readonly Bid[], viewerId: string | null): Map
       continue;
     }
     if (bid.bidderId === viewerId) {
-      labels.set(bid.bidderId, 'Tú');
+      labels.set(bid.bidderId, { kind: 'you' });
     } else {
-      labels.set(bid.bidderId, `Postor ${String(next)}`);
+      labels.set(bid.bidderId, { kind: 'bidder', number: next });
       next += 1;
     }
   }

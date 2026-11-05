@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { ButtonLink } from '@/components/ui/button';
 import { EmptyState, LoadingState } from '@/components/ui/layout';
@@ -11,6 +12,7 @@ import { ArtworkExhibit } from '@/app/(public)/obras/[id]/artwork-exhibit';
 type Loaded = { kind: 'loading' } | { kind: 'ready'; sheet: PurchasedSheet } | { kind: 'missing' };
 
 export function PurchasedSheetView({ ownerId, lotId }: { ownerId: string; lotId: string }) {
+  const t = useTranslations('Artwork.unavailableSheet');
   const [state, setState] = useState<Loaded>({ kind: 'loading' });
 
   useEffect(() => {
@@ -26,14 +28,14 @@ export function PurchasedSheetView({ ownerId, lotId }: { ownerId: string; lotId:
   }, [ownerId, lotId]);
 
   if (state.kind === 'loading') {
-    return <LoadingState label="Abriendo la ficha…" />;
+    return <LoadingState label={t('opening')} />;
   }
   if (state.kind === 'missing' || !state.sheet.lot) {
     return (
       <EmptyState
-        title="Esta ficha no está disponible"
-        description="Puede que la obra sea privada en esta galería o que el enlace esté mal."
-        action={<ButtonLink href={`/galerias/${ownerId}`} variant="secondary">Ver la galería</ButtonLink>}
+        title={t('title')}
+        description={t('description')}
+        action={<ButtonLink href={`/galerias/${ownerId}`} variant="secondary">{t('action')}</ButtonLink>}
       />
     );
   }

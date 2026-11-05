@@ -206,5 +206,449 @@
     "score": "Puntaje de autenticidad {score}",
     "noScore": "Puntaje de autenticidad sin dato",
     "noVerdict": "Todavía sin veredicto"
+  },
+  "Home": {
+    "eyebrow": "Sala de arte",
+    "title": "La obra entra cuando el material y el siglo coinciden.",
+    "lead": "Subastas de arte y antigüedades con auditoría de autenticidad. El precio solo sube, el cierre se alarga si alguien puja en el último instante y lo que ganas se exhibe en tu propia sala.",
+    "toCatalog": "Ver el catálogo",
+    "howItWorks": "Cómo funciona",
+    "steps": {
+      "audit": {
+        "title": "Auditamos",
+        "text": "Cada obra pasa una auditoría de autenticidad: material, época e imagen deben coincidir."
+      },
+      "auction": {
+        "title": "Subastamos",
+        "text": "Salas en vivo con el reloj del servidor. Una puja en el último instante alarga el cierre."
+      },
+      "exhibit": {
+        "title": "Exhibes",
+        "text": "La obra que ganas cuelga en tu galería 3D, que puedes recorrer y montar a tu gusto."
+      }
+    }
+  },
+  "Categories": {
+    "arte-digital": "Arte digital",
+    "ceramica": "Cerámica y jarrones",
+    "escultura": "Escultura",
+    "fotografia": "Fotografía",
+    "objetos-artisticos": "Objetos artísticos",
+    "otras": "Otras",
+    "pinturas": "Pinturas"
+  },
+  "Catalog": {
+    "eyebrow": "Exposición",
+    "title": "Catálogo",
+    "description": "Pinturas, fotografías y objetos con auditoría de autenticidad. Cada pocos minutos una obra sale a subasta.",
+    "errors": {
+      "unavailable": "El catálogo no está disponible.",
+      "offline": "No hay conexión con la sala."
+    },
+    "categories": "Categorías",
+    "allCatalog": "Todo el catálogo",
+    "empty": {
+      "title": "No hay obras con ese criterio",
+      "description": "Prueba otra categoría, otro formato o una búsqueda más corta.",
+      "action": "Ver todo el catálogo"
+    },
+    "featured": "Obra destacada",
+    "unattributedArtist": "Artista sin atribuir",
+    "unattributed": "Sin atribuir",
+    "noCategory": "Sin categoría",
+    "total": "{total, plural, one {# obra} other {# obras}} en esta selección.",
+    "object": "Objeto",
+    "wallWork": "Obra mural",
+    "search": {
+      "label": "Buscar obra, artista o material",
+      "placeholder": "Retrato, óleo, Vásquez…",
+      "clear": "Borrar la búsqueda",
+      "format": "Formato",
+      "all": "Todos",
+      "flat": "Obras planas",
+      "objects": "Objetos",
+      "submit": "Buscar"
+    },
+    "pager": {
+      "label": "Páginas del catálogo",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Página {page} de {pages}"
+    }
+  },
+  "LiveAuctions": {
+    "eyebrow": "Sala abierta",
+    "title": "En vivo y próximas",
+    "description": "Cada pocos minutos abre una sala nueva con una obra del catálogo.",
+    "toCatalog": "Ver todo el catálogo",
+    "unavailable": "La cartelera no está disponible en este momento.",
+    "empty": "Estamos preparando la próxima sala. Vuelve en unos minutos.",
+    "live": "En vivo",
+    "upcoming": "Próxima",
+    "unattributedArtist": "Artista sin atribuir",
+    "currentPrice": "Precio actual",
+    "openingPrice": "Salida",
+    "closesIn": "Cierra en",
+    "opensIn": "Abre en",
+    "closing": "Cerrando…",
+    "opening": "Abriendo…",
+    "buyNow": "Compra inmediata:"
+  },
+  "HowItWorks": {
+    "metaTitle": "Cómo funciona",
+    "eyebrow": "Guía",
+    "title": "Cómo funciona la sala",
+    "description": "De la auditoría a tu galería: todo lo que pasa con una obra en ArtAuction.",
+    "toLive": "Ver salas en vivo",
+    "createAccount": "Crear cuenta",
+    "sections": {
+      "audit": {
+        "title": "Auditoría de autenticidad",
+        "p1": "Cada obra publicada pasa por una auditoría: reglas que detectan anacronismos (por ejemplo, acrílico antes de 1950) o imágenes repetidas, y un modelo que evalúa la ficha completa.",
+        "p2": "Si todo cuadra, la obra se publica con un puntaje de autenticidad y un precio sugerido. Si algo no encaja, queda en revisión manual y la decide una persona."
+      },
+      "rooms": {
+        "title": "Salas de subasta",
+        "p1": "Siempre hay algunas salas abiertas o por abrir: cada pocos minutos una obra del catálogo sale a subasta y la sala dura entre 15 y 30 minutos.",
+        "p2": "El precio solo sube. Si alguien puja en los últimos 30 segundos, el cierre se alarga otros 30. Puedes retirar tu oferta hasta 4 minutos antes del cierre.",
+        "p3": "La cuenta regresiva usa el reloj del servidor, así que todas las personas ven el mismo tiempo."
+      },
+      "wallet": {
+        "title": "Artacoins y bolsillo",
+        "p1": "Las pujas se pagan en artacoins. Se recargan en el bolsillo con un cobro simulado: sirve cualquier tarjeta que no esté vencida.",
+        "p2": "Al ofertar solo se retiene la diferencia con tu oferta anterior. Si pierdes, lo retenido vuelve; si ganas, se cobra, y quien vende recibe el precio menos el 10 % de comisión."
+      },
+      "gallery": {
+        "title": "Tu galería 3D",
+        "p1": "Las obras que ganas cuelgan en tu sala 3D. Puedes recorrerla a pie, acercarte a cada obra y montarla a tu gusto: paredes, suelo, luz y la posición de cada pieza.",
+        "p2": "Las obras públicas también se ven en tu galería pública, y otras personas pueden seguirte."
+      }
+    }
+  },
+  "Artwork": {
+    "work": "Obra",
+    "sheetTitle": "Ficha de la obra",
+    "preparingModel": "Preparando el modelo 3D…",
+    "noCategory": "Sin categoría",
+    "threeD": "Objeto tridimensional",
+    "twoD": "Obra bidimensional",
+    "unclassified": "Formato sin clasificar",
+    "format": {
+      "landscape": "Formato horizontal",
+      "portrait": "Formato vertical",
+      "square": "Formato cuadrado"
+    },
+    "returned": "Un administrador devolvió esta obra",
+    "editAndResend": "Editar y reenviar",
+    "notAudited": "Sin auditar",
+    "unattributed": "Sin atribuir",
+    "unknownYear": "año desconocido",
+    "facts": {
+      "materials": "Materiales",
+      "presentation": "Presentación",
+      "measures": "Medidas",
+      "noMeasures": "Sin medidas en la ficha",
+      "provenance": "Procedencia",
+      "noProvenance": "Sin procedencia en la ficha",
+      "priceBand": "Banda sugerida"
+    },
+    "personalTitle": "Proyecto propio, sin auditar",
+    "personalText": "Su autor la subió para su galería personal. No pasó por la auditoría de autenticidad y no está a la venta.",
+    "audit": {
+      "critical": "La auditoría encontró una inconsistencia crítica.",
+      "clean": "La auditoría no encontró inconsistencias críticas.",
+      "soldWith": "Score de autenticidad con el que se vendió la obra.",
+      "pending": "El reporte de autenticidad aparece cuando termina la auditoría."
+    },
+    "source": {
+      "personal": "Proyecto propio, sin auditar",
+      "manualApproval": "Aprobada por revisión manual de un administrador",
+      "localRules": "Evaluación local (sin IA): la IA no estaba disponible",
+      "systemRule": "Decidió una regla del sistema",
+      "unfinished": "La auditoría automática no terminó",
+      "ai": "Evaluada por la IA ({model})"
+    },
+    "translation": {
+      "automatic": "Traducido automáticamente",
+      "original": "Texto original",
+      "showOriginal": "Ver original",
+      "showTranslation": "Ver traducción"
+    },
+    "auction": {
+      "openNow": "Sala abierta ahora",
+      "scheduled": "Subasta programada",
+      "currentPrice": "Va en {price}",
+      "openingPrice": "Sale en {price}",
+      "openingAt": "Sale en {price} · abre el {date}",
+      "buyNow": "Compra inmediata:",
+      "buyNowWhenOpen": "al abrir la sala",
+      "enterRoom": "Entrar a la sala",
+      "seeRoom": "Ver la sala"
+    },
+    "purchase": {
+      "title": "Ficha guardada de la compra",
+      "byBuyNow": "por compra inmediata",
+      "atAuction": "en subasta",
+      "onArtAuction": "en ArtAuction",
+      "bought": "Comprada {how}",
+      "on": "el {date}",
+      "for": "por {price}",
+      "snapshot": "Es la ficha de la obra tal como estaba al venderse."
+    },
+    "view": "Vista de la obra",
+    "photo": "Foto",
+    "model": "Modelo 3D",
+    "noImage": "Esta obra todavía no tiene una imagen publicada.",
+    "verifiedModel": "Modelo 3D verificado · {triangles} triángulos",
+    "unavailable": {
+      "title": "Esta obra no está disponible",
+      "description": "Puede que sea privada, que se haya vendido o que el enlace esté mal.",
+      "action": "Volver al catálogo",
+      "opening": "Abriendo la ficha…"
+    },
+    "unavailableSheet": {
+      "title": "Esta ficha no está disponible",
+      "description": "Puede que la obra sea privada en esta galería o que el enlace esté mal.",
+      "action": "Ver la galería",
+      "opening": "Abriendo la ficha…"
+    }
+  },
+  "PublicGallery": {
+    "metaTitle": "Galería",
+    "eyebrow": "Colección",
+    "title": "Galería pública",
+    "description": "Las obras públicas de esta colección: lo que su dueño ganó, publicó o creó para su galería. Síguela para ver en tu feed lo que gana.",
+    "empty": {
+      "title": "Todavía no hay obras públicas",
+      "description": "Cuando esta persona gane o publique obras públicas, se verán aquí."
+    },
+    "sources": {
+      "GANADA": "Ganada en subasta",
+      "PROPIA": "De su autoría",
+      "PROYECTO": "Proyecto propio, sin auditar",
+      "other": "En la colección"
+    },
+    "unattributedArtist": "Artista sin atribuir",
+    "follow": {
+      "signIn": "Entrar para seguir",
+      "own": "Es tu galería: ir a la sala 3D",
+      "done": "Ahora sigues esta galería. Su actividad aparecerá en tu feed.",
+      "failed": "No se pudo seguir esta galería.",
+      "following": "Siguiendo",
+      "follow": "Seguir galería"
+    }
+  },
+  "Room": {
+    "metaTitle": "Sala de subasta",
+    "eyebrow": "Sala de subasta",
+    "fallbackTitle": "La puja",
+    "unattributedArtist": "Artista sin atribuir",
+    "workAlt": "Obra en subasta",
+    "seeSheet": "Ver la ficha y el reporte de autenticidad",
+    "preparing": "Preparando la sala…",
+    "unavailable": {
+      "title": "Sala no disponible",
+      "description": "Esta sala no existe o ya no está disponible.",
+      "action": "Ver salas en vivo"
+    },
+    "live": "En vivo",
+    "connecting": "Conectando…",
+    "highestBid": "Oferta más alta",
+    "openingPrice": "Precio de salida",
+    "leaderYou": "La lleva tu oferta",
+    "leader": "La lleva {bidder}",
+    "you": "Tú",
+    "bidder": "Postor {number}",
+    "withdraw": "Retirar mi oferta",
+    "history": "Historial de pujas",
+    "noBids": "Aún no hay pujas. La primera oferta abre en {amount}.",
+    "buyNowTag": "Compra inmediata",
+    "minimumBid": "La oferta mínima es {amount}.",
+    "bidExtended": "Oferta aceptada. El cierre se alargó 30 segundos.",
+    "bidAccepted": "Oferta aceptada: vas ganando con {amount}.",
+    "bidFailed": "La oferta no entró. Intenta de nuevo.",
+    "withdrawn": "Te retiraste. Volvieron {amount} a tu bolsillo.",
+    "withdrawFailed": "No fue posible retirarse.",
+    "bought": "¡La compraste por {amount}! Ya está en tu galería.",
+    "buyFailed": "La compra no se completó. Intenta de nuevo.",
+    "extendedByOther": "Puja en el último momento: el cierre se alargó 30 segundos.",
+    "available": "Disponible: {amount}",
+    "heldHere": "más {amount} ya retenidas en esta sala",
+    "topUp": "Recargar",
+    "withdrawDialog": {
+      "title": "¿Retirar tu oferta?",
+      "confirm": "Retirarme",
+      "body": "Las artacoins retenidas vuelven a tu bolsillo y dejas de competir por esta obra. Solo se puede hasta 4 minutos antes del cierre."
+    },
+    "buyDialog": {
+      "title": "¿Comprar ahora?",
+      "confirm": "Comprar por {price}",
+      "body": "Pagas <strong>{price}</strong>, te llevas la obra y la subasta termina para todos. Quienes pujaron recuperan lo retenido."
+    },
+    "clock": {
+      "unsold": "Cerró sin ventas: se programará otra fecha.",
+      "youBought": "¡La compraste! Ya está en tu galería.",
+      "soldBuyNow": "Se vendió por compra inmediata.",
+      "youWon": "¡Ganaste esta obra! Ya está en tu galería.",
+      "closedWithWinner": "Cerró con un ganador.",
+      "opening": "Abriendo la sala…",
+      "closing": "Cerrando la sala…",
+      "opensIn": "Abre en",
+      "closesIn": "Cierra en"
+    },
+    "bid": {
+      "wantToBid": "¿Quieres pujar?",
+      "signInHint": "Entra con tu cuenta y recarga artacoins en el bolsillo.",
+      "signIn": "Entrar para pujar",
+      "ownWork": "Es tu obra: puedes seguir la sala, pero no ofertar en ella.",
+      "notYet": "Podrás ofertar cuando la sala abra.",
+      "noMore": "La sala ya no recibe ofertas.",
+      "amountLabel": "Tu oferta en artacoins",
+      "minimum": "Mínimo {amount}.",
+      "quick": "Ofertas rápidas",
+      "available": "Disponible: {amount}.",
+      "topUp": "Recargar",
+      "onlyIncrease": "Solo se retiene lo que sube tu oferta.",
+      "submit": "Ofertar",
+      "submitAmount": "Ofertar {amount}"
+    },
+    "buyNow": {
+      "whenOpen": "Compra inmediata al abrir la sala: {price}.",
+      "exceeded": "La compra inmediata ya no está disponible: las pujas llegaron a {threshold}, el 80 % de {price}.",
+      "price": "Compra inmediata: {price}.",
+      "pitch": "¿No quieres esperar? Llévatela ahora y la subasta termina.",
+      "action": "Comprar ahora por {price}"
+    }
+  },
+  "Wallet": {
+    "signInTitle": "Entra para ver tu bolsillo",
+    "loadFailed": "No se pudo abrir el bolsillo.",
+    "payFailed": "La pasarela no completó el cobro. Intenta de nuevo.",
+    "credited": "Entraron {amount} con la tarjeta terminada en {last4}.",
+    "opening": "Abriendo tu bolsillo…",
+    "eyebrow": "Artacoins",
+    "title": "Bolsillo",
+    "description": "Las artacoins son la moneda de la sala. El cobro es simulado: sirve cualquier tarjeta inventada que no esté vencida.",
+    "topUp": "Recargar",
+    "pack": "Paquete",
+    "notStored": "No se guarda el número ni el código.",
+    "charging": "Cobrando…",
+    "pay": "Pagar {amount}",
+    "available": "Disponible",
+    "held": "Retenido en salas",
+    "entriesTitle": "Movimientos",
+    "noEntries": "Aún no hay movimientos. Tu primera recarga aparecerá aquí.",
+    "entries": {
+      "RECARGA": "Recarga",
+      "RETENCION": "Retenido en una sala",
+      "LIBERACION": "Devolución de una sala",
+      "CANJE": "Pago de una obra ganada",
+      "VENTA": "Venta de una obra",
+      "REEMBOLSO": "Reembolso de una compra anulada",
+      "ANULACION": "Venta anulada"
+    }
+  },
+  "Card": {
+    "genericBrand": "Tarjeta",
+    "namePlaceholder": "NOMBRE EN LA TARJETA",
+    "expiryPlaceholder": "MM/AA",
+    "nameLabel": "Nombre en la tarjeta",
+    "numberLabel": "Número de la tarjeta",
+    "numberHint": "Visa, Mastercard, American Express o Diners Club.",
+    "expiryLabel": "Vencimiento",
+    "cvvLabel": "Código de seguridad",
+    "cvvHintFront": "{digits} dígitos, al frente.",
+    "cvvHintBack": "{digits} dígitos, al respaldo.",
+    "numberRequired": "Escribe el número de la tarjeta.",
+    "numberLength": "Una tarjeta {brand} tiene {digits} dígitos.",
+    "expiryRequired": "Escribe el vencimiento.",
+    "expiryFormat": "Escribe el vencimiento como MM/AA.",
+    "expiryMonth": "El mes debe estar entre 01 y 12.",
+    "expired": "La tarjeta está vencida.",
+    "expiryYear": "Revisa el año de vencimiento.",
+    "cvvLength": "El código de seguridad tiene {digits} dígitos.",
+    "nameRequired": "Escribe el nombre como aparece en la tarjeta."
+  },
+  "Events": {
+    "auditApproved": {
+      "title": "Tu obra pasó la auditoría",
+      "body": "Ya está publicada en el catálogo y recibirá su sala de subasta."
+    },
+    "auditManual": {
+      "title": "Tu obra quedó en revisión manual",
+      "body": "La auditoría encontró algo que debe mirar una persona. Te avisaremos al resolverla."
+    },
+    "auditDone": {
+      "title": "Terminó la auditoría de tu obra",
+      "result": "Resultado: {verdict}.",
+      "noResult": "Revisa la ficha para ver el resultado."
+    },
+    "lotReturned": {
+      "title": "{title} volvió a borrador",
+      "genericTitle": "Tu obra volvió a borrador",
+      "reason": "Motivo: {reason} Corrígela y reenvíala a auditoría.",
+      "noReason": "Un administrador la devolvió. Corrígela y reenvíala a auditoría."
+    },
+    "boughtNow": {
+      "title": "Compraste ahora",
+      "body": "Pagaste {amount} y la subasta terminó. La obra ya cuelga en tu galería."
+    },
+    "wonAuction": {
+      "title": "¡Ganaste la subasta!",
+      "body": "Pagaste {amount}. La obra ya cuelga en tu galería."
+    },
+    "soldBuyNow": {
+      "title": "Vendiste por compra inmediata",
+      "body": "Alguien pagó {amount} y cerró la subasta. El pago, menos la comisión, ya está en tu bolsillo."
+    },
+    "sold": {
+      "title": "Vendiste una obra",
+      "body": "La subasta cerró en {amount}. El pago, menos la comisión, ya está en tu bolsillo."
+    },
+    "lostBuyNow": {
+      "title": "La obra se vendió por compra inmediata",
+      "body": "Ya no compites por ella. Lo que tenías retenido volvió a tu bolsillo."
+    },
+    "lost": {
+      "title": "La subasta cerró con otro ganador",
+      "body": "Ya no compites por ella. Lo que tenías retenido volvió a tu bolsillo."
+    },
+    "generic": {
+      "title": "Aviso",
+      "body": "Hay novedades en tu cuenta."
+    },
+    "activity": {
+      "followed": "Siguió a {name}",
+      "boughtNow": "Compró {name} al instante",
+      "won": "Ganó {name}"
+    }
+  },
+  "Feed": {
+    "signInTitle": "Entra para ver la actividad",
+    "eyebrow": "Comunidad",
+    "title": "Actividad",
+    "description": "Lo que pasa con tus obras y con las galerías que sigues.",
+    "loadFailed": "No se pudo cargar la actividad.",
+    "loading": "Cargando actividad…",
+    "empty": {
+      "title": "Aún no hay actividad",
+      "description": "Gana una subasta o sigue la galería de otra persona y su actividad aparecerá aquí.",
+      "action": "Explorar el catálogo"
+    },
+    "you": "Tú",
+    "followed": "Alguien que sigues"
+  },
+  "Notifications": {
+    "signInTitle": "Entra para ver tus avisos",
+    "eyebrow": "Tu cuenta",
+    "title": "Avisos",
+    "description": "Resultados de tus auditorías y de las subastas en las que participaste.",
+    "loadFailed": "No se pudieron cargar los avisos.",
+    "loading": "Cargando avisos…",
+    "empty": {
+      "title": "Sin avisos por ahora",
+      "description": "Cuando termine una auditoría o cierre una subasta en la que participes, lo verás aquí.",
+      "action": "Ver salas en vivo"
+    }
   }
 }

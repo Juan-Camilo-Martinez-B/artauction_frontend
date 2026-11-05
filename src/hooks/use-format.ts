@@ -2,7 +2,7 @@
 
 import { useLocale } from 'next-intl';
 import { useMemo } from 'react';
-import { formatDateTime, formatDecimal, formatInteger, formatMoney, formatRelative } from '@/lib/format';
+import { formatArtacoins, formatDateTime, formatDecimal, formatInteger, formatMoney, formatRelative } from '@/lib/format';
 
 /** Formateadores atados al idioma activo, para componentes de cliente. */
 export function useFormat() {
@@ -15,6 +15,7 @@ export function useFormat() {
       integer: (value: number) => formatInteger(value, locale),
       decimal: (value: number) => formatDecimal(value, locale),
       money: (value: string | number | null | undefined, currency?: string) => formatMoney(value, locale, currency),
+      artacoins: (value: string | number | null | undefined) => formatArtacoins(value, locale),
     }),
     [locale],
   );

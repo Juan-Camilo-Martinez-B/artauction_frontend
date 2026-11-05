@@ -2,6 +2,7 @@
 
 import { Gavel, ShoppingBag, Undo2, Wifi, WifiOff } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { ArtworkImage } from '@/components/artwork-image';
 import { StatusPill } from '@/components/status-pill';
@@ -11,12 +12,13 @@ import { EmptyState, LoadingState, Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { TextField } from '@/components/ui/text-field';
 import { useToast } from '@/components/ui/toast';
+import { useErrorText } from '@/hooks/use-error-text';
 import { useRemaining } from '@/hooks/use-remaining';
-import { ApiError, artApi } from '@/lib/api/client';
+import { artApi } from '@/lib/api/client';
 import type { Auction, WalletSnapshot } from '@/lib/api/types';
 import { buyNowOpen, buyNowThreshold } from '@/lib/auction/buy-now';
-import { canWithdraw, formatArtacoins } from '@/lib/auction/policy';
-import { bidderLabels, mergeBid, nextMinimumBid, quickBids, type RoomPhase } from '@/lib/auction/room';
+import { canWithdraw } from '@/lib/auction/policy';
+import { bidderLabels, mergeBid, nextMinimumBid, quickBids, type BidderLabel, type RoomPhase } from '@/lib/auction/room';
 import { useFormat } from '@/hooks/use-format';
 import { loginHref } from '@/lib/session/next-path';
 import { browserSession, type SessionSnapshot } from '@/lib/session/browser-session';
@@ -30,6 +32,8 @@ const onlyDigits = (raw: string) => raw.replace(/\D+/g, '').slice(0, 9);
  * useLiveAuction.
  */
 export function LiveRoom({ auctionId }: { auctionId: string }) {
+  const t = useTranslations('Room');
+  const errorText = useErrorText();
   const format = useFormat();
   const notify = useToast();
   const { auction, lot, loadError, offsetMs, connected, wallet, session, phase, reload, updateAuction, refreshWallet } = useLiveAuction(auctionId);
@@ -54,7 +58,7 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
     event.preventDefault();
     setError(null);
     if (Number(amount) < minimum) {
-      setError(`La oferta mínima es ${formatArtacoins(minimum)}.`);
+      setError(t('minimumBid', { amount: format.artacoins(minimum) }));
       return;
     }
     const token = await browserSession.accessToken();
@@ -70,10 +74,10 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
         endsAt: placed.endsAt,
         bids: mergeBid(current.bids ?? [], { id: placed.bidId, bidderId: session.profile?.userId ?? '', amount: placed.amount, createdAt: new Date(Date.now() + offsetMs).toISOString(), active: true }),
       }));
-      notify(placed.extended ? 'Oferta aceptada. El cierre se alargó 30 segundos.' : `Oferta aceptada: vas ganando con ${formatArtacoins(placed.amount)}.`, 'success');
+      notify(placed.extended ? t('bidExtended') : t('bidAccepted', { amount: format.artacoins(placed.amount) }), 'success');
       await refreshWallet(token);
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'La oferta no entró. Intenta de nuevo.');
+      setError(errorText(caught, t('bidFailed')));
     } finally {
       setPending(false);
     }
@@ -88,11 +92,11 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
     }
     try {
       const result = await artApi.withdrawBid(token, auctionId);
-      notify(`Te retiraste. Volvieron ${formatArtacoins(result.released)} a tu bolsillo.`, 'success');
+      notify(t('withdrawn', { amount: format.artacoins(result.released) }), 'success');
       await reload();
       await refreshWallet(token);
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : 'No fue posible retirarse.');
+      setError(errorText(caught, t('withdrawFailed')));
     }
   }
 
@@ -114,11 +118,11 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
       buyKey.current = null;
       setConfirmBuyNow(false);
       updateAuction((current) => ({ ...current, status: 'CERRADA', currentPrice: bought.amount, winnerId: session.profile?.userId ?? null, closedBy: 'BUY_NOW', buyNowAvailable: false }));
-      notify(`¡La compraste por ${formatArtacoins(bought.amount)}! Ya está en tu galería.`, 'success');
+      notify(t('bought', { amount: format.artacoins(bought.amount) }), 'success');
       await refreshWallet(token);
     } catch (caught) {
       setConfirmBuyNow(false);
-      setError(caught instanceof ApiError ? caught.message : 'La compra no se completó. Intenta de nuevo.');
+      setError(errorText(caught, t('buyFailed')));
       await reload();
     } finally {
       setBuying(false);
@@ -126,14 +130,15 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
   }
 
   if (loadError) {
-    return <EmptyState icon={<Gavel aria-hidden="true" className="h-6 w-6" />} title="Sala no disponible" description={loadError} action={<ButtonLink href="/catalogo">Ver salas en vivo</ButtonLink>} />;
+    return <EmptyState icon={<Gavel aria-hidden="true" className="h-6 w-6" />} title={t('unavailable.title')} description={t('unavailable.description')} action={<ButtonLink href="/catalogo">{t('unavailable.action')}</ButtonLink>} />;
   }
   if (!auction || !phase) {
-    return <LoadingState label="Preparando la sala…" />;
+    return <LoadingState label={t('preparing')} />;
   }
 
   const viewerId = session.profile?.userId ?? null;
   const labels = bidderLabels(auction.bids ?? [], viewerId);
+  const bidderName = (label: BidderLabel | undefined) => (label?.kind === 'bidder' ? t('bidder', { number: label.number }) : t('you'));
   const history = [...(auction.bids ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const leader = history.find((bid) => bid.active !== false);
   const isSeller = viewerId !== null && viewerId === auction.sellerId;
@@ -148,25 +153,25 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)] lg:items-start">
       <section aria-labelledby="room-title">
-        <p className="text-xs font-medium uppercase tracking-[0.22em] text-oxide">Sala de subasta</p>
+        <p className="text-xs font-medium uppercase tracking-[0.22em] text-oxide">{t('eyebrow')}</p>
         <h1 id="room-title" className="mt-1 font-serif text-4xl leading-tight md:text-5xl">
-          {lot?.title ?? 'La puja'}
+          {lot?.title ?? t('fallbackTitle')}
         </h1>
         {lot ? (
           <p className="mt-2 text-muted">
-            {lot.artistName ?? 'Artista sin atribuir'}
+            {lot.artistName ?? t('unattributedArtist')}
             {lot.creationYear ? ` · ${String(lot.creationYear)}` : ''}
           </p>
         ) : null}
         <div className="mt-6 overflow-hidden rounded-panel border border-line bg-surface p-3 shadow-panel">
           <div className="overflow-hidden rounded-field bg-paper-deep">
-            <ArtworkImage src={lot?.images?.[0]?.url ?? null} alt={lot?.title ?? 'Obra en subasta'} featured />
+            <ArtworkImage src={lot?.images?.[0]?.url ?? null} alt={lot?.title ?? t('workAlt')} featured />
           </div>
         </div>
         {auction.saleDescription ? <p className="mt-6 max-w-prose leading-relaxed">{auction.saleDescription}</p> : null}
         {lot ? (
           <Link href={`/obras/${lot.id}`} className="mt-4 inline-block text-sm font-medium underline underline-offset-4">
-            Ver la ficha y el reporte de autenticidad
+            {t('seeSheet')}
           </Link>
         ) : null}
       </section>
@@ -178,13 +183,17 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
             {session.status === 'authenticated' ? (
               <span className={`inline-flex items-center gap-1.5 text-xs ${connected ? 'text-moss' : 'text-muted'}`}>
                 {connected ? <Wifi aria-hidden="true" className="h-3.5 w-3.5" /> : <WifiOff aria-hidden="true" className="h-3.5 w-3.5" />}
-                {connected ? 'En vivo' : 'Conectando…'}
+                {connected ? t('live') : t('connecting')}
               </span>
             ) : null}
           </div>
-          <p className="mt-4 text-sm text-muted">{leader ? 'Oferta más alta' : 'Precio de salida'}</p>
-          <p className="font-serif text-5xl tabular-nums">{formatArtacoins(auction.currentPrice)}</p>
-          {leader ? <p className="mt-1 text-sm text-muted">La lleva {labels.get(leader.bidderId) === 'Tú' ? 'tu oferta' : labels.get(leader.bidderId)}</p> : null}
+          <p className="mt-4 text-sm text-muted">{leader ? t('highestBid') : t('openingPrice')}</p>
+          <p className="font-serif text-5xl tabular-nums">{format.artacoins(auction.currentPrice)}</p>
+          {leader ? (
+            <p className="mt-1 text-sm text-muted">
+              {labels.get(leader.bidderId)?.kind === 'you' ? t('leaderYou') : t('leader', { bidder: bidderName(labels.get(leader.bidderId)) })}
+            </p>
+          ) : null}
           <PhaseClock auction={auction} phase={phase} offsetMs={offsetMs} viewerId={viewerId} />
         </Panel>
 
@@ -213,24 +222,24 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
           {error ? <Notice tone="error" className="mt-4">{error}</Notice> : null}
           {withdrawAllowed ? (
             <Button variant="ghost" className="mt-3" icon={<Undo2 aria-hidden="true" className="h-4 w-4" />} onClick={() => { setConfirmWithdraw(true); }}>
-              Retirar mi oferta
+              {t('withdraw')}
             </Button>
           ) : null}
         </Panel>
 
         <Panel>
-          <h2 className="font-serif text-xl">Historial de pujas</h2>
+          <h2 className="font-serif text-xl">{t('history')}</h2>
           {history.length === 0 ? (
-            <p className="mt-2 text-sm text-muted">Aún no hay pujas. La primera oferta abre en {formatArtacoins(minimum)}.</p>
+            <p className="mt-2 text-sm text-muted">{t('noBids', { amount: format.artacoins(minimum) })}</p>
           ) : (
             <ol className="mt-3 divide-y divide-line text-sm">
               {history.slice(0, 12).map((bid) => (
                 <li key={bid.id} className={`flex items-baseline justify-between gap-3 py-2 ${bid.active === false ? 'text-muted line-through' : ''}`}>
-                  <span className={labels.get(bid.bidderId) === 'Tú' ? 'font-medium' : ''}>
-                    {labels.get(bid.bidderId)}
-                    {bid.buyNow ? <span className="ml-2 text-xs uppercase tracking-wide text-oxide">Compra inmediata</span> : null}
+                  <span className={labels.get(bid.bidderId)?.kind === 'you' ? 'font-medium' : ''}>
+                    {bidderName(labels.get(bid.bidderId))}
+                    {bid.buyNow ? <span className="ml-2 text-xs uppercase tracking-wide text-oxide">{t('buyNowTag')}</span> : null}
                   </span>
-                  <span className="tabular-nums">{formatArtacoins(bid.amount)}</span>
+                  <span className="tabular-nums">{format.artacoins(bid.amount)}</span>
                   <time dateTime={bid.createdAt} className="w-24 text-right text-xs text-muted">
                     {format.relative(bid.createdAt, new Date(Date.now() + offsetMs))}
                   </time>
@@ -243,19 +252,19 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
 
       <ConfirmDialog
         open={confirmWithdraw}
-        title="¿Retirar tu oferta?"
-        confirmLabel="Retirarme"
+        title={t('withdrawDialog.title')}
+        confirmLabel={t('withdrawDialog.confirm')}
         tone="danger"
         onCancel={() => { setConfirmWithdraw(false); }}
         onConfirm={() => void onWithdraw()}
       >
-        Las artacoins retenidas vuelven a tu bolsillo y dejas de competir por esta obra. Solo se puede hasta 4 minutos antes del cierre.
+        {t('withdrawDialog.body')}
       </ConfirmDialog>
 
       <ConfirmDialog
         open={confirmBuyNow}
-        title="¿Comprar ahora?"
-        confirmLabel={`Comprar por ${formatArtacoins(auction.buyNowPrice ?? 0)}`}
+        title={t('buyDialog.title')}
+        confirmLabel={t('buyDialog.confirm', { price: format.artacoins(auction.buyNowPrice ?? 0) })}
         tone="accent"
         confirmDisabled={buyNowShort}
         confirmLoading={buying}
@@ -263,15 +272,15 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
         onConfirm={() => void onBuyNow()}
       >
         <p>
-          Pagas <strong className="text-ink">{formatArtacoins(auction.buyNowPrice ?? 0)}</strong>, te llevas la obra y la subasta termina para todos. Quienes pujaron recuperan lo retenido.
+          {t.rich('buyDialog.body', { price: format.artacoins(auction.buyNowPrice ?? 0), strong: (chunks) => <strong className="text-ink">{chunks}</strong> })}
         </p>
         {balance !== null ? (
           <p className={`mt-2 ${buyNowShort ? 'text-oxide' : ''}`}>
-            Disponible: {formatArtacoins(balance)}
-            {myHold > 0 ? ` más ${formatArtacoins(myHold)} ya retenidas en esta sala` : ''}.{' '}
+            {t('available', { amount: format.artacoins(balance) })}
+            {myHold > 0 ? ` ${t('heldHere', { amount: format.artacoins(myHold) })}` : ''}.{' '}
             {buyNowShort ? (
               <Link href="/bolsillo" className="font-medium underline underline-offset-4">
-                Recargar
+                {t('topUp')}
               </Link>
             ) : null}
           </p>
@@ -283,6 +292,7 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
 
 /** Reloj de la sala: cuanto falta para abrir o cerrar, o el resultado si ya cerro. */
 function PhaseClock({ auction, phase, offsetMs, viewerId }: { auction: Auction; phase: RoomPhase; offsetMs: number; viewerId: string | null }) {
+  const t = useTranslations('Room.clock');
   const target = phase === 'upcoming' ? (auction.startsAt ?? auction.endsAt) : auction.endsAt;
   const { label } = useRemaining(target, offsetMs);
   if (phase === 'closed') {
@@ -290,26 +300,26 @@ function PhaseClock({ auction, phase, offsetMs, viewerId }: { auction: Auction; 
     const buyNow = auction.closedBy === 'BUY_NOW';
     const text =
       auction.winnerId === null
-        ? 'Cerró sin ventas: se programará otra fecha.'
+        ? t('unsold')
         : buyNow
           ? mine
-            ? '¡La compraste! Ya está en tu galería.'
-            : 'Se vendió por compra inmediata.'
+            ? t('youBought')
+            : t('soldBuyNow')
           : mine
-            ? '¡Ganaste esta obra! Ya está en tu galería.'
-            : 'Cerró con un ganador.';
+            ? t('youWon')
+            : t('closedWithWinner');
     return <Notice tone={auction.winnerId === viewerId ? 'success' : 'info'} className="mt-4">{text}</Notice>;
   }
   if (phase === 'opening' || phase === 'closing') {
     return (
       <p className="mt-4 text-sm text-muted" role="status">
-        {phase === 'opening' ? 'Abriendo la sala…' : 'Cerrando la sala…'}
+        {phase === 'opening' ? t('opening') : t('closing')}
       </p>
     );
   }
   return (
     <div className="mt-4 border-t border-line pt-4">
-      <p className="text-sm text-muted">{phase === 'upcoming' ? 'Abre en' : 'Cierra en'}</p>
+      <p className="text-sm text-muted">{phase === 'upcoming' ? t('opensIn') : t('closesIn')}</p>
       <p className="font-serif text-3xl tabular-nums" role="timer" aria-live="off">
         {label}
       </p>
@@ -342,24 +352,26 @@ function BidArea({
   wallet: WalletSnapshot | null;
   onSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
 }) {
+  const t = useTranslations('Room.bid');
+  const format = useFormat();
   if (session.status !== 'authenticated') {
     return (
       <div>
-        <h2 className="font-serif text-xl">¿Quieres pujar?</h2>
-        <p className="mt-1 text-sm text-muted">Entra con tu cuenta y recarga artacoins en el bolsillo.</p>
+        <h2 className="font-serif text-xl">{t('wantToBid')}</h2>
+        <p className="mt-1 text-sm text-muted">{t('signInHint')}</p>
         <ButtonLink href={loginHref(`/subasta/${auctionId}`)} className="mt-4 w-full">
-          Entrar para pujar
+          {t('signIn')}
         </ButtonLink>
       </div>
     );
   }
   if (isSeller) {
-    return <Notice>Es tu obra: puedes seguir la sala, pero no ofertar en ella.</Notice>;
+    return <Notice>{t('ownWork')}</Notice>;
   }
   if (phase !== 'live') {
     return (
       <p className="text-sm text-muted">
-        {phase === 'upcoming' || phase === 'opening' ? 'Podrás ofertar cuando la sala abra.' : 'La sala ya no recibe ofertas.'}
+        {phase === 'upcoming' || phase === 'opening' ? t('notYet') : t('noMore')}
       </p>
     );
   }
@@ -369,14 +381,14 @@ function BidArea({
     <form noValidate onSubmit={onSubmit}>
       <TextField
         id="bid-amount"
-        label="Tu oferta en artacoins"
+        label={t('amountLabel')}
         inputMode="numeric"
         value={amount}
         format={onlyDigits}
         onValueChange={onAmount}
-        hint={`Mínimo ${formatArtacoins(minimum)}.`}
+        hint={t('minimum', { amount: format.artacoins(minimum) })}
       />
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Ofertas rápidas">
+      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t('quick')}>
         {quickBids(minimum, increment).map((value) => (
           <button
             key={value}
@@ -385,24 +397,24 @@ function BidArea({
             aria-pressed={Number(amount) === value}
             className={`rounded-full border px-3 py-1 text-sm tabular-nums ${Number(amount) === value ? 'border-ink bg-ink text-paper' : 'border-line-strong hover:border-ink'}`}
           >
-            {value.toLocaleString('es-CO')}
+            {format.integer(value)}
           </button>
         ))}
       </div>
       {balance !== null ? (
         <p className={`mt-3 text-sm ${short ? 'text-oxide' : 'text-muted'}`}>
-          Disponible: {formatArtacoins(balance)}.{' '}
+          {t('available', { amount: format.artacoins(balance) })}{' '}
           {short ? (
             <Link href="/bolsillo" className="font-medium underline underline-offset-4">
-              Recargar
+              {t('topUp')}
             </Link>
           ) : (
-            'Solo se retiene lo que sube tu oferta.'
+            t('onlyIncrease')
           )}
         </p>
       ) : null}
       <Button type="submit" variant="accent" loading={pending} className="mt-4 w-full" icon={<Gavel aria-hidden="true" className="h-4 w-4" />}>
-        Ofertar {amount ? formatArtacoins(Number(amount)) : ''}
+        {amount ? t('submitAmount', { amount: format.artacoins(Number(amount)) }) : t('submit')}
       </Button>
     </form>
   );
@@ -427,28 +439,30 @@ function BuyNowArea({
   available: boolean;
   onOpen: () => void;
 }) {
+  const t = useTranslations('Room.buyNow');
+  const format = useFormat();
   if (!auction.buyNowPrice || phase === 'closed' || phase === 'closing') {
     return null;
   }
-  const price = formatArtacoins(auction.buyNowPrice);
+  const price = format.artacoins(auction.buyNowPrice);
   if (phase !== 'live') {
-    return <p className="mt-4 border-t border-line pt-4 text-sm text-muted">Compra inmediata al abrir la sala: {price}.</p>;
+    return <p className="mt-4 border-t border-line pt-4 text-sm text-muted">{t('whenOpen', { price })}</p>;
   }
   if (!available) {
     return (
       <p className="mt-4 border-t border-line pt-4 text-sm text-muted">
-        La compra inmediata ya no está disponible: las pujas llegaron a {formatArtacoins(Math.ceil(buyNowThreshold(auction.buyNowPrice)))}, el 80 % de {price}.
+        {t('exceeded', { threshold: format.artacoins(Math.ceil(buyNowThreshold(auction.buyNowPrice))), price })}
       </p>
     );
   }
   if (!authenticated || isSeller) {
-    return <p className="mt-4 border-t border-line pt-4 text-sm text-muted">Compra inmediata: {price}.</p>;
+    return <p className="mt-4 border-t border-line pt-4 text-sm text-muted">{t('price', { price })}</p>;
   }
   return (
     <div className="mt-4 border-t border-line pt-4">
-      <p className="text-sm text-muted">¿No quieres esperar? Llévatela ahora y la subasta termina.</p>
+      <p className="text-sm text-muted">{t('pitch')}</p>
       <Button variant="primary" className="mt-3 w-full" icon={<ShoppingBag aria-hidden="true" className="h-4 w-4" />} onClick={onOpen}>
-        Comprar ahora por {price}
+        {t('action', { price })}
       </Button>
     </div>
   );

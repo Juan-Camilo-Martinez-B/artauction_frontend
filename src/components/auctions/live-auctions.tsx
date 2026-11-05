@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArtworkImage } from '@/components/artwork-image';
 import { ButtonLink } from '@/components/ui/button';
+import { useFormat } from '@/hooks/use-format';
 import { useRemaining } from '@/hooks/use-remaining';
 import { artApi } from '@/lib/api/client';
 import type { Lot } from '@/lib/api/types';
-import { formatArtacoins } from '@/lib/auction/policy';
 import { clockOffset } from '@/lib/clock';
 
 // La cartelera cambia cada pocos minutos: se refresca sola y al volver a la pestaña.
@@ -22,6 +23,7 @@ type State = { status: 'loading' } | { status: 'error' } | { status: 'ready'; it
  * siempre algunas en cartelera; cada tarjeta lleva a su sala.
  */
 export function LiveAuctions({ limit = 8, showCatalogLink = false }: { limit?: number; showCatalogLink?: boolean }) {
+  const t = useTranslations('LiveAuctions');
   const [state, setState] = useState<State>({ status: 'loading' });
   const pending = useRef(false);
 
@@ -62,24 +64,24 @@ export function LiveAuctions({ limit = 8, showCatalogLink = false }: { limit?: n
         <div>
           <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-oxide">
             <span aria-hidden="true" className="h-2 w-2 animate-pulse rounded-full bg-oxide" />
-            Sala abierta
+            {t('eyebrow')}
           </p>
           <h2 id="live-auctions-title" className="mt-1 font-serif text-3xl">
-            En vivo y próximas
+            {t('title')}
           </h2>
-          <p className="mt-1 text-sm text-muted">Cada pocos minutos abre una sala nueva con una obra del catálogo.</p>
+          <p className="mt-1 text-sm text-muted">{t('description')}</p>
         </div>
         {showCatalogLink ? (
           <ButtonLink href="/catalogo" variant="secondary" size="sm">
-            Ver todo el catálogo
+            {t('toCatalog')}
           </ButtonLink>
         ) : null}
       </div>
       {state.status === 'loading' ? <LiveSkeleton /> : null}
-      {state.status === 'error' ? <p className="text-sm text-muted">La cartelera no está disponible en este momento.</p> : null}
+      {state.status === 'error' ? <p className="text-sm text-muted">{t('unavailable')}</p> : null}
       {state.status === 'ready' && state.items.length === 0 ? (
         <p className="rounded-panel border border-dashed border-line-strong px-6 py-8 text-center text-sm text-muted">
-          Estamos preparando la próxima sala. Vuelve en unos minutos.
+          {t('empty')}
         </p>
       ) : null}
       {state.status === 'ready' && state.items.length > 0 ? (
@@ -96,6 +98,8 @@ export function LiveAuctions({ limit = 8, showCatalogLink = false }: { limit?: n
 }
 
 function LiveCard({ lot, offsetMs, onElapsed }: { lot: LiveLot; offsetMs: number; onElapsed: () => void }) {
+  const t = useTranslations('LiveAuctions');
+  const format = useFormat();
   const { auction } = lot;
   const live = auction.status === 'ACTIVA';
   const target = live ? auction.endsAt : (auction.startsAt ?? auction.endsAt);
@@ -124,25 +128,25 @@ function LiveCard({ lot, offsetMs, onElapsed }: { lot: LiveLot; offsetMs: number
           }`}
         >
           {live ? <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> : null}
-          {live ? 'En vivo' : 'Próxima'}
+          {live ? t('live') : t('upcoming')}
         </span>
       </div>
       <div className="flex flex-1 flex-col p-4">
         <h3 className="line-clamp-2 font-serif text-lg leading-snug group-hover:underline">{lot.title}</h3>
-        <p className="mt-0.5 truncate text-xs text-muted">{lot.artistName ?? 'Artista sin atribuir'}</p>
+        <p className="mt-0.5 truncate text-xs text-muted">{lot.artistName ?? t('unattributedArtist')}</p>
         <dl className="mt-auto flex items-end pt-3 justify-between gap-2 text-sm">
           <div>
-            <dt className="text-xs text-muted">{live ? 'Precio actual' : 'Salida'}</dt>
-            <dd className="font-medium">{formatArtacoins(auction.currentPrice)}</dd>
+            <dt className="text-xs text-muted">{live ? t('currentPrice') : t('openingPrice')}</dt>
+            <dd className="font-medium">{format.artacoins(auction.currentPrice)}</dd>
           </div>
           <div className="text-right">
-            <dt className="text-xs text-muted">{live ? 'Cierra en' : 'Abre en'}</dt>
-            <dd className="font-medium tabular-nums">{elapsed ? (live ? 'Cerrando…' : 'Abriendo…') : label}</dd>
+            <dt className="text-xs text-muted">{live ? t('closesIn') : t('opensIn')}</dt>
+            <dd className="font-medium tabular-nums">{elapsed ? (live ? t('closing') : t('opening')) : label}</dd>
           </div>
         </dl>
         {auction.buyNowPrice && (auction.buyNowAvailable || !live) ? (
           <p className="mt-2 text-xs text-muted">
-            Compra inmediata: <span className="font-medium text-ink">{formatArtacoins(auction.buyNowPrice)}</span>
+            {t('buyNow')} <span className="font-medium text-ink">{format.artacoins(auction.buyNowPrice)}</span>
           </p>
         ) : null}
       </div>

@@ -41,9 +41,9 @@ describe('número de tarjeta', () => {
   });
 
   it('exige la longitud de la marca', () => {
-    expect(cardNumberError('')).toBe('Escribe el número de la tarjeta.');
-    expect(cardNumberError('4242 4242')).toBe('Una tarjeta Visa tiene 16 dígitos.');
-    expect(cardNumberError('3782 822463 1000')).toBe('Una tarjeta American Express tiene 15 dígitos.');
+    expect(cardNumberError('')).toBe('numberRequired');
+    expect(cardNumberError('4242 4242')).toBe('numberLength');
+    expect(cardNumberError('3782 822463 1000')).toBe('numberLength');
     expect(cardNumberError('1234 5678 9012 3456')).toBeUndefined();
   });
 
@@ -69,15 +69,15 @@ describe('vencimiento', () => {
 
   it('acepta el mes en curso y rechaza el anterior', () => {
     expect(expiryError('11/26', NOW)).toBeUndefined();
-    expect(expiryError('10/26', NOW)).toBe('La tarjeta está vencida.');
-    expect(expiryError('01/20', NOW)).toBe('La tarjeta está vencida.');
+    expect(expiryError('10/26', NOW)).toBe('expired');
+    expect(expiryError('01/20', NOW)).toBe('expired');
   });
 
   it('explica los formatos inválidos', () => {
-    expect(expiryError('', NOW)).toBe('Escribe el vencimiento.');
-    expect(expiryError('12/3', NOW)).toBe('Escribe el vencimiento como MM/AA.');
-    expect(expiryError('13/30', NOW)).toBe('El mes debe estar entre 01 y 12.');
-    expect(expiryError('12/99', NOW)).toBe('Revisa el año de vencimiento.');
+    expect(expiryError('', NOW)).toBe('expiryRequired');
+    expect(expiryError('12/3', NOW)).toBe('expiryFormat');
+    expect(expiryError('13/30', NOW)).toBe('expiryMonth');
+    expect(expiryError('12/99', NOW)).toBe('expiryYear');
   });
 
   it('convierte MM/AA en mes y año completos', () => {
@@ -90,13 +90,13 @@ describe('código de seguridad y nombre', () => {
   it('limita el código al largo de la marca', () => {
     expect(formatCvv('12345', 'visa')).toBe('123');
     expect(formatCvv('12a345', 'amex')).toBe('1234');
-    expect(cvvError('123', 'amex')).toBe('El código de seguridad tiene 4 dígitos.');
+    expect(cvvError('123', 'amex')).toBe('cvvLength');
     expect(cvvError('123', 'visa')).toBeUndefined();
   });
 
   it('deja el nombre como viene impreso', () => {
     expect(formatCardName('  leo   vásquez 3')).toBe('LEO VÁSQUEZ ');
-    expect(cardNameError('LE')).toBe('Escribe el nombre como aparece en la tarjeta.');
+    expect(cardNameError('LE')).toBe('nameRequired');
     expect(cardNameError('LEO')).toBeUndefined();
   });
 });

@@ -2,7 +2,10 @@ import { requestLocale } from '@/i18n/request';
 import { artApi, publicApiUrl } from './client';
 import type { CatalogPage, Category, GalleryItem, Lot } from './types';
 
-export async function getPublicLots(query = ''): Promise<{ catalog: CatalogPage; error: string | null }> {
+/** Por que no hay catalogo: el gateway respondio con error o no hubo conexion. La pagina lo traduce. */
+export type CatalogError = 'unavailable' | 'offline';
+
+export async function getPublicLots(query = ''): Promise<{ catalog: CatalogPage; error: CatalogError | null }> {
   try {
     const response = await fetch(`${serverApiUrl()}/lots${query}`, {
       // El idioma va en la cabecera: la cache de Next guarda una respuesta por idioma.
@@ -10,11 +13,11 @@ export async function getPublicLots(query = ''): Promise<{ catalog: CatalogPage;
       next: { revalidate: 60, tags: ['catalog'] },
     });
     if (!response.ok) {
-      return { catalog: { items: [], total: 0, page: 1, pageSize: 12 }, error: 'El catálogo no está disponible.' };
+      return { catalog: { items: [], total: 0, page: 1, pageSize: 12 }, error: 'unavailable' };
     }
     return { catalog: (await response.json()) as CatalogPage, error: null };
   } catch {
-    return { catalog: { items: [], total: 0, page: 1, pageSize: 12 }, error: 'No hay conexión con la sala.' };
+    return { catalog: { items: [], total: 0, page: 1, pageSize: 12 }, error: 'offline' };
   }
 }
 

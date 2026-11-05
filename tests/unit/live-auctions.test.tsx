@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { renderWithIntl } from '../intl';
 import { describe, expect, it, vi } from 'vitest';
 import type { LiveAuctions as LiveAuctionsResponse, Lot } from '@/lib/api/types';
 
@@ -38,7 +39,7 @@ describe('cartelera en vivo', () => {
         lot('l2', 'Jarrón', { id: 'a2', status: 'PROGRAMADA', currentPrice: '300.00', startsAt: '2026-11-02T15:03:00.000Z', endsAt: '2026-11-02T15:23:00.000Z' }),
       ],
     });
-    render(<LiveAuctions />);
+    renderWithIntl(<LiveAuctions />);
 
     const live = await screen.findByRole('link', { name: /Marina/ });
     expect(live).toHaveAttribute('href', '/subasta/a1');
@@ -55,7 +56,7 @@ describe('cartelera en vivo', () => {
 
   it('avisa cuando no hay salas en cartelera', async () => {
     liveAuctions.mockResolvedValue({ serverTime: SERVER_TIME, items: [] });
-    render(<LiveAuctions />);
+    renderWithIntl(<LiveAuctions />);
     expect(await screen.findByText(/preparando la próxima sala/)).toBeInTheDocument();
   });
 });
