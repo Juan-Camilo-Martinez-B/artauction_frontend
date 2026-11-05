@@ -71,7 +71,7 @@ Los hooks que sirven a una sola pantalla viven junto a ella. En `app/(private)/p
 La sala personal (`/mi-galeria`) simula una galería real con React Three Fiber.
 
 - **Sala.** Paredes, suelo, techo y pedestales usan texturas PBR CC0 de Poly Haven (`public/textures`, con créditos en su README), repetidas a su tamaño real. El yeso y el concreto toman de la textura solo el relieve y la rugosidad, y el color de la paleta. Luz ambiental, un entorno de paneles de luz para los reflejos y un foco por obra (hasta 8 murales y 4 objetos).
-- **Obras murales.** La imagen real de la obra con su tamaño en centímetros, y un marco según el soporte:
+- **Obras murales.** La imagen real de la obra, con un marco que sigue su proporción y según el soporte. Se exhiben a su tamaño en centímetros, salvo las pequeñas, que se amplían enteras hasta 80 cm de lado mayor para verse desde la sala:
   - moldura dorada para un óleo;
   - marco negro con paspartú y vidrio para obras sobre papel o fotografías;
   - marco flotante para arte digital;

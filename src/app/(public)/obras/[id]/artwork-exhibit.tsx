@@ -50,7 +50,9 @@ export function ArtworkExhibit({ lot, purchase = null }: { lot: Lot; purchase?: 
   const [showOriginal, setShowOriginal] = useState(false);
   const image = lot.images?.find((item) => item.url)?.url ?? null;
   const [format, setFormat] = useState<ImageFormat | null>(null);
-  const orientation = format?.orientation() ?? 'pending';
+  const photoOrientation = format?.orientation() ?? 'pending';
+  // Una obra con modelo 3D conserva sus dos columnas: la estructura no depende de la vista elegida ni de la foto.
+  const orientation = lot.model?.url ? 'portrait' : photoOrientation;
   const category = categoryName(lot.categories?.find((link) => link.isPrimary)?.category) ?? t('noCategory');
   const representation =
     lot.representationKind === 'THREE_D' ? t('threeD') : lot.representationKind === 'TWO_D' ? t('twoD') : t('unclassified');
@@ -67,6 +69,7 @@ export function ArtworkExhibit({ lot, purchase = null }: { lot: Lot; purchase?: 
         model={lot.model?.url ? lot.model : null}
         alt={texts.title}
         orientation={orientation}
+        photoOrientation={photoOrientation}
         caption={format ? t(`format.${format.orientation()}`) : t('work')}
         onMeasure={(width, height) => { setFormat(new ImageFormat(width, height)); }}
       />
@@ -213,13 +216,17 @@ function ArtworkFrame({
   model,
   alt,
   orientation,
+  photoOrientation,
   caption,
   onMeasure,
 }: {
   src: string | null;
   model: LotModel | null;
   alt: string;
+  /** Estructura de la ficha. */
   orientation: ImageOrientation | 'pending';
+  /** Forma de la foto: decide como se ajusta la imagen. */
+  photoOrientation: ImageOrientation | 'pending';
   caption: string;
   onMeasure: (width: number, height: number) => void;
 }) {
@@ -253,7 +260,7 @@ function ArtworkFrame({
             src={src}
             alt={alt}
             onLoad={(event) => { onMeasure(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight); }}
-            className={imageClass(orientation)}
+            className={imageClass(photoOrientation)}
           />
         ) : (
           <div className="grid min-h-72 place-items-center bg-[linear-gradient(160deg,#f7f1e6,#e4d5c3)] px-6 text-center text-sm text-muted">

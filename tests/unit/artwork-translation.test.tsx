@@ -27,6 +27,33 @@ const TRANSLATED: Lot = {
   original: { title: 'Estatua gótica', description: 'Figura envuelta en un manto.', materials: 'Piedra', provenance: null },
 };
 
+describe('estructura de una obra con modelo 3D', () => {
+  const MODEL_LOT: Lot = {
+    ...BASE,
+    representationKind: 'THREE_D',
+    images: [{ url: 'https://media.example/foto.jpg' }] as Lot['images'],
+    model: { url: 'https://media.example/modelo.glb', triangleCount: 5000 } as Lot['model'],
+  };
+
+  it('mantiene las dos columnas al entrar y al alternar entre el modelo y la foto', () => {
+    const { container } = renderWithIntl(<ArtworkExhibit lot={MODEL_LOT} />);
+    const layout = () => container.querySelector('article')?.className;
+    const initial = layout();
+    expect(initial).toContain('lg:grid-cols');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Foto' }));
+    const photo = screen.getByRole('img', { name: MODEL_LOT.title });
+    // Una foto apaisada tampoco cambia la estructura.
+    Object.defineProperty(photo, 'naturalWidth', { value: 1600 });
+    Object.defineProperty(photo, 'naturalHeight', { value: 900 });
+    fireEvent.load(photo);
+    expect(layout()).toBe(initial);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Modelo 3D' }));
+    expect(layout()).toBe(initial);
+  });
+});
+
 describe('ficha traducida automaticamente', () => {
   it('avisa de la traduccion y alterna con el original en el mismo lugar', () => {
     renderWithIntl(<ArtworkExhibit lot={TRANSLATED} />, { locale: 'en' });

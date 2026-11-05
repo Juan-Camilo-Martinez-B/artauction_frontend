@@ -1,6 +1,6 @@
 import type { GalleryConfig, Lot } from '@/lib/api/types';
 
-// Montaje de la sala: tamano real de cada obra, geometria de las paredes y el
+// Montaje de la sala: tamano de exhibicion de cada obra, geometria de las paredes y el
 // plan de colgado automatico. Todo en metros, con el origen en el centro del
 // suelo: x hacia la derecha, z hacia el frente (donde entra el visitante).
 
@@ -63,7 +63,14 @@ export function canExhibit(lot: Pick<Lot, 'representationKind' | 'model'>): bool
 const MAX_SIZE: ArtworkSize = { width: 4, height: 2.6, depth: 3 };
 
 /**
- * Tamano real de la obra en metros. Si no cabe en la sala se reduce entera, con
+ * Lado mayor minimo de una obra mural en la sala. A tamano real, una acuarela de
+ * 18 cm o un cromo de 7 cm apenas se distinguen desde el centro de la sala.
+ */
+const MIN_WALL_SIDE = 0.8;
+
+/**
+ * Tamano de exhibicion en metros: el real, salvo que una obra mural pequena se
+ * amplia entera hasta MIN_WALL_SIDE. Si no cabe en la sala se reduce entera, con
  * el mismo factor en las tres medidas: limitar cada una por separado deformaba
  * la pieza (una estatua alta quedaba ancha y achatada).
  */
@@ -73,8 +80,26 @@ export function artworkSize(lot: Pick<Lot, 'widthCm' | 'heightCm' | 'depthCm' | 
   const width = centimeters(lot.widthCm) ?? fallback.width;
   const height = centimeters(lot.heightCm) ?? fallback.height;
   const depth = object ? (centimeters(lot.depthCm) ?? width) : DEFAULT_2D.depth;
-  const fit = Math.min(1, MAX_SIZE.width / width, MAX_SIZE.height / height, object ? MAX_SIZE.depth / depth : 1);
+  const grow = object ? 1 : Math.max(1, MIN_WALL_SIDE / Math.max(width, height));
+  const fit = Math.min(grow, MAX_SIZE.width / width, MAX_SIZE.height / height, object ? MAX_SIZE.depth / depth : grow);
   return { width: width * fit, height: height * fit, depth: object ? depth * fit : depth };
+}
+
+/**
+ * Ajusta una obra mural a la proporcion real de su imagen, para no deformarla
+ * cuando las medidas declaradas no coinciden. Conserva el lado mayor y no se
+ * sale de lo que cabe en la sala.
+ */
+export function fitSizeToImage(size: ArtworkSize, imageWidth: number, imageHeight: number): ArtworkSize {
+  if (!(imageWidth > 0) || !(imageHeight > 0)) {
+    return size;
+  }
+  const ratio = imageWidth / imageHeight;
+  const longest = Math.max(size.width, size.height);
+  const width = ratio >= 1 ? longest : longest * ratio;
+  const height = ratio >= 1 ? longest / ratio : longest;
+  const fit = Math.min(1, MAX_SIZE.width / width, MAX_SIZE.height / height);
+  return { width: width * fit, height: height * fit, depth: size.depth };
 }
 
 export function wallLength(side: WallSide, room: Room): number {

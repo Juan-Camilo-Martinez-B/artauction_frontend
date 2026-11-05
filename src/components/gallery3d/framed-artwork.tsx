@@ -5,9 +5,9 @@ import type { ThreeEvent } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { SRGBColorSpace, type Object3D, type SpotLight, type Texture } from 'three';
 import type { Lot } from '@/lib/api/types';
-import { fitFrameToSize, frameStyle, type FrameStyle } from '@/lib/gallery/frames';
+import { frameStyle, type FrameStyle } from '@/lib/gallery/frames';
 import { textureSource } from '@/lib/gallery/image-source';
-import type { ArtworkSize, Placement } from '@/lib/gallery/layout';
+import { fitSizeToImage, type ArtworkSize, type Placement } from '@/lib/gallery/layout';
 import { LABEL_ASPECT, labelTexture } from './label-texture';
 import { SceneBoundary } from './scene-boundary';
 
@@ -35,9 +35,36 @@ export interface ArtworkViewProps {
 
 /** Obra mural enmarcada, con su foco y su cartela. */
 export function FramedArtwork(props: ArtworkViewProps) {
-  const { id, lot, placement, size, onSelect } = props;
-  const style = useMemo(() => fitFrameToSize(frameStyle(lot), size), [lot, size]);
+  const { lot, placement } = props;
   const source = textureSource(lot.images?.[0]?.url);
+  // Sin imagen, o mientras carga, la obra se monta con sus medidas declaradas.
+  const blank = <MountedArtwork {...props} shown={props.size} texture={null} />;
+
+  return (
+    <group position={[placement.posX, placement.posY, placement.posZ]} rotation={[0, placement.rotY, 0]} scale={placement.scale}>
+      <SceneBoundary fallback={blank}>
+        <Suspense fallback={blank}>{source ? <LoadedArtwork {...props} url={source} /> : blank}</Suspense>
+      </SceneBoundary>
+      {props.lit ? <ArtworkLight {...props} /> : null}
+    </group>
+  );
+}
+
+/** Con la imagen cargada, el marco toma su proporcion real: la obra no se deforma ni sobra paspartu. */
+function LoadedArtwork({ url, ...props }: ArtworkViewProps & { url: string }) {
+  const texture = useTexture(url);
+  useEffect(() => {
+    texture.colorSpace = SRGBColorSpace;
+    texture.anisotropy = 8;
+    texture.needsUpdate = true;
+  }, [texture]);
+  const image = texture.image as { width: number; height: number };
+  return <MountedArtwork {...props} shown={fitSizeToImage(props.size, image.width, image.height)} texture={texture} />;
+}
+
+/** Marco, obra, vidrio y cartela, todos con el tamano que se muestra. */
+function MountedArtwork({ id, lot, placement, selected, unattributed, onSelect, shown, texture }: ArtworkViewProps & { shown: ArtworkSize; texture: Texture | null }) {
+  const style = useMemo(() => frameStyle(lot), [lot]);
 
   function onClick(event: ThreeEvent<MouseEvent>) {
     event.stopPropagation();
@@ -47,30 +74,15 @@ export function FramedArtwork(props: ArtworkViewProps) {
   }
 
   return (
-    <group position={[placement.posX, placement.posY, placement.posZ]} rotation={[0, placement.rotY, 0]} scale={placement.scale}>
+    <>
       <group onClick={onClick} onPointerOver={() => { document.body.style.cursor = 'pointer'; }} onPointerOut={() => { document.body.style.cursor = ''; }}>
-        <Frame style={style} size={size} selected={props.selected} />
-        <SceneBoundary fallback={<Canvas size={size} texture={null} />}>
-          <Suspense fallback={<Canvas size={size} texture={null} />}>
-            {source ? <LoadedCanvas url={source} size={size} /> : <Canvas size={size} texture={null} />}
-          </Suspense>
-        </SceneBoundary>
-        {style.glass ? <Glass size={size} style={style} /> : null}
+        <Frame style={style} size={shown} selected={selected} />
+        <Canvas size={shown} texture={texture} />
+        {style.glass ? <Glass size={shown} style={style} /> : null}
       </group>
-      <Label lot={lot} unattributed={props.unattributed} x={(size.width + 2 * (style.width + style.mat)) / 2 + 0.22} y={LABEL_HEIGHT - placement.posY} scale={placement.scale} />
-      {props.lit ? <ArtworkLight {...props} /> : null}
-    </group>
+      <Label lot={lot} unattributed={unattributed} x={(shown.width + 2 * (style.width + style.mat)) / 2 + 0.22} y={LABEL_HEIGHT - placement.posY} scale={placement.scale} />
+    </>
   );
-}
-
-function LoadedCanvas({ url, size }: { url: string; size: ArtworkSize }) {
-  const texture = useTexture(url);
-  useEffect(() => {
-    texture.colorSpace = SRGBColorSpace;
-    texture.anisotropy = 8;
-    texture.needsUpdate = true;
-  }, [texture]);
-  return <Canvas size={size} texture={texture} />;
 }
 
 /** La obra en si: un plano con la imagen, o un lienzo neutro si no hay imagen. */
