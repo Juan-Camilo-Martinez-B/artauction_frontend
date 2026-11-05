@@ -168,7 +168,12 @@ export function LiveRoom({ auctionId }: { auctionId: string }) {
             <ArtworkImage src={lot?.images?.[0]?.url ?? null} alt={lot?.title ?? t('workAlt')} featured />
           </div>
         </div>
-        {auction.saleDescription ? <p className="mt-6 max-w-prose leading-relaxed">{auction.saleDescription}</p> : null}
+        {/* Se guarda en el idioma del autor: con la ficha traducida se muestra su descripcion. */}
+        {lot?.translated ? (
+          <p className="mt-6 max-w-prose leading-relaxed">{lot.description}</p>
+        ) : auction.saleDescription ? (
+          <p className="mt-6 max-w-prose leading-relaxed">{auction.saleDescription}</p>
+        ) : null}
         {lot ? (
           <Link href={`/obras/${lot.id}`} className="mt-4 inline-block text-sm font-medium underline underline-offset-4">
             {t('seeSheet')}

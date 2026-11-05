@@ -173,7 +173,8 @@
     "loading": "Loading…",
     "cancel": "Cancel",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "closeNotice": "Close notice"
   },
   "Session": {
     "checking": "Checking your session…",

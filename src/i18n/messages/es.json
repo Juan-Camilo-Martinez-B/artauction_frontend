@@ -173,7 +173,8 @@
     "loading": "Cargando…",
     "cancel": "Cancelar",
     "showPassword": "Mostrar contraseña",
-    "hidePassword": "Ocultar contraseña"
+    "hidePassword": "Ocultar contraseña",
+    "closeNotice": "Cerrar aviso"
   },
   "Session": {
     "checking": "Comprobando tu sesión…",

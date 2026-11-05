@@ -109,7 +109,8 @@ export function ArtworkExhibit({ lot, purchase = null }: { lot: Lot; purchase?: 
               <Fact label={t('facts.priceBand')} value={`${formatter.money(lot.suggestedPriceMin)} – ${formatter.money(lot.suggestedPriceMax)}`} />
             )}
           </dl>
-          {lot.auction?.saleDescription ? <p className="mt-6 max-w-prose leading-relaxed">{lot.auction.saleDescription}</p> : null}
+          {/* Se guarda en el idioma del autor: repite la ficha, asi que con la ficha traducida no se muestra. */}
+          {lot.auction?.saleDescription && !lot.translated ? <p className="mt-6 max-w-prose leading-relaxed">{lot.auction.saleDescription}</p> : null}
           {lot.auction && lot.auction.status !== 'CERRADA' ? <AuctionCall auction={lot.auction} /> : null}
         </section>
         {purchase ? <PurchaseNotice purchase={purchase} wide={orientation === 'landscape'} /> : null}
