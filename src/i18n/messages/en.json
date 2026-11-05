@@ -157,9 +157,7 @@
     "name": "Name",
     "email": "Email",
     "password": "Password",
-    "passwordHint": "At least {min} characters, no spaces.",
-    "sellerTitle": "I want to publish works",
-    "sellerHint": "Your account will be able to send works to audit and auction them."
+    "passwordHint": "At least {min} characters, no spaces."
   },
   "Validation": {
     "emailRequired": "Enter your email.",
