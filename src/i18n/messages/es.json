@@ -157,9 +157,7 @@
     "name": "Nombre",
     "email": "Correo",
     "password": "Contraseña",
-    "passwordHint": "Mínimo {min} caracteres, sin espacios.",
-    "sellerTitle": "Quiero publicar obras",
-    "sellerHint": "Tu cuenta podrá enviar obras a auditoría y subastarlas."
+    "passwordHint": "Mínimo {min} caracteres, sin espacios."
   },
   "Validation": {
     "emailRequired": "Escribe tu correo.",

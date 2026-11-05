@@ -22,7 +22,6 @@ export default function RegisterPage() {
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [seller, setSeller] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const { touch, visibleError, attemptSubmit } = useFormValidation(accountErrors(validateRegistration({ displayName, email, password })));
@@ -40,11 +39,10 @@ export default function RegisterPage() {
         email: cleanEmail,
         password,
         displayName: displayName.trim(),
-        role: seller ? 'SELLER' : 'USER',
       });
       const tokens = await artApi.login(cleanEmail, password);
       await browserSession.establish(tokens);
-      router.push(seller ? '/publicar' : '/catalogo');
+      router.push('/catalogo');
     } catch (caught) {
       setError(errorText(caught, t('registerFailed')));
       setPending(false);
@@ -90,18 +88,6 @@ export default function RegisterPage() {
           onBlur={() => { touch('password'); }}
           error={visibleError('password')}
         />
-        <label className="flex items-start gap-3 rounded-field border border-line bg-paper px-3 py-3 text-sm">
-          <input
-            type="checkbox"
-            className="mt-0.5 h-4 w-4 accent-oxide"
-            checked={seller}
-            onChange={(event) => { setSeller(event.target.checked); }}
-          />
-          <span>
-            <span className="block font-medium">{t('sellerTitle')}</span>
-            <span className="text-muted">{t('sellerHint')}</span>
-          </span>
-        </label>
         {error ? <Notice tone="error">{error}</Notice> : null}
         <Button type="submit" variant="accent" loading={pending} className="w-full">
           {pending ? t('creatingAccount') : t('createAccount')}
