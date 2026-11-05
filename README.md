@@ -108,6 +108,11 @@ La interfaz está en español e inglés con [next-intl](https://next-intl.dev), 
 - **Sala 3D.** El `Canvas` de three no lee el idioma: los textos de las cartelas entran a la escena como datos.
 - **Lo que no se traduce.** Los títulos en la galería pública y en la actividad, los hallazgos de auditoría del panel de administración y el resumen de una sala ya generada vienen del backend en su idioma original.
 
+## Dependencias
+
+- `overrides` en `package.json` sube la `postcss` que `next` fija por dentro, vulnerable hasta 8.5.22. Se puede quitar cuando `next` traiga una versión corregida.
+- `vite` queda en 7 de forma explícita: `vitest` 5 instalaría `vite` 8, que necesita `rolldown`, y npm deja sus binarios opcionales fuera del lockfile.
+
 ## Convenciones
 
 - Commits en [Conventional Commits](https://www.conventionalcommits.org/): `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`, `build`.
