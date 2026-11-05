@@ -14,8 +14,14 @@ function cached<T extends Intl.DateTimeFormat | Intl.RelativeTimeFormat | Intl.N
   return formatter;
 }
 
+/**
+ * Zona horaria de la plataforma. Va fija porque el servidor corre en UTC y el
+ * navegador en la suya: con horas distintas, React rechaza el HTML del servidor.
+ */
+export const PLATFORM_TIME_ZONE = 'America/Bogota';
+
 const dateTime = (locale: Locale) =>
-  cached(`dt:${locale}`, () => new Intl.DateTimeFormat(INTL_LOCALE[locale], { dateStyle: 'medium', timeStyle: 'short' }));
+  cached(`dt:${locale}`, () => new Intl.DateTimeFormat(INTL_LOCALE[locale], { dateStyle: 'medium', timeStyle: 'short', timeZone: PLATFORM_TIME_ZONE }));
 const relative = (locale: Locale) => cached(`rel:${locale}`, () => new Intl.RelativeTimeFormat(INTL_LOCALE[locale], { numeric: 'auto' }));
 const integer = (locale: Locale) => cached(`int:${locale}`, () => new Intl.NumberFormat(INTL_LOCALE[locale], { maximumFractionDigits: 0 }));
 const decimal = (locale: Locale) => cached(`dec:${locale}`, () => new Intl.NumberFormat(INTL_LOCALE[locale], { maximumFractionDigits: 2 }));
