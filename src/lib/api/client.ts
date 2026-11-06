@@ -247,6 +247,12 @@ export const artApi = {
   follow(token: string, userId: string) {
     return api<{ status: string }>(`/users/${userId}/follow`, { method: 'POST', token });
   },
+  unfollow(token: string, userId: string) {
+    return api<{ status: string }>(`/users/${userId}/follow`, { method: 'DELETE', token });
+  },
+  following(token: string) {
+    return api<string[]>('/me/following', { token });
+  },
   feed(token: string) {
     return api<ActivityItem[]>('/feed', { token });
   },

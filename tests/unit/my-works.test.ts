@@ -25,7 +25,7 @@ function lot(id: string, status: string, extra: Partial<Lot> = {}): Lot {
 }
 
 function item(lotId: string, source: GalleryItem['source']): GalleryItem {
-  return { ownerId: 's1', lotId, source, visibility: 'PRIVATE', title: lotId, artistName: null, imageKeys: [], acquiredAt: '2026-11-03T00:00:00Z' };
+  return { ownerId: 's1', lotId, source, visibility: 'PRIVATE', title: lotId, artistName: null, imageKeys: [], acquiredAt: '2026-11-03T00:00:00Z', previewUrl: null };
 }
 
 const returned = lot('devuelta', 'BORRADOR', { lastReview: { decision: 'RETURN_TO_DRAFT', reason: 'Corrige el año declarado.', createdAt: null } });

@@ -113,6 +113,10 @@ La interfaz está en español e inglés con [next-intl](https://next-intl.dev), 
 - `overrides` en `package.json` sube la `postcss` que `next` fija por dentro, vulnerable hasta 8.5.22. Se puede quitar cuando `next` traiga una versión corregida.
 - `vite` queda en 7 de forma explícita: `vitest` 5 instalaría `vite` 8, que necesita `rolldown`, y npm deja sus binarios opcionales fuera del lockfile.
 
+## Explorar galerías
+
+`/explorar` lista las galerías con obras públicas, con una muestra de cuatro obras, cifras y un botón para seguir. `/galerias/<id>` muestra la galería completa. Ambas se renderizan en cada petición: el idioma sale de una cookie, y declararlas estáticas produce un 500 solo en producción (`DYNAMIC_SERVER_USAGE`), nunca en desarrollo.
+
 ## Convenciones
 
 - Commits en [Conventional Commits](https://www.conventionalcommits.org/): `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`, `build`.

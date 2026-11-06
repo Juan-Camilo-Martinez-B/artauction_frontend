@@ -13,6 +13,7 @@ export async function SiteFooter() {
         </div>
         <ul className="space-y-1.5">
           <li><Link href="/catalogo" className="hover:text-ink">{t('catalog')}</Link></li>
+          <li><Link href="/explorar" className="hover:text-ink">{t('explore')}</Link></li>
           <li><Link href="/mi-galeria" className="hover:text-ink">{t('myGallery')}</Link></li>
           <li><Link href="/como-funciona" className="hover:text-ink">{t('howItWorks')}</Link></li>
         </ul>

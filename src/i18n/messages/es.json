@@ -9,6 +9,7 @@
   },
   "Nav": {
     "catalog": "Catálogo",
+    "explore": "Explorar",
     "myGallery": "Mi galería",
     "howItWorks": "Cómo funciona",
     "openMenu": "Abrir el menú",
@@ -37,6 +38,7 @@
   "Footer": {
     "tagline": "Subastas de arte y antigüedades con auditoría de autenticidad. El reloj de cada sala es el del servidor.",
     "catalog": "Catálogo y salas en vivo",
+    "explore": "Explorar galerías",
     "myGallery": "Mi galería 3D",
     "howItWorks": "Cómo funciona",
     "wallet": "Bolsillo de artacoins",
@@ -412,8 +414,33 @@
       "opening": "Abriendo la ficha…"
     }
   },
+  "Explore": {
+    "metaTitle": "Explorar galerías",
+    "eyebrow": "Comunidad",
+    "title": "Explorar galerías",
+    "description": "Descubre lo que coleccionan y crean otras personas. Sigue las galerías que te gusten para ver su actividad en tu feed.",
+    "sortLabel": "Ordenar galerías",
+    "sort": {
+      "recent": "Recientes",
+      "popular": "Populares"
+    },
+    "empty": {
+      "title": "Todavía no hay galerías públicas",
+      "description": "Cuando alguien publique una obra o muestre un proyecto propio, su galería aparecerá aquí."
+    },
+    "failed": "No pudimos cargar las galerías. Intenta de nuevo en un momento.",
+    "open": "Ver la galería de {name}",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "page": "Página {page} de {pages}",
+    "pagination": "Páginas de galerías"
+  },
   "PublicGallery": {
     "metaTitle": "Galería",
+    "back": "Explorar galerías",
+    "ownerDescription": "Las obras que esta persona muestra al público.",
+    "works": "{count, plural, one {# obra} other {# obras}}",
+    "followers": "{count, plural, one {# seguidor} other {# seguidores}}",
     "eyebrow": "Colección",
     "title": "Galería pública",
     "description": "Las obras públicas de esta colección: lo que su dueño ganó, publicó o creó para su galería. Síguela para ver en tu feed lo que gana.",
@@ -423,7 +450,7 @@
     },
     "sources": {
       "GANADA": "Ganada en subasta",
-      "PROPIA": "De su autoría",
+      "PROPIA": "En el catálogo",
       "PROYECTO": "Proyecto propio, sin auditar",
       "other": "En la colección"
     },
@@ -434,7 +461,10 @@
       "done": "Ahora sigues esta galería. Su actividad aparecerá en tu feed.",
       "failed": "No se pudo seguir esta galería.",
       "following": "Siguiendo",
-      "follow": "Seguir galería"
+      "follow": "Seguir",
+      "unfollow": "Dejar de seguir",
+      "unfollowDone": "Ya no sigues esta galería.",
+      "unfollowFailed": "No se pudo dejar de seguir esta galería."
     }
   },
   "Room": {
