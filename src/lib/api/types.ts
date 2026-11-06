@@ -191,6 +191,26 @@ export interface GalleryItem {
   artistName: string | null;
   imageKeys: string[];
   acquiredAt: string;
+  /** Primera imagen; null si la obra no tiene o aun no se pudo obtener. */
+  previewUrl: string | null;
+}
+
+/** Una galeria con obras publicas, tal como se muestra al explorar. */
+export interface PublicGallery {
+  ownerId: string;
+  displayName: string;
+  avatarUrl: string | null;
+  workCount: number;
+  followerCount: number;
+  latestAt: string | null;
+  previews: GalleryItem[];
+}
+
+export interface PublicGalleriesPage {
+  items: PublicGallery[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 export interface ActivityItem {

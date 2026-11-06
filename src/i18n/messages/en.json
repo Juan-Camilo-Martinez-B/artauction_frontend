@@ -9,6 +9,7 @@
   },
   "Nav": {
     "catalog": "Catalog",
+    "explore": "Explore",
     "myGallery": "My gallery",
     "howItWorks": "How it works",
     "openMenu": "Open menu",
@@ -35,6 +36,7 @@
     "unit": "AC"
   },
   "Footer": {
+    "explore": "Explore galleries",
     "tagline": "Art and antiques auctions with authenticity audits. Every room runs on the server's clock.",
     "catalog": "Catalog and live rooms",
     "myGallery": "My 3D gallery",
@@ -412,8 +414,33 @@
       "opening": "Opening the sheet…"
     }
   },
+  "Explore": {
+    "metaTitle": "Explore galleries",
+    "eyebrow": "Community",
+    "title": "Explore galleries",
+    "description": "Discover what other people collect and create. Follow the galleries you like to see their activity in your feed.",
+    "sortLabel": "Sort galleries",
+    "sort": {
+      "recent": "Recent",
+      "popular": "Popular"
+    },
+    "empty": {
+      "title": "No public galleries yet",
+      "description": "When someone publishes a work or shows a personal project, their gallery will appear here."
+    },
+    "failed": "We could not load the galleries. Try again in a moment.",
+    "open": "View {name}'s gallery",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {pages}",
+    "pagination": "Gallery pages"
+  },
   "PublicGallery": {
     "metaTitle": "Gallery",
+    "back": "Explore galleries",
+    "ownerDescription": "The works this person shows to the public.",
+    "works": "{count, plural, one {# work} other {# works}}",
+    "followers": "{count, plural, one {# follower} other {# followers}}",
     "eyebrow": "Collection",
     "title": "Public gallery",
     "description": "The public works in this collection: what its owner won, published or created for their gallery. Follow it to see what they win in your feed.",
@@ -423,7 +450,7 @@
     },
     "sources": {
       "GANADA": "Won at auction",
-      "PROPIA": "Their own work",
+      "PROPIA": "In the catalog",
       "PROYECTO": "Personal project, not audited",
       "other": "In the collection"
     },
@@ -434,7 +461,10 @@
       "done": "You now follow this gallery. Its activity will appear in your feed.",
       "failed": "We could not follow this gallery.",
       "following": "Following",
-      "follow": "Follow gallery"
+      "follow": "Follow",
+      "unfollow": "Unfollow",
+      "unfollowDone": "You no longer follow this gallery.",
+      "unfollowFailed": "We could not unfollow this gallery."
     }
   },
   "Room": {

@@ -1,6 +1,7 @@
 import { requestLocale } from '@/i18n/request';
 import { artApi, publicApiUrl } from './client';
-import type { CatalogPage, Category, GalleryItem, Lot } from './types';
+import { EXPLORE_PAGE_SIZE, type ExploreSort } from '@/lib/social/explore';
+import type { CatalogPage, Category, GalleryItem, Lot, PublicGalleriesPage, PublicGallery } from './types';
 
 /** Por que no hay catalogo: el gateway respondio con error o no hubo conexion. La pagina lo traduce. */
 export type CatalogError = 'unavailable' | 'offline';
@@ -42,6 +43,27 @@ export async function getLot(id: string): Promise<Lot | null> {
       return null;
     }
     return (await response.json()) as Lot;
+  } catch {
+    return null;
+  }
+}
+
+/** Galerias para explorar; null si el API no respondio, para no confundirlo con una lista vacia. */
+export async function getPublicGalleries(page: number, sort: ExploreSort): Promise<PublicGalleriesPage | null> {
+  try {
+    const query = new URLSearchParams({ page: String(page), pageSize: String(EXPLORE_PAGE_SIZE), sort });
+    const response = await fetch(`${serverApiUrl()}/galleries?${query.toString()}`, { cache: 'no-store' });
+    return response.ok ? ((await response.json()) as PublicGalleriesPage) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Cabecera de una galeria; null si la persona no existe o su perfil es privado. */
+export async function getGallerySummary(ownerId: string): Promise<PublicGallery | null> {
+  try {
+    const response = await fetch(`${serverApiUrl()}/galleries/${ownerId}/summary`, { cache: 'no-store' });
+    return response.ok ? ((await response.json()) as PublicGallery) : null;
   } catch {
     return null;
   }
