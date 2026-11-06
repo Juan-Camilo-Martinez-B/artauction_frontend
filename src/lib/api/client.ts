@@ -8,6 +8,7 @@ import type {
   CatalogPage,
   Category,
   GalleryItem,
+  GalleryRoom,
   LiveAuctions,
   Lot,
   LotModel,
@@ -240,6 +241,10 @@ export const artApi = {
   gallery(ownerId: string, token?: string | null) {
     return api<GalleryItem[]>(`/galleries/${ownerId}`, { token });
   },
+  /** La sala 3D de una galeria; responde 404 si es privada, salvo a su duena. */
+  galleryRoom(ownerId: string, token?: string | null) {
+    return api<GalleryRoom>(`/galleries/${ownerId}/room`, { token });
+  },
   /** Ficha guardada de una obra comprada; sin sesion solo responde si la obra es publica. */
   purchasedSheet(ownerId: string, lotId: string, token?: string | null) {
     return api<PurchasedSheet>(`/galleries/${ownerId}/works/${lotId}`, { token });
@@ -267,6 +272,13 @@ export const artApi = {
   },
   myGallery(token: string) {
     return api<PersonalGallery>('/me/gallery', { token });
+  },
+  setGalleryVisibility(token: string, visibility: 'PUBLIC' | 'PRIVATE') {
+    return api<PersonalGallery>('/me/gallery/visibility', { method: 'PATCH', token, body: JSON.stringify({ visibility }) });
+  },
+  /** Muestra u oculta una obra comprada en la galeria de quien la compro. */
+  setItemVisibility(token: string, lotId: string, visibility: 'PUBLIC' | 'PRIVATE') {
+    return api<GalleryItem>(`/me/gallery/items/${lotId}/visibility`, { method: 'PATCH', token, body: JSON.stringify({ visibility }) });
   },
   generateGallery(token: string, preferences: unknown, random = false, replaceApplied = false) {
     return api<PersonalGallery>('/me/gallery/generate', {

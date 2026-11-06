@@ -312,6 +312,7 @@ export interface PersonalGallery {
   id: string;
   ownerId: string;
   name: string;
+  visibility: 'PUBLIC' | 'PRIVATE';
   customizationStatus: 'SIN_PERSONALIZAR' | 'PERSONALIZADA' | 'EDITADA';
   preferences: Record<string, unknown>;
   suggestedConfig: GalleryConfig | null;
@@ -328,3 +329,6 @@ export interface PersonalGallery {
     lot: Lot;
   }>;
 }
+
+/** La sala tal como la ve un visitante. */
+export type GalleryRoom = Pick<PersonalGallery, 'ownerId' | 'visibility' | 'appliedConfig' | 'artworks'>;

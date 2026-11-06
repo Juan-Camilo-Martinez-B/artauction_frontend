@@ -143,7 +143,8 @@
     "VALIDATION_FAILED": "Revisa los datos: hay campos incompletos o con un formato no válido.",
     "INVALID_JSON": "La solicitud llegó dañada. Intenta de nuevo.",
     "PAYLOAD_TOO_LARGE": "Lo que enviaste es demasiado grande.",
-    "INTERNAL": "Algo falló de nuestro lado. Intenta de nuevo."
+    "INTERNAL": "Algo falló de nuestro lado. Intenta de nuevo.",
+    "ITEM_VISIBILITY_LOCKED": "La visibilidad de esta obra no se cambia desde aquí."
   },
   "Auth": {
     "loginEyebrow": "Tu cuenta",
@@ -418,7 +419,7 @@
     "metaTitle": "Explorar galerías",
     "eyebrow": "Comunidad",
     "title": "Explorar galerías",
-    "description": "Descubre lo que coleccionan y crean otras personas. Sigue las galerías que te gusten para ver su actividad en tu feed.",
+    "description": "Recorre en 3D las galerías que otras personas abrieron al público. Sigue las que te gusten para ver su actividad en tu feed.",
     "sortLabel": "Ordenar galerías",
     "sort": {
       "recent": "Recientes",
@@ -426,7 +427,7 @@
     },
     "empty": {
       "title": "Todavía no hay galerías públicas",
-      "description": "Cuando alguien publique una obra o muestre un proyecto propio, su galería aparecerá aquí."
+      "description": "Cuando alguien abra su galería al público, aparecerá aquí."
     },
     "failed": "No pudimos cargar las galerías. Intenta de nuevo en un momento.",
     "open": "Ver la galería de {name}",
@@ -438,22 +439,11 @@
   "PublicGallery": {
     "metaTitle": "Galería",
     "back": "Explorar galerías",
-    "ownerDescription": "Las obras que esta persona muestra al público.",
+    "ownerDescription": "Recorre la sala 3D que esta persona abrió al público.",
     "works": "{count, plural, one {# obra} other {# obras}}",
     "followers": "{count, plural, one {# seguidor} other {# seguidores}}",
     "eyebrow": "Colección",
     "title": "Galería pública",
-    "description": "Las obras públicas de esta colección: lo que su dueño ganó, publicó o creó para su galería. Síguela para ver en tu feed lo que gana.",
-    "empty": {
-      "title": "Todavía no hay obras públicas",
-      "description": "Cuando esta persona gane o publique obras públicas, se verán aquí."
-    },
-    "sources": {
-      "GANADA": "Ganada en subasta",
-      "PROPIA": "En el catálogo",
-      "PROYECTO": "Proyecto propio, sin auditar",
-      "other": "En la colección"
-    },
     "unattributedArtist": "Artista sin atribuir",
     "follow": {
       "signIn": "Entrar para seguir",
@@ -465,7 +455,22 @@
       "unfollow": "Dejar de seguir",
       "unfollowDone": "Ya no sigues esta galería.",
       "unfollowFailed": "No se pudo dejar de seguir esta galería."
-    }
+    },
+    "opening": "Abriendo la sala…",
+    "roomFailed": "No pudimos abrir esta sala. Intenta de nuevo en un momento.",
+    "closed": {
+      "title": "Esta galería es privada",
+      "description": "Solo su dueño puede verla. Si la abre al público, aparecerá aquí y en Explorar."
+    },
+    "ownerPublic": "Tu galería es pública: así la ven los visitantes, solo con las obras colgadas que marcaste como públicas.",
+    "ownerPrivate": "Tu galería es privada: nadie más puede abrir esta página. Así la verían los visitantes si la haces pública.",
+    "manage": "Gestionar mi galería",
+    "empty": {
+      "title": "Todavía no hay obras expuestas",
+      "description": "Cuando esta persona cuelgue obras públicas en su sala, se verán aquí.",
+      "owner": "Cuelga obras en tu sala y márcalas como públicas desde Mis obras."
+    },
+    "worksTitle": "Obras de esta sala"
   },
   "Room": {
     "metaTitle": "Sala de subasta",
@@ -900,7 +905,9 @@
       "unhangFailed": "No se pudo quitar la obra de la sala.",
       "moved": "{title} entró a la auditoría.",
       "moveFailed": "No se pudo pasar la obra al catálogo."
-    }
+    },
+    "roomPrivate": "Tu galería es privada: nadie más ve estas obras, aunque estén marcadas como públicas.",
+    "roomPrivateLink": "Ábrela desde Mi galería."
   },
   "Studio": {
     "defaultName": "Mi galería",
@@ -1023,6 +1030,21 @@
       "loadFailed": "No se pudo cargar el modelo 3D. Prueba de nuevo más tarde.",
       "label": "Modelo 3D de {title}. Arrastra para girarlo.",
       "hint": "Arrastra para girar · rueda o pellizca para acercar"
+    },
+    "visibility": {
+      "label": "Quién ve tu galería",
+      "privateTitle": "Tu galería es privada",
+      "publicTitle": "Tu galería es pública",
+      "privateHint": "Solo tú puedes verla y no aparece en Explorar.",
+      "publicHint": "Cualquier persona puede recorrerla y aparece en Explorar.",
+      "worksHint": "Los visitantes solo ven las obras colgadas que marques como públicas en Mis obras.",
+      "preview": "Ver como visitante",
+      "myWorks": "Mis obras",
+      "makePublic": "Hacer pública",
+      "makePrivate": "Hacer privada",
+      "nowPublic": "Tu galería ya es pública.",
+      "nowPrivate": "Tu galería ahora es privada.",
+      "failed": "No se pudo cambiar quién ve tu galería."
     }
   },
   "Admin": {
