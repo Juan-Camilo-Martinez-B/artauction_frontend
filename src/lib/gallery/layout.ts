@@ -19,6 +19,11 @@ export interface Placement {
   support: string;
 }
 
+/** La colocacion guardada de una obra colgada. */
+export function storedPlacement(artwork: Placement): Placement {
+  return { posX: artwork.posX, posY: artwork.posY, posZ: artwork.posZ, rotY: artwork.rotY, scale: artwork.scale, support: artwork.support };
+}
+
 export interface ArtworkSize {
   width: number;
   height: number;

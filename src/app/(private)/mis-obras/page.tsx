@@ -52,6 +52,7 @@ interface WorkActions {
   resubmit: (lot: Lot) => void;
   toCatalog: (lot: Lot) => void;
   toggleVisibility: (lot: Lot) => void;
+  toggleItemVisibility: (item: GalleryItem) => void;
   toggleHang: (lotId: string, title: string) => void;
 }
 
@@ -77,6 +78,7 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
   const sells = canSell(profile.role);
   const [works, setWorks] = useState<MyWork[] | null>(null);
   const [hung, setHung] = useState<ReadonlySet<string>>(new Set());
+  const [roomIsPublic, setRoomIsPublic] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [moving, setMoving] = useState<Lot | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -104,6 +106,7 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
     );
     if (room.status === 'fulfilled') {
       setHung(new Set(room.value.artworks.map((artwork) => artwork.lotId)));
+      setRoomIsPublic(room.value.visibility === 'PUBLIC');
     }
   }, [profile.userId, errorText, t]);
 
@@ -147,6 +150,15 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
         t('actions.visibilityFailed'),
       );
     },
+    toggleItemVisibility: (item) => {
+      const next = item.visibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
+      void run(
+        item.lotId,
+        (token) => artApi.setItemVisibility(token, item.lotId, next),
+        next === 'PUBLIC' ? t('actions.nowPublic', { title: item.title }) : t('actions.nowPrivate', { title: item.title }),
+        t('actions.visibilityFailed'),
+      );
+    },
     toggleHang: (lotId, title) => {
       const hanging = !hung.has(lotId);
       void run(
@@ -182,6 +194,14 @@ function MyWorks({ profile }: { profile: AccountProfile }) {
         }
       />
       {error ? <Notice tone="error" className="mb-6">{error}</Notice> : null}
+      {roomIsPublic ? null : (
+        <Notice className="mb-6">
+          {t('roomPrivate')}{' '}
+          <Link href="/mi-galeria" className="underline">
+            {t('roomPrivateLink')}
+          </Link>
+        </Notice>
+      )}
       {works === null ? <LoadingState label={t('loading')} /> : null}
       {works?.length === 0 ? (
         <EmptyState
@@ -392,7 +412,16 @@ function WonRow({ item, actions }: { item: GalleryItem; actions: WorkActions }) 
         </span>
         <time dateTime={item.acquiredAt}>{format.dateTime(item.acquiredAt)}</time>
       </div>
-      <div className="mt-3">
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant="secondary"
+          loading={actions.busy === item.lotId}
+          icon={item.visibility === 'PUBLIC' ? <EyeOff aria-hidden="true" className="h-4 w-4" /> : <Eye aria-hidden="true" className="h-4 w-4" />}
+          onClick={() => { actions.toggleItemVisibility(item); }}
+        >
+          {item.visibility === 'PUBLIC' ? t('makePrivate') : t('makePublic')}
+        </Button>
         <HangButton lotId={item.lotId} title={item.title} actions={actions} />
       </div>
     </article>

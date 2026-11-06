@@ -2,11 +2,11 @@
 
 import { Footprints, LayoutGrid, Move3d, Sparkles } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArtworkCard } from '@/components/gallery3d/artwork-card';
 import { AmbiencePanel } from '@/components/gallery3d/ambience-panel';
 import type { SceneArtwork, SceneMode } from '@/components/gallery3d/gallery-scene';
+import { LazyGalleryScene } from '@/components/gallery3d/lazy-gallery-scene';
 import { PlacementPanel } from '@/components/gallery3d/placement-panel';
 import { RequireSession } from '@/components/session/require-session';
 import { TouchPad } from '@/components/gallery3d/touch-pad';
@@ -17,22 +17,13 @@ import { LoadingState, PageHeader, Panel } from '@/components/ui/layout';
 import { Notice } from '@/components/ui/notice';
 import { useToast } from '@/components/ui/toast';
 import { useErrorText } from '@/hooks/use-error-text';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import { artApi } from '@/lib/api/client';
 import type { GalleryConfig, PersonalGallery } from '@/lib/api/types';
 import { DEFAULT_GALLERY_CONFIG, sameConfig } from '@/lib/gallery/default-config';
-import { artworkSize, hangingPlan, hasOverlaps, isObjectLot, objectTop, roomOf, viewpointFor, type Placement } from '@/lib/gallery/layout';
+import { artworkSize, hangingPlan, hasOverlaps, isObjectLot, objectTop, roomOf, storedPlacement, viewpointFor, type Placement } from '@/lib/gallery/layout';
 import { browserSession } from '@/lib/session/browser-session';
-
-// La escena 3D solo existe en el navegador: se carga aparte para no pesar en el primer render.
-const GalleryScene = dynamic(() => import('@/components/gallery3d/gallery-scene').then((module) => module.GalleryScene), {
-  ssr: false,
-  loading: () => <SceneLoading />,
-});
-
-function SceneLoading() {
-  const t = useTranslations('Studio');
-  return <div className="flex h-full items-center justify-center text-sm text-paper/80">{t('preparing')}</div>;
-}
+import { GalleryVisibility } from './gallery-visibility';
 
 /** Nombre con que gallery-service crea cada sala; es el nombre por omision, no uno elegido. */
 const DEFAULT_GALLERY_NAME = 'Mi galería';
@@ -41,25 +32,9 @@ type LoadState = { status: 'loading' } | { status: 'error'; message: string } | 
 
 type GalleryArtwork = PersonalGallery['artworks'][number];
 
-function storedPlacement(artwork: GalleryArtwork): Placement {
-  return { posX: artwork.posX, posY: artwork.posY, posZ: artwork.posZ, rotY: artwork.rotY, scale: artwork.scale, support: artwork.support };
-}
-
 function samePlacement(a: Placement, b: Placement): boolean {
   const close = (x: number, y: number) => Math.abs(x - y) < 1e-4;
   return close(a.posX, b.posX) && close(a.posY, b.posY) && close(a.posZ, b.posZ) && close(a.rotY, b.rotY) && close(a.scale, b.scale) && a.support === b.support;
-}
-
-function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReduced(query.matches);
-    const onChange = (event: MediaQueryListEvent) => { setReduced(event.matches); };
-    query.addEventListener('change', onChange);
-    return () => { query.removeEventListener('change', onChange); };
-  }, []);
-  return reduced;
 }
 
 export function GalleryStudio() {
@@ -303,8 +278,11 @@ function Studio() {
         }
       />
 
+      {/* Cambiar quien la ve no toca los cambios de la sala sin guardar. */}
+      <GalleryVisibility gallery={gallery} onChange={(next) => { setState({ status: 'ready', gallery: next }); }} />
+
       <div ref={viewport} className="relative h-[72vh] min-h-[28rem] scroll-mt-6 overflow-hidden rounded-panel border border-line bg-ink shadow-panel">
-        <GalleryScene
+        <LazyGalleryScene
           config={config}
           artworks={sceneArtworks}
           mode={mode}

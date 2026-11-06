@@ -115,7 +115,9 @@ La interfaz está en español e inglés con [next-intl](https://next-intl.dev), 
 
 ## Explorar galerías
 
-`/explorar` lista las galerías con obras públicas, con una muestra de cuatro obras, cifras y un botón para seguir. `/galerias/<id>` muestra la galería completa. Ambas se renderizan en cada petición: el idioma sale de una cookie, y declararlas estáticas produce un 500 solo en producción (`DYNAMIC_SERVER_USAGE`), nunca en desarrollo.
+`/explorar` lista las galerías que sus dueños abrieron al público, con una muestra de cuatro obras, cifras y un botón para seguir. `/galerias/<id>` abre la sala 3D de esa persona en modo recorrido, con la lista de sus obras debajo para ir directo a cada una.
+
+Cada galería es privada hasta que su dueño la hace pública desde **Mi galería**. Un visitante solo ve las obras colgadas y marcadas como públicas; las compradas se muestran u ocultan desde **Mis obras**. Si la galería es privada, la página le dice a cualquier otra persona que lo es; a su dueño le muestra cómo la verían los visitantes.
 
 ## Convenciones
 
@@ -178,7 +180,7 @@ Reemplaza a «Mi colección» (`/galeria`), que listaba las mismas obras propias
 |---|---|
 | `/` y `/como-funciona` | SSG |
 | `/catalogo` | ISR 60 s, tag `catalog` |
-| `/galerias/[ownerId]` | ISR 60 s, tags `gallery` y `gallery:{ownerId}` |
+| `/galerias/[ownerId]` | Por petición; la sala se pide en el navegador con la sesión de quien mira |
 | `/obras/[id]` | SSR con `Suspense` (ficha y puntaje por separado) |
 | `/subasta/[id]` | Esqueleto SSR y sala en cliente |
 | `/entrar` y `/registro` | Cliente. El access token queda en `sessionStorage`; el refresh, en cookie `httpOnly` |

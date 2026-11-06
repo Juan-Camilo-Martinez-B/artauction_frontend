@@ -1,7 +1,7 @@
 import { requestLocale } from '@/i18n/request';
 import { artApi, publicApiUrl } from './client';
 import { EXPLORE_PAGE_SIZE, type ExploreSort } from '@/lib/social/explore';
-import type { CatalogPage, Category, GalleryItem, Lot, PublicGalleriesPage, PublicGallery } from './types';
+import type { CatalogPage, Category, Lot, PublicGalleriesPage, PublicGallery } from './types';
 
 /** Por que no hay catalogo: el gateway respondio con error o no hubo conexion. La pagina lo traduce. */
 export type CatalogError = 'unavailable' | 'offline';
@@ -66,21 +66,6 @@ export async function getGallerySummary(ownerId: string): Promise<PublicGallery 
     return response.ok ? ((await response.json()) as PublicGallery) : null;
   } catch {
     return null;
-  }
-}
-
-export async function getPublicGallery(ownerId: string): Promise<GalleryItem[]> {
-  try {
-    const response = await fetch(`${serverApiUrl()}/galleries/${ownerId}`, {
-      next: { revalidate: 60, tags: ['gallery', `gallery:${ownerId}`] },
-    });
-    if (!response.ok) {
-      return [];
-    }
-    const items = (await response.json()) as GalleryItem[];
-    return items.filter((item) => item.visibility === 'PUBLIC');
-  } catch {
-    return [];
   }
 }
 
