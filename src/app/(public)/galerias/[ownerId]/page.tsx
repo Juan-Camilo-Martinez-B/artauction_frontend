@@ -56,7 +56,7 @@ export default async function PublicGalleryPage({ params }: { params: Promise<{ 
           {items.map((item) => (
             <li key={item.lotId} className="flex flex-col overflow-hidden rounded-panel border border-line bg-surface">
               <Link href={item.source === 'GANADA' ? purchasedSheetHref(item.ownerId, item.lotId) : `/obras/${item.lotId}`} className="group flex flex-1 flex-col">
-                <span className="block aspect-[4/3] w-full bg-paper">
+                <span className="block aspect-[4/3] w-full overflow-hidden bg-paper">
                   <ArtworkImage src={item.previewUrl} alt="" cover />
                 </span>
                 <span className="block p-5">
