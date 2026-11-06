@@ -932,7 +932,7 @@
     "restore": "Back to the assistant's proposal",
     "removed": "{title} left your gallery.",
     "removeFailed": "We could not remove the work.",
-    "tourHint": "Drag to look · WASD or arrows to walk · click a work to get closer",
+    "tourHint": "WASD to walk · arrows or drag to look · click a work to get closer",
     "editHint": "Choose a work to move it · drag to turn the view",
     "overlap": "Some works overlap. Go to <strong>Edit layout</strong> and use <strong>Arrange automatically</strong>.",
     "empty": {
@@ -1045,6 +1045,11 @@
       "nowPublic": "Your gallery is now public.",
       "nowPrivate": "Your gallery is now private.",
       "failed": "Could not change who sees your gallery."
+    },
+    "fullscreen": {
+      "enter": "Full screen",
+      "exit": "Exit",
+      "failed": "Could not open full screen."
     }
   },
   "Admin": {

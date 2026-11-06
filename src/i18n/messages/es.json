@@ -932,7 +932,7 @@
     "restore": "Volver a la propuesta del asistente",
     "removed": "{title} salió de tu galería.",
     "removeFailed": "No se pudo retirar la obra.",
-    "tourHint": "Arrastra para mirar · WASD o flechas para caminar · clic en una obra para acercarte",
+    "tourHint": "WASD para caminar · flechas o arrastrar para mirar · clic en una obra para acercarte",
     "editHint": "Elige una obra para moverla · arrastra para girar la vista",
     "overlap": "Hay obras superpuestas. Entra en <strong>Editar montaje</strong> y usa <strong>Organizar automáticamente</strong>.",
     "empty": {
@@ -1045,6 +1045,11 @@
       "nowPublic": "Tu galería ya es pública.",
       "nowPrivate": "Tu galería ahora es privada.",
       "failed": "No se pudo cambiar quién ve tu galería."
+    },
+    "fullscreen": {
+      "enter": "Pantalla completa",
+      "exit": "Salir",
+      "failed": "No se pudo abrir la pantalla completa."
     }
   },
   "Admin": {

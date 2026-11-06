@@ -4,6 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef, type RefObject } from 'react';
 import { Vector3 } from 'three';
 import { VISITOR_EYE, type Room } from '@/lib/gallery/layout';
+import { isTourKey, tourInput } from '@/lib/gallery/tour-input';
 
 /** Movimiento pedido desde los botones en pantalla (tactil): -1, 0 o 1. */
 export interface MoveIntent {
@@ -25,20 +26,12 @@ export interface Viewpoint {
 const WALK_SPEED = 1.5;
 const RUN_SPEED = 3;
 const TURN_SPEED = 1.6;
+const TILT_SPEED = 1.1;
 const LOOK_SENSITIVITY = 0.0032;
 const MAX_PITCH = 0.75;
 const BODY_RADIUS = 0.35;
 const WALL_MARGIN = 0.45;
 const FOCUS_SECONDS = 0.9;
-
-const KEYS = {
-  forward: ['KeyW', 'ArrowUp'],
-  back: ['KeyS', 'ArrowDown'],
-  left: ['KeyA'],
-  right: ['KeyD'],
-  turnLeft: ['ArrowLeft', 'KeyQ'],
-  turnRight: ['ArrowRight', 'KeyE'],
-};
 
 function isTyping(target: EventTarget | null): boolean {
   return target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
@@ -66,9 +59,10 @@ function shortestAngle(from: number, to: number): number {
 
 /**
  * Recorrido a pie: la camara va a la altura de los ojos, arrastrar mira
- * alrededor, WASD o flechas caminan (Shift corre) y Q/E o flechas laterales
- * giran. No atraviesa paredes ni pedestales. Con `focus`, la camara viaja hasta
- * el punto de vista de la obra; caminar de nuevo deja ese modo.
+ * alrededor, WASD camina (Shift corre) y las flechas mueven la camara hacia los
+ * cuatro lados; Q/E tambien giran. No atraviesa paredes ni pedestales. Con
+ * `focus`, la camara viaja hasta el punto de vista de la obra; moverse de nuevo
+ * deja ese modo.
  */
 export function TourControls({
   room,
@@ -126,8 +120,7 @@ export function TourControls({
       if (isTyping(event.target)) {
         return;
       }
-      const all = Object.values(KEYS).flat();
-      if (all.includes(event.code)) {
+      if (isTourKey(event.code)) {
         event.preventDefault();
         keys.current.add(event.code);
       }
@@ -189,12 +182,12 @@ export function TourControls({
 
   useFrame((_, delta) => {
     const step = Math.min(delta, 0.1);
-    const pressed = (codes: string[]) => codes.some((code) => keys.current.has(code));
-    const forward = (pressed(KEYS.forward) ? 1 : 0) - (pressed(KEYS.back) ? 1 : 0) + intent.current.forward;
-    const strafe = (pressed(KEYS.right) ? 1 : 0) - (pressed(KEYS.left) ? 1 : 0);
-    const turn = (pressed(KEYS.turnLeft) ? 1 : 0) - (pressed(KEYS.turnRight) ? 1 : 0) + intent.current.turn;
+    const input = tourInput(keys.current);
+    const forward = input.forward + intent.current.forward;
+    const { strafe, tilt } = input;
+    const turn = input.turn + intent.current.turn;
 
-    if (forward !== 0 || strafe !== 0 || turn !== 0) {
+    if (forward !== 0 || strafe !== 0 || turn !== 0 || tilt !== 0) {
       flight.current = null;
       if (focused.current) {
         focused.current = false;
@@ -214,6 +207,7 @@ export function TourControls({
       }
     } else {
       yaw.current += turn * TURN_SPEED * step;
+      pitch.current = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, pitch.current + tilt * TILT_SPEED * step));
       const speed = (keys.current.has('Shift') ? RUN_SPEED : WALK_SPEED) * step;
       const sin = Math.sin(yaw.current);
       const cos = Math.cos(yaw.current);

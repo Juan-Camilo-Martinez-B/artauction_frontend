@@ -89,7 +89,7 @@ La sala personal (`/mi-galeria`) simula una galería real con React Three Fiber.
   - Los triángulos son evidencia y límite técnico, no cambian el precio. La auditoría compara las proporciones del modelo con las medidas declaradas.
   - El decodificador Draco se sirve desde `public/draco` (copiado de three.js), sin CDN externo.
 - **Imágenes.** WebGL exige CORS. Las imágenes de Garage se piden con `?texture=1` para no reutilizar la copia sin CORS que dejó el catálogo. Las del Met pasan por `/api/artwork-image`, un proxy con lista de hosts permitidos, sin redirecciones y con límite de tamaño.
-- **Recorrido.** Se arrastra para mirar. WASD o flechas para caminar (Shift corre), Q/E para girar, o los botones en pantalla. Hay colisión con paredes y pedestales. Un clic en una obra lleva hasta ella y abre su ficha. Con `prefers-reduced-motion`, el salto es instantáneo.
+- **Recorrido.** Se arrastra para mirar. WASD para caminar (Shift corre), flechas para mover la cámara hacia los cuatro lados, Q/E para girar, o los botones en pantalla. Hay colisión con paredes y pedestales. Un clic en una obra lleva hasta ella y abre su ficha. Con `prefers-reduced-motion`, el salto es instantáneo.
 - **Montaje.** En **Editar montaje** se elige una obra para cambiarla de pared, moverla, subirla o escalarla. **Organizar automáticamente** reparte todo según las medidas reales. Ambiente y montaje son un borrador: **Guardar cambios** solo aparece si hay cambios, y avisa antes de cerrar la pestaña.
 
 ## Idiomas

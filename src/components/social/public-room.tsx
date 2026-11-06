@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArtworkImage } from '@/components/artwork-image';
 import { ArtworkCard } from '@/components/gallery3d/artwork-card';
+import { FullscreenButton } from '@/components/gallery3d/fullscreen-button';
 import type { SceneArtwork } from '@/components/gallery3d/gallery-scene';
 import { LazyGalleryScene } from '@/components/gallery3d/lazy-gallery-scene';
 import { TouchPad } from '@/components/gallery3d/touch-pad';
@@ -118,7 +119,7 @@ export function PublicRoom({ ownerId, followerCount, returnTo }: { ownerId: stri
         />
       ) : (
         <>
-          <div ref={viewport} className="relative h-[72vh] min-h-[28rem] scroll-mt-6 overflow-hidden rounded-panel border border-line bg-ink shadow-panel">
+          <div ref={viewport} className="relative h-[72vh] min-h-[28rem] scroll-mt-6 overflow-hidden rounded-panel border border-line bg-ink shadow-panel fullscreen:rounded-none fullscreen:border-0">
             <LazyGalleryScene
               config={config}
               artworks={sceneArtworks}
@@ -130,11 +131,12 @@ export function PublicRoom({ ownerId, followerCount, returnTo }: { ownerId: stri
               intent={intent}
               reducedMotion={reducedMotion}
             />
+            <FullscreenButton target={viewport} className="absolute right-3 top-3 shadow-panel" />
             <div className="absolute bottom-3 left-3 flex items-end gap-3">
               <TouchPad intent={intent} />
               <p className="hidden rounded-field bg-ink/70 px-3 py-2 text-xs text-paper md:block">{tStudio('tourHint')}</p>
             </div>
-            <div className="absolute bottom-3 right-3 top-3 flex items-end justify-end">
+            <div className="absolute bottom-3 right-3 top-16 flex items-end justify-end">
               {focused ? <ArtworkCard lot={focused.lot} ownerId={ownerId} onBack={() => { setFocusId(null); }} /> : null}
             </div>
           </div>
