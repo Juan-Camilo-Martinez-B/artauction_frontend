@@ -4,6 +4,7 @@ import { Footprints, LayoutGrid, Move3d, Sparkles } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ArtworkCard } from '@/components/gallery3d/artwork-card';
+import { FullscreenButton } from '@/components/gallery3d/fullscreen-button';
 import { AmbiencePanel } from '@/components/gallery3d/ambience-panel';
 import type { SceneArtwork, SceneMode } from '@/components/gallery3d/gallery-scene';
 import { LazyGalleryScene } from '@/components/gallery3d/lazy-gallery-scene';
@@ -281,7 +282,7 @@ function Studio() {
       {/* Cambiar quien la ve no toca los cambios de la sala sin guardar. */}
       <GalleryVisibility gallery={gallery} onChange={(next) => { setState({ status: 'ready', gallery: next }); }} />
 
-      <div ref={viewport} className="relative h-[72vh] min-h-[28rem] scroll-mt-6 overflow-hidden rounded-panel border border-line bg-ink shadow-panel">
+      <div ref={viewport} className="relative h-[72vh] min-h-[28rem] scroll-mt-6 overflow-hidden rounded-panel border border-line bg-ink shadow-panel fullscreen:rounded-none fullscreen:border-0">
         <LazyGalleryScene
           config={config}
           artworks={sceneArtworks}
@@ -303,11 +304,14 @@ function Studio() {
               {t('modeEdit')}
             </ModeButton>
           </div>
-          {mode === 'edit' && gallery.artworks.length > 0 ? (
-            <Button variant="secondary" size="sm" className="pointer-events-auto shadow-panel" icon={<LayoutGrid aria-hidden="true" className="h-4 w-4" />} onClick={organize}>
-              {t('organize')}
-            </Button>
-          ) : null}
+          <div className="pointer-events-auto flex flex-wrap gap-2">
+            {mode === 'edit' && gallery.artworks.length > 0 ? (
+              <Button variant="secondary" size="sm" className="shadow-panel" icon={<LayoutGrid aria-hidden="true" className="h-4 w-4" />} onClick={organize}>
+                {t('organize')}
+              </Button>
+            ) : null}
+            <FullscreenButton target={viewport} className="shadow-panel" />
+          </div>
         </div>
 
         {gallery.artworks.length === 0 ? (
